@@ -6,7 +6,7 @@ Everything you need to run the example is in this folder. The dependencies are t
 
 ## Before you start
 
-- **Node.js 22 or newer**, npm, and Git.
+- **Node.js 22.9 or newer**, npm, and Git.
 - A [Circle developer account](https://console.circle.com) with mainnet access.
 - A **developer-controlled EOA wallet on `ARC`**, a live API key, and the entity secret registered for that account. A user-controlled wallet or smart contract account needs a different integration.
 - USDC on **Arc mainnet, chain `5042`**. API payments and swaps both use this network on the public service. `ARC-TESTNET` wallets and faucet USDC cannot pay it.

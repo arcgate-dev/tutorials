@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Connect a Circle wallet to the public Arcgate API",
-  "engines": { "node": ">=22" },
+  "engines": { "node": ">=22.9.0" },
   "scripts": {
     "inspect": "node --env-file-if-exists=.env src/main.js inspect",
     "connect": "node --env-file-if-exists=.env src/main.js connect",

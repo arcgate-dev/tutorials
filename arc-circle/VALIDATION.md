@@ -6,6 +6,7 @@ Checked September 28, 2026 using the source in this directory.
 | --- | --- |
 | Public npm dependency installation | Passed; no authenticated registry or workspace packages |
 | `npm test` | Passed: 19 offline tests |
+| GitHub Actions | Passed on Node.js 22 in a fresh Linux checkout |
 | `npm run inspect` against `https://api.arcgate.dev` | Passed: health OK, HTTP 402, x402 v2 on `eip155:5042`, search price 0.005 USDC |
 | Configured mainnet router | Non-empty contract code at `0x6cf4f7785d479b9ec1c3abe2fb569525380baede` on chain 5042 |
 | Circle wallet connection | Passed with an existing `ARC-TESTNET` EOA through the included Circle adapter |
