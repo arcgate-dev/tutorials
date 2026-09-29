@@ -1,0 +1,192 @@
+{
+  "verifiedAt": "2026-09-29T00:46:13.585Z",
+  "api": "https://api.arcgate.dev",
+  "chainId": 5042,
+  "wallet": "0x6D2f707D75431A6f37C106b2c5085D5e42F7842d",
+  "configuration": {
+    "sellAmountUsdc": "0.50",
+    "tokenIn": "0x3600000000000000000000000000000000000000",
+    "tokenOut": "0x171A4217b86A807A64eB94757Db6849fb4bDbAA0",
+    "router": "0x6Cf4F7785D479B9Ec1c3abe2fB569525380BAEdE",
+    "payTo": "0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e",
+    "slippageBps": 100
+  },
+  "commands": [
+    {
+      "command": "npm run search",
+      "result": "passed",
+      "apiPayments": [
+        {
+          "command": "npm run search",
+          "operation": "search",
+          "amountUsdc": "0.005",
+          "amountAtomic": "5000",
+          "transaction": "0x8c319b1829953d473c66ca8c415e881da0527aee0660d8321350c86dca13cdd5",
+          "blockNumber": "23285191",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0x8c319b1829953d473c66ca8c415e881da0527aee0660d8321350c86dca13cdd5"
+        }
+      ]
+    },
+    {
+      "command": "npm run quote",
+      "result": "passed",
+      "apiPayments": [
+        {
+          "command": "npm run quote",
+          "operation": "search",
+          "amountUsdc": "0.005",
+          "amountAtomic": "5000",
+          "transaction": "0x8219d9df0a9e81e66f7d304d70bba563e33cac11175f6efd77bd5c42f324c0ae",
+          "blockNumber": "23285228",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0x8219d9df0a9e81e66f7d304d70bba563e33cac11175f6efd77bd5c42f324c0ae"
+        },
+        {
+          "command": "npm run quote",
+          "operation": "quote",
+          "amountUsdc": "0.01",
+          "amountAtomic": "10000",
+          "transaction": "0xe3b167e260ab86f87c4127207a9fb80d0988e07e3fb1453f03e9b654d296d8a4",
+          "blockNumber": "23285235",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0xe3b167e260ab86f87c4127207a9fb80d0988e07e3fb1453f03e9b654d296d8a4"
+        }
+      ]
+    },
+    {
+      "command": "npm run preview",
+      "result": "passed",
+      "apiPayments": [
+        {
+          "command": "npm run preview",
+          "operation": "search",
+          "amountUsdc": "0.005",
+          "amountAtomic": "5000",
+          "transaction": "0xcdd384f2ba8a136054f0d8fa58cd7231d6a132e109da85f4a454b197ea2fda49",
+          "blockNumber": "23285283",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0xcdd384f2ba8a136054f0d8fa58cd7231d6a132e109da85f4a454b197ea2fda49"
+        },
+        {
+          "command": "npm run preview",
+          "operation": "quote",
+          "amountUsdc": "0.01",
+          "amountAtomic": "10000",
+          "transaction": "0xc6405ac0fcac2dbfe42bdc2fd6141e56e19cb7c0adea0033dfb27b2864913086",
+          "blockNumber": "23285289",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0xc6405ac0fcac2dbfe42bdc2fd6141e56e19cb7c0adea0033dfb27b2864913086"
+        },
+        {
+          "command": "npm run preview",
+          "operation": "swap",
+          "amountUsdc": "0.01",
+          "amountAtomic": "10000",
+          "transaction": "0xc11c8b6b6772ed78460462dc130cf696d5420ae23d1becdbc5b558ee7c943c78",
+          "blockNumber": "23285303",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0xc11c8b6b6772ed78460462dc130cf696d5420ae23d1becdbc5b558ee7c943c78"
+        }
+      ]
+    },
+    {
+      "command": "npm run trade -- --execute",
+      "result": "passed",
+      "apiPayments": [
+        {
+          "command": "npm run trade -- --execute",
+          "operation": "search",
+          "amountUsdc": "0.005",
+          "amountAtomic": "5000",
+          "transaction": "0x5ebf6344ad4ba445d32ce76ec048135f4101b5a518336b18f3c118cf243bf482",
+          "blockNumber": "23285378",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0x5ebf6344ad4ba445d32ce76ec048135f4101b5a518336b18f3c118cf243bf482"
+        },
+        {
+          "command": "npm run trade -- --execute",
+          "operation": "quote",
+          "amountUsdc": "0.01",
+          "amountAtomic": "10000",
+          "transaction": "0x631ea2dd040fc42c42af8c2468ea22cc6e342f4d398a8d07bc468a97eef841ef",
+          "blockNumber": "23285392",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0x631ea2dd040fc42c42af8c2468ea22cc6e342f4d398a8d07bc468a97eef841ef"
+        },
+        {
+          "command": "npm run trade -- --execute",
+          "operation": "swap",
+          "amountUsdc": "0.01",
+          "amountAtomic": "10000",
+          "transaction": "0x4286a85525b55d0bde809a0aad5cbced846a0198190706cff794635ec0379978",
+          "blockNumber": "23285399",
+          "status": "success",
+          "explorer": "https://explorer.arc.io/tx/0x4286a85525b55d0bde809a0aad5cbced846a0198190706cff794635ec0379978"
+        }
+      ]
+    }
+  ],
+  "transactions": [
+    {
+      "purpose": "approve",
+      "transaction": "0x5ef3b8c04d15814d100463deaf93d58cab0122267515b4e19ccd3ea4da02f285",
+      "blockNumber": "23285403",
+      "circleState": "COMPLETE",
+      "status": "success",
+      "gasUsed": "55438",
+      "effectiveGasPrice": "22022511699",
+      "gasFeeUsdc": "0.001220884003569162",
+      "explorer": "https://explorer.arc.io/tx/0x5ef3b8c04d15814d100463deaf93d58cab0122267515b4e19ccd3ea4da02f285"
+    },
+    {
+      "purpose": "swap",
+      "transaction": "0x391b5ef95c6cfb2483f729f2b343a003756165da4592ee0d734500ac2a69f42a",
+      "blockNumber": "23285408",
+      "circleState": "COMPLETE",
+      "status": "success",
+      "gasUsed": "236263",
+      "effectiveGasPrice": "27022311666",
+      "gasFeeUsdc": "0.006384372421144158",
+      "explorer": "https://explorer.arc.io/tx/0x391b5ef95c6cfb2483f729f2b343a003756165da4592ee0d734500ac2a69f42a"
+    }
+  ],
+  "delivery": {
+    "minimumAtomic": "592",
+    "deliveredAtomic": "598",
+    "decimals": 8,
+    "beforeAtomic": "0",
+    "afterAtomic": "598",
+    "balanceReadAtBlocks": [
+      "23285407",
+      "23285408"
+    ],
+    "matchesTransferLogs": true,
+    "remainingUsdcAllowanceAtomic": "0"
+  },
+  "additionalSearch": {
+    "query": "PEEPER",
+    "resolution": "ambiguous",
+    "traded": false,
+    "payments": [
+      {
+        "command": "additional PEEPER search",
+        "operation": "search",
+        "amountUsdc": "0.005",
+        "amountAtomic": "5000",
+        "transaction": "0xcd44b302eb165888c1b3b12b3821cd4e92452a165f3b5e33a7e77a35b9bc2896",
+        "blockNumber": "23285123",
+        "status": "success",
+        "explorer": "https://explorer.arc.io/tx/0xcd44b302eb165888c1b3b12b3821cd4e92452a165f3b5e33a7e77a35b9bc2896"
+      }
+    ]
+  },
+  "totals": {
+    "tradeInputUsdc": "0.50",
+    "walkthroughApiFeesUsdc": "0.07",
+    "additionalSearchFeeUsdc": "0.005",
+    "allApiFeesUsdc": "0.075",
+    "approvalAndSwapGasUsdc": "0.00760525642471332",
+    "totalSpentUsdc": "0.58260525642471332"
+  }
+}

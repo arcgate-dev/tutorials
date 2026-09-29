@@ -4,6 +4,8 @@ Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect
 
 Everything you need to run the example is in this folder. The dependencies are the public Circle SDK, x402 SDK, and viem. Arcgate does not need an API key: your wallet pays per call. Your Circle credentials go to Circle, never to Arcgate.
 
+**Verified on Arc mainnet, September 29, 2026 (UTC):** the published commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. See [the validation record and transaction receipts](VALIDATION.md).
+
 ## Before you start
 
 - **Node.js 22.9 or newer**, npm, and Git.
@@ -172,6 +174,8 @@ Content-Type: application/json
 ```
 
 Here `amount` is a **human-readable token amount**: `"1"` means 1 USDC. Slippage is 100 basis points, or 1%. You can lower `SELL_AMOUNT` in `.env`; the tutorial caps it at 1 USDC.
+
+The verified mainnet walkthrough used `SELL_AMOUNT=0.50`. Set that value in `.env` to follow the same trade size.
 
 The response includes `quoteId`, `expiresAt`, the tokens, routes, `best`, and `safety`. For an exact-input quote, the input is `sell.amount` / `sell.amountRaw`. `best.amountOutQuoted` and `best.minAmountOut` are human-readable output amounts. The script preserves that original minimum when it later checks the swap calldata.
 
