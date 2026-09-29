@@ -9,7 +9,9 @@ Checked September 28, 2026 using the source in this directory.
 | GitHub Actions | Passed on Node.js 22 in a fresh Linux checkout |
 | `npm run inspect` against `https://api.arcgate.dev` | Passed: health OK, HTTP 402, x402 v2 on `eip155:5042`, search price 0.005 USDC |
 | Configured mainnet router | Non-empty contract code at `0x6cf4f7785d479b9ec1c3abe2fb569525380baede` on chain 5042 |
-| Circle wallet connection | Passed with an existing `ARC-TESTNET` EOA through the included Circle adapter |
+| `npm run wallet:create` on mainnet | Passed: created a wallet set and one `ARC` EOA through Circle |
+| `npm run connect` on mainnet | Passed: loaded the new `ARC` EOA and read its balance, initially 0 USDC |
+| Circle testnet wallet connection | Passed with an existing `ARC-TESTNET` EOA through the included Circle adapter |
 | Real Circle x402 signing and settlement | Passed for search, quote, and swap, paying 0.025 testnet USDC total |
 | Search → quote → swap → delivery | Passed against a local API and Arc mainnet fork: 1 USDC sold; 1,191 atomic cirBTC units delivered, minimum 1,179 |
 | Paid requests against the public mainnet API | **Not run** with Circle in this validation |

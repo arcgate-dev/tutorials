@@ -75,8 +75,16 @@ For a new Circle account:
 1. Enable mainnet access and create a **live** API key in Circle Console.
 2. Generate and register an entity secret using [Circle's setup instructions](https://developers.circle.com/wallets/dev-controlled/register-entity-secret). Keep the recovery file outside this repository.
 3. Set `CIRCLE_API_KEY` and `CIRCLE_ENTITY_SECRET` in `.env`, leaving `CIRCLE_WALLET_ID` empty.
-4. Run `npm run wallet:create`. It creates a wallet set and one `ARC` EOA through the public Circle SDK. Paste the printed `CIRCLE_WALLET_ID=…` line into `.env`. If that variable is already set, the command validates the existing wallet instead.
-5. Fund the printed address with USDC on **Arc mainnet**. Check the destination network before transferring.
+
+Create the wallet programmatically with the included script:
+
+```sh
+npm run wallet:create
+```
+
+[src/create-wallet.js](src/create-wallet.js) follows Circle's [Create your first developer-controlled wallet](https://developers.circle.com/wallets/dev-controlled/create-your-first-wallet) guide: call `createWalletSet`, then `createWallets`. It sets `blockchains: ['ARC']` and `accountType: 'EOA'` for this mainnet tutorial. Circle's quickstart uses `ARC-TESTNET` in its example.
+
+Paste the printed `CIRCLE_WALLET_ID=…` line into `.env`. If that variable is already set, the command validates the existing wallet instead of creating another. Fund the printed address with USDC on **Arc mainnet**, leaving additional USDC for gas.
 
 Then connect:
 
