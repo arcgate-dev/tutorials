@@ -3,17 +3,20 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  arc-circle:
+  tutorials:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tutorial: [arc-circle, arc-metamask]
     defaults:
       run:
-        working-directory: arc-circle
+        working-directory: ${{ matrix.tutorial }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: arc-circle/package-lock.json
+          cache-dependency-path: ${{ matrix.tutorial }}/package-lock.json
       - run: npm ci --ignore-scripts
       - run: npm test
