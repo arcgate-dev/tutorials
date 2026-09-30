@@ -1,0 +1,27 @@
+{
+  "name": "arc-metamask",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Connect MetaMask Agent Wallet 7.0.0 to the public Arcgate API",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "inspect": "node --env-file-if-exists=.env src/main.js inspect",
+    "connect": "node --env-file-if-exists=.env src/main.js connect",
+    "search": "node --env-file-if-exists=.env src/main.js search",
+    "quote": "node --env-file-if-exists=.env src/main.js quote",
+    "preview": "node --env-file-if-exists=.env src/main.js preview",
+    "trade": "node --env-file-if-exists=.env src/main.js trade",
+    "receipt": "node --env-file-if-exists=.env src/main.js receipt",
+    "test": "node --test test/*.test.js",
+    "policy": "node --env-file-if-exists=.env src/main.js policy"
+  },
+  "dependencies": {
+    "@x402/core": "2.27.0",
+    "@x402/evm": "2.27.0",
+    "viem": "2.56.9",
+    "yaml": "2.9.1"
+  }
+}
