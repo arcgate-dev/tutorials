@@ -1,5 +1,23 @@
 # Validation
 
+## API compatibility review — September 30, 2026
+
+Reviewed the tutorial against the live [docs OpenAPI document](https://docs.arcgate.dev/openapi.json), [API OpenAPI document](https://api.arcgate.dev/openapi.json), and Circle's current [typed-data signing](https://developers.circle.com/api-reference/wallets/developer-controlled-wallets/sign-typed-data) and [contract execution](https://developers.circle.com/api-reference/wallets/developer-controlled-wallets/create-developer-transaction-contract-execution) references.
+
+Fixed the outdated instruction to submit a signed Permit2 permit to another paid `/swap` call: the current second round is free `/trade/v1/swap/tx`. The runnable example continues to use exact ERC-20 approval. It now supplies `taker` for quote readiness, checks the API's stop/executability signals, preserves structured error guidance and replacement quotes, and checks the free receipt after local delivery verification. A separate `receipt` command can recheck an existing trade without Circle credentials or payments. The README and Arcgate's docs-site tutorial source were synchronized.
+
+Checks completed:
+
+- `npm test`: **30 tests passed**, including readiness refusals, receipt pass/pending/fail handling, preservation of free replacement quotes and request IDs, empty middleware 402 bodies and settlement failure headers, and prevention of automatic payment or transaction retries.
+- Arcgate's `pnpm exec vitest run scripts/docs.test.mjs`: **12 tests passed**, including docs rendering/build checks.
+- Captured the example's actual search, quote and swap request bodies in an injected preview run and validated them, plus the receipt request, against **both published OpenAPI schemas**. The readiness and receipt response fixtures also matched both schemas.
+- Ran `node src/main.js inspect` without loading `.env`: health returned 200 with x402 enabled on `eip155:5042`; unpaid search returned 402 offering 0.005 USDC to the pinned recipient.
+- An unpaid quote including `taker` returned 402 offering 0.01 USDC. A free receipt lookup for an unknown quote returned 404 `swap_not_found` / `next: "stop"`. A `/swap/tx` request without its required permit returned 400 `invalid_request` / `next: "fix_request"`, without payment gating.
+
+[API review evidence](evidence/api-review-2026-09-30.json) records schema hashes, public request IDs and unpaid responses. **No funds were spent, no Circle signatures were requested, and no transactions were broadcast in this review.** Successful paid responses and mined receipt handling were tested offline; the funded end-to-end validation below predates these changes.
+
+## Earlier mainnet walkthrough — September 29, 2026
+
 The published tutorial completed a real mainnet walkthrough on **September 29, 2026 (UTC)** against `https://api.arcgate.dev`, with `SELL_AMOUNT=0.50`. Circle signed the x402 payments and signed and broadcast the approval and swap on Arc, chain `5042`.
 
 **Result: 0.50 USDC → 0.00000598 cirBTC**, above the quoted minimum of 0.00000592 cirBTC. Both Circle transactions reached `COMPLETE`; both onchain receipts succeeded. The balance increase at the swap block was 598 atomic units and matched the Transfer logs. The exact-amount USDC allowance was fully consumed, leaving zero allowance to ArcgateRouter.

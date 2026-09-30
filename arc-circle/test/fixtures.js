@@ -28,8 +28,19 @@ export function authorization() {
 export function quote() {
   return { quoteId: 'q_1234567890abcdef', network: 'eip155:5042', side: 'exactIn',
     sell: { address: USDC, decimals: 6, amount: '1', amountRaw: '1000000' },
-    buy: { address: config.buyToken, decimals: 8 }, best: { amountOutQuoted: '0.000012', minAmountOut: '0.00001188' },
+    buy: { address: config.buyToken, decimals: 8 }, best: { amountOutQuoted: '0.000012', minAmountOut: '0.00001188', executable: true },
+    readiness: { taker: wallet.address.toLowerCase(), balance: { token: USDC, required: '1000000', available: '3000000', enough: true },
+      approval: { mode: 'permit2', needs: 'approve_and_sign_permit' }, approve: { needs: 'approve' },
+      gas: { estimatedUsdc: '0.01', available: '1.98', enough: true },
+      fees: { swapUsdc: '0.01', payer: wallet.address.toLowerCase(), payerAvailable: '2.99', enough: true },
+      totalCostUsdc: '0.02', ready: true },
     slippageBps: 100, safety: { verdict: 'pinned' }, expiresAt: new Date(Date.now() + 120_000).toISOString() };
+}
+
+export function tradeReceipt() {
+  return { quoteId: 'q_1234567890abcdef', result: 'pass', token: config.buyToken.toLowerCase(),
+    recipient: wallet.address.toLowerCase(), minAmountOut: '1188', delivered: '1200', block: 100,
+    transactions: [{ hash, purpose: 'swap', status: 'success', block: 100 }], reason: null };
 }
 
 export function swapArgs() {

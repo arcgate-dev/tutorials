@@ -1,0 +1,118 @@
+{
+  "checkedAt": "2026-09-30T19:54:12.938Z",
+  "fundsSpentUsdc": "0",
+  "circleSigningOrBroadcastingPerformed": false,
+  "schemas": [
+    {
+      "url": "https://docs.arcgate.dev/openapi.json",
+      "sha256": "57ac0da68e8ceb51c71ef667def80e9f73c0ba2cfe8d54fb42da4836e626500d"
+    },
+    {
+      "url": "https://api.arcgate.dev/openapi.json",
+      "sha256": "dfe194da101485a1522de364f6e9075637de2f84ac00c492f1deba6bc837bc1a"
+    }
+  ],
+  "schemaValidation": {
+    "sources": "both schemas above",
+    "requests": [
+      "SearchRequest",
+      "QuoteRequest",
+      "SwapRequest",
+      "ReceiptRequest"
+    ],
+    "responseFixtures": [
+      "QuoteReadinessOut",
+      "ReceiptResponse"
+    ],
+    "passed": true
+  },
+  "checks": [
+    {
+      "path": "/trade/v1/quote",
+      "request": {
+        "sell": "0x3600000000000000000000000000000000000000",
+        "buy": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+        "amount": "1",
+        "side": "exactIn",
+        "slippageBps": 100,
+        "taker": "0x1111111111111111111111111111111111111111"
+      },
+      "status": 402,
+      "requestId": "3dd92bf6",
+      "error": {
+        "code": "payment_required",
+        "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+        "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+      },
+      "next": "pay",
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://api.arcgate.dev/trade/v1/quote",
+          "description": "Swap quote",
+          "mimeType": ""
+        },
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:5042",
+            "amount": "10000",
+            "asset": "0x3600000000000000000000000000000000000000",
+            "payTo": "0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e",
+            "maxTimeoutSeconds": 300,
+            "extra": {
+              "name": "USDC",
+              "version": "2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "/trade/v1/receipt",
+      "request": {
+        "quoteId": "q_00000000000000000000000000000000",
+        "txHashes": [
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ]
+      },
+      "status": 404,
+      "requestId": "f7b226f0",
+      "error": {
+        "code": "swap_not_found",
+        "message": "no /trade/v1/swap answer was issued for that quoteId in the last hour"
+      },
+      "next": "stop"
+    },
+    {
+      "path": "/trade/v1/swap/tx",
+      "request": {
+        "quoteId": "q_00000000000000000000000000000000",
+        "taker": "0x1111111111111111111111111111111111111111"
+      },
+      "status": 400,
+      "requestId": "d7a5b4c8",
+      "error": {
+        "code": "invalid_request",
+        "message": "invalid request body",
+        "details": [
+          {
+            "expected": "object",
+            "code": "invalid_type",
+            "path": [
+              "permit"
+            ],
+            "message": "Invalid input: expected object, received undefined"
+          }
+        ]
+      },
+      "next": "fix_request"
+    }
+  ],
+  "limitations": [
+    "No fresh paid search, quote or swap response was obtained.",
+    "No Circle signatures or transactions were requested.",
+    "The free receipt probe used an unknown quote, so it verifies the error path, not a mined fill."
+  ]
+}

@@ -1,10 +1,10 @@
 # Connect a Circle wallet to Arcgate
 
-Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect the wallet, pay for a token search with x402, quote 1 USDC for cirBTC, inspect the unsigned swap, and optionally send it through Circle.
+Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect the wallet, pay for a token search with x402, quote 1 USDC for cirBTC, inspect the unsigned swap, optionally send it through Circle, and check the fill with Arcgate's free receipt endpoint.
 
 Everything you need to run the example is in this folder. The dependencies are the public Circle SDK, x402 SDK, and viem. Arcgate does not need an API key: your wallet pays per call. Your Circle credentials go to Circle, never to Arcgate.
 
-**Verified on Arc mainnet, September 29, 2026 (UTC):** the published commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. See [the validation record and transaction receipts](VALIDATION.md).
+**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. See [the validation record and transaction receipts](VALIDATION.md).
 
 ## Before you start
 
@@ -22,9 +22,12 @@ This walkthrough uses real funds. Its default limits are **0.01 USDC per API cal
 | `npm run search` | Resolves cirBTC | 0.005 USDC |
 | `npm run quote` | Searches, then quotes 1 USDC | 0.015 USDC total |
 | `npm run preview` | Searches, quotes, and builds an unsigned swap | 0.025 USDC total |
-| `npm run trade -- --execute` | Runs the same three calls, then broadcasts | 0.025 USDC, plus the trade and gas |
+| `npm run trade -- --execute` | Runs the same three calls, broadcasts, then checks the receipt | 0.025 USDC, plus the trade and gas |
+| `npm run receipt -- <quoteId> <txHash> [txHash ...]` | Checks an already submitted trade without Circle credentials | Free |
 
 Each command starts a new run. Running all four paid commands costs 0.07 USDC in API fees. A preview pays for its API calls even though it does not send the swap. The code refuses prices above its limits.
+
+These prices apply to this tutorial's trade of at most 1 USDC. The API's swap fee increases for larger orders; see [current pricing](https://docs.arcgate.dev/#arcgate/description/prices). API errors are not charged. A successful quote with an unsafe verdict or insufficient wallet readiness is still a paid answer, even though this tutorial stops on it.
 
 ## 1. Install the tutorial
 
@@ -138,7 +141,7 @@ Content-Type: application/json
 
 1. Send the request without payment and read the 402 requirements.
 2. Check the network, USDC contract, fee recipient, amount, and authorization timeout.
-3. Ask the x402 SDK to build an **EIP-3009 `TransferWithAuthorization`**. Its signer calls `circle.signTypedData({ walletId, data })`. Circle keeps the wallet key; the script receives a signature and verifies that it recovers to your wallet address.
+3. Ask the x402 SDK to build an **EIP-3009 `TransferWithAuthorization`**. Its signer calls [`circle.signTypedData({ walletId, data })`](https://developers.circle.com/api-reference/wallets/developer-controlled-wallets/sign-typed-data), where `data` is the EIP-712 payload serialized as a JSON string, including `types.EIP712Domain`. The helper converts big integers to decimal strings. Circle keeps the wallet key; the script receives a signature, normalizes its recovery ID, and verifies that it recovers to your wallet address.
 4. Retry the identical request once, with the signed payload in `PAYMENT-SIGNATURE`.
 5. Read the result and the settlement receipt in `PAYMENT-RESPONSE`.
 
@@ -169,7 +172,8 @@ Content-Type: application/json
   "buy": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
   "amount": "1",
   "side": "exactIn",
-  "slippageBps": 100
+  "slippageBps": 100,
+  "taker": "0xYourCircleWalletAddress"
 }
 ```
 
@@ -179,7 +183,16 @@ The verified mainnet walkthrough used `SELL_AMOUNT=0.50`. Set that value in `.en
 
 The response includes `quoteId`, `expiresAt`, the tokens, routes, `best`, and `safety`. For an exact-input quote, the input is `sell.amount` / `sell.amountRaw`. `best.amountOutQuoted` and `best.minAmountOut` are human-readable output amounts. The script preserves that original minimum when it later checks the swap calldata.
 
-Quotes normally expire after 120 seconds. The preview and trade commands request a fresh quote and use it immediately. They stop if the quote is expired or the safety verdict is anything other than `ok` or `pinned`.
+The script supplies your wallet address as `taker`, so the response also reports `readiness` at the quote's block:
+
+- `balance`: whether the wallet holds the input amount, in raw token units.
+- `approve.needs`: whether this tutorial's `approval: "approve"` flow needs an ERC-20 approval, already has allowance (`none`), or uses native USDC (`native`). `approval.needs` describes the separate default Permit2 flow.
+- `gas` and `fees`: estimated native USDC gas and the remaining swap API fee, with balance checks for the taker and x402 payer.
+- `totalCostUsdc`: swap fee plus estimated gas, excluding the traded principal and the search/quote fees already paid. The gas estimate uses the default Permit2 plan, so the exact-approval flow's actual gas can differ.
+
+The script prints readiness and stops if `readiness.ready` is false, `next` is `stop`, or `best.executable` is false. This snapshot does not reserve funds or guarantee execution; `/swap` checks the wallet again.
+
+Quotes expire after 120 seconds by default; optional `ttlSec` can shorten that lifetime to 1–120 seconds. The preview and trade commands request a fresh quote and use it immediately. They also stop if the quote is expired or the safety verdict is anything other than `ok` or `pinned`.
 
 ## 5. Inspect the swap
 
@@ -201,7 +214,11 @@ const swap = await api('swap', {
 
 `api` is the paid HTTP helper from [src/payment.js](src/payment.js); `runFlow` shows all three calls together in [src/flow.js](src/flow.js).
 
-`POST /trade/v1/swap` simulates the trade from your wallet, so you need the sell amount even for a preview. Arcgate returns unsigned `transactions[]`. This tutorial requests **`approval: "approve"`**: at most one ERC-20 approval for the exact sell amount, followed by the swap. An existing allowance or a route funded by native USDC can make the approval unnecessary. The API's default is Permit2, which can require signing a permit and making another paid `/swap` call; that is a separate approval flow.
+`POST /trade/v1/swap` re-quotes and simulates the trade from your wallet, so you need the sell amount and gas headroom even for a preview. Arcgate returns unsigned `transactions[]`. This tutorial requests **`approval: "approve"`**: at most one ERC-20 approval for the exact sell amount, followed by the swap. An existing allowance or a route funded by native USDC can make the approval unnecessary. `signatures` must be empty before this example will send anything.
+
+`deadlineSec: 300` sets the onchain execution deadline. It does not extend the quote's 120-second lifetime for requesting swap construction. The swap response's `minAmountOut` and `amountOutSimulated` are raw output-token units; the quote's `best.minAmountOut` is human-readable. The guard decodes the calldata and compares it with the original quote minimum converted to raw units.
+
+**If you choose Permit2 in another integration:** call paid `/trade/v1/swap` first. If it returns `next: "sign_permit"` and a nonempty `signatures` array, validate and sign `signatures[0].typedData` with the taker's Circle wallet, then call **free `POST /trade/v1/swap/tx`** with the same `quoteId`, `taker`, `recipient`, optional `deadlineSec`, and `permit: { message: typedData.message, signature }`. Send only the final response's transactions, in order. `/swap/tx` accepts no `approval` field, and `/swap` accepts no `permit` field. The free round requires a pending paid swap for that quote, taker and recipient, a live quote, and is consumed by its first successful response. This tutorial keeps exact approval throughout; its x402 signing policy accepts payment authorizations only, so implementing Permit2 also requires a separate permit validation policy.
 
 Before sending anything, [src/guards.js](src/guards.js) decodes the entire transaction batch. It checks the approval spender and amount, router address, input and output tokens, sell amount, recipient, minimum output, deadline, native value, and input pull mode. The router is pinned to the public deployment:
 
@@ -236,11 +253,49 @@ const created = await circle.createContractExecutionTransaction({
 });
 ```
 
-Circle's `amount` is a decimal native-currency amount, not wei. The helper in [src/circle.js](src/circle.js) supplies an idempotency key, records Circle's transaction ID, waits for `COMPLETE`, and returns the transaction hash. The flow also checks the onchain receipt before sending the next transaction. An approval failure stops the swap.
+Circle's [`amount`](https://developers.circle.com/api-reference/wallets/developer-controlled-wallets/create-developer-transaction-contract-execution) is a decimal native-currency amount, not wei. Use `callData` with the returned raw transaction data; do not combine it with `abiFunctionSignature` or `abiParameters`. The helper in [src/circle.js](src/circle.js) supplies an idempotency key, records Circle's transaction ID, waits for `COMPLETE`, and returns the transaction hash. The flow also checks the onchain receipt before sending the next transaction. An approval failure stops the swap.
 
-Finally it compares the cirBTC balance increase with both the Transfer events and the original quote's minimum. A successful run prints the settlement hashes, approval/swap hashes, and delivered amount. Prices and hashes will differ each time.
+It compares the cirBTC balance increase with both the Transfer events and the original quote's minimum, then checks Arcgate's free receipt as described below. A successful run prints the settlement hashes, approval/swap hashes, delivered amount and receipt result. Prices and hashes will differ each time.
 
-Run logs are saved under `.runs/`. They contain public transaction IDs and hashes, not credentials or reusable payment signatures. If a payment response or Circle transaction times out, the script stops instead of submitting a new payment or transaction. Inspect the recorded transaction in Circle Console and on the network before retrying. Rerunning the whole trade creates a new order and can trade again.
+Run logs are saved under `.runs/`. They contain Circle transaction IDs, quote IDs, onchain hashes, readiness, receipts and API error guidance, not credentials or reusable payment signatures. If a payment response or Circle transaction times out, the script stops instead of submitting a new payment or transaction. Inspect the recorded transaction in Circle Console and on the network before retrying. Rerunning the whole trade creates a new order and can trade again.
+
+## 7. Check the fill for free
+
+After the transactions confirm, the trade command calls **`POST /trade/v1/receipt`** with plain `fetch`, without an x402 payment:
+
+```js
+const response = await fetch(`${config.apiUrl}/trade/v1/receipt`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ quoteId: quote.quoteId, txHashes }),
+});
+const receipt = await response.json();
+if (!response.ok) throw new Error(`receipt: ${response.status} ${receipt.error?.code}`);
+```
+
+`txHashes` contains the onchain swap hash and any approval hashes (1–4 total), not Circle transaction IDs or x402 settlement hashes. The included [receipt helper](src/receipt.js) preserves API errors and never signs a payment. It works for this Circle EOA's direct transactions; the endpoint does not support Safe, ERC-4337 or batching EIP-7702 execution.
+
+- `result: "pass"`: `delivered` meets `minAmountOut`. Both are raw units of `token` received by `recipient`; cirBTC has 8 decimals. The script also checks them against its locally verified fill.
+- `result: "pending"`: wait at least 5 seconds and query the receipt again. Do not broadcast again.
+- `result: "fail"`: inspect `reason` and `next`. `stop` means a swap succeeded but the fill failed the check; do not trade again. `requote` means no swap succeeded; inspect the transactions before deciding on a new trade.
+
+The trade command prints a ready-to-run `npm run receipt -- ...` command with its quote ID and hashes. You can also fill them in yourself:
+
+```sh
+npm run receipt -- <quoteId> <swapTxHash> [approvalTxHash]
+```
+
+Replace the placeholders, omitting the brackets and optional approval hash when none was sent. This command needs no Circle credentials and spends nothing. If the receipt lookup fails after a trade, use it to check that same trade; rerunning `trade` would submit a new order. Receipt records are available for one hour after swap construction. Requests are limited to one chain read per quote every 5 seconds and 132 reads per quote; respect `retryAfterSec` on a rate limit.
+
+## API errors and replacement quotes
+
+Arcgate's application errors and unpaid payment challenge carry `error.code`, optional `error.hint`, and a top-level `next`: `requote`, `retry`, `fix_request`, `stop` or `pay`. `retryAfterSec`, when present, supplies the delay; `X-Request-Id` identifies the request for support. The client prints and records these fields. `sign_permit` is the action on a successful Permit2 swap response, not permission to broadcast its unfinished transaction.
+
+**A signed payment can instead receive HTTP 402 with an empty `{}` body and no `next`.** These responses come from the x402 middleware when the payment amount is wrong, verification fails, or settlement fails. For a settlement failure, decode `PAYMENT-RESPONSE`: it carries `success: false` and `errorReason`, and nothing was charged. The client preserves that decoded header as `ArcgateError.paymentResponse` and in the run log. For a rejected payment, check the offered amount, authorization and USDC balance. Fix the cause before starting a new run with a fresh payment; the tutorial never automatically retries. A lost response has an uncertain outcome and still requires checking whether payment settled before retrying.
+
+`/swap` can return **409 `quote_stale`** or **410 `quote_expired`** with a free replacement in `quote` and `next: "requote"`. Review its price, safety and readiness before using its new `quoteId`; accepting it may change the trade's output floor. This courtesy is limited to one fresh quote per paid quote and is unavailable after some expiry/retry conditions. When it cannot offer a tradable replacement, the response may say `stop` with a reason, or `requote` without a quote. `/swap/tx` never includes this free replacement.
+
+This tutorial records any replacement quote but stops for review; it does not automatically accept a new price or sign another payment. In a custom client, the structured response is also available on `ArcgateError.body`. A new command starts from a new paid search and quote.
 
 ## Troubleshooting
 
@@ -249,12 +304,15 @@ Run logs are saved under `.runs/`. They contain public transaction IDs and hashe
 | Circle 401/403 or wallet not found | The API key, registered entity secret, and wallet ID must belong to the same Circle account and environment. |
 | `ARC-TESTNET`, `TEST_API_KEY`, or SCA refused | Use a mainnet `ARC` developer-controlled **EOA** and live credentials. |
 | Payment requirements differ | Run `npm run inspect`. Check the public service configuration and documented addresses before changing the pinned recipient or limits. |
-| 402 after signing | Check USDC balance and the payment error. The script does not keep signing new payments. |
-| HTTP 410 | The quote expired. A new run gets a new quote and incurs new successful-call fees. |
+| 402 after signing | The body may be `{}` with no `next`. Check `PAYMENT-RESPONSE` / the logged `paymentResponse` for settlement failure details, plus the payment amount, authorization and USDC balance. Fix the cause before a fresh payment; no automatic retry. |
+| HTTP 409 `quote_stale` / 410 `quote_expired` | Review `next`, `error.hint` and any free replacement `quote` in the run log. The tutorial stops; starting a new run incurs new successful-call fees. |
+| Quote `next: "stop"` or readiness false | Review the printed balance, gas, fee and route checks. Fix the cause before paying for a new quote. |
+| HTTP 429 | Respect `next` and `retryAfterSec`. `swap_attempts_exhausted` requires a new quote; repeatedly retrying the same one will not help. |
 | HTTP 422 | Read the error code: the order may lack liquidity, fail simulation, or be non-executable for this wallet. |
 | Swap guard refuses a changed minimum | The swap no longer preserves the earlier quote's output floor. Review a new quote. |
 | Circle timeout or `SENT` | A submitted transaction may still execute. Look up its recorded Circle ID before retrying. |
 | Receipt reverted | Stop. Previously paid API fees and onchain gas are separate from the failed trade. |
+| Free receipt pending or unavailable | Use the printed receipt command to check the existing trade. Do not rerun `trade`. A 404 `swap_not_found` can mean its one-hour receipt record expired; use the onchain hashes. |
 
 ## Tests and verification
 

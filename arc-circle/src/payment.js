@@ -3,6 +3,7 @@ import { decodePaymentRequiredHeader, decodePaymentResponseHeader } from '@x402/
 import { ExactEvmScheme } from '@x402/evm/exact/client';
 import { getAddress } from 'viem';
 import { signTypedData } from './circle.js';
+import { readApiResponse } from './errors.js';
 
 export const USDC = '0x3600000000000000000000000000000000000000';
 export const authorizationTypes = { TransferWithAuthorization: [
@@ -67,7 +68,10 @@ export function createArcgateClient({ circle, wallet, config, fetchFn = fetch, r
     const init = { method: 'POST', redirect: 'error', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) };
     const request = headers => fetchFn(url, { ...init, headers, signal: AbortSignal.timeout(90_000) });
     const unpaid = await request(init.headers);
-    if (unpaid.status !== 402) throw new Error(`${operation}: expected HTTP 402, received ${unpaid.status}. No payment signed.`);
+    if (unpaid.status !== 402) {
+      await readApiResponse(operation, unpaid, record);
+      throw new Error(`${operation}: expected HTTP 402, received ${unpaid.status}. No payment signed.`);
+    }
     const required = await paymentRequired(unpaid);
     const offer = required.accepts.find(value => acceptOffer(value, config));
     if (!offer) throw new Error(`${operation}: payment network, asset, recipient, price or timeout differs from the configured limits. Run npm run inspect.`);
@@ -79,16 +83,16 @@ export function createArcgateClient({ circle, wallet, config, fetchFn = fetch, r
     let paid;
     try { paid = await request({ ...init.headers, ...httpClient.encodePaymentSignatureHeader(payload) }); }
     catch { throw new Error(`${operation}: response lost after payment was signed. It may have settled. Do not automatically retry.`); }
-    const result = await paid.json();
-    if (!paid.ok) throw new Error(`${operation}: HTTP ${paid.status} (${result.error?.code ?? 'request_failed'}). No automatic retry.`);
     const receipt = paid.headers.get('payment-response');
     const settlement = receipt ? decodePaymentResponseHeader(receipt) : null;
+    const result = await readApiResponse(operation, paid, record, settlement);
     if (!settlement?.success || settlement.network !== config.network
         || !/^0x[0-9a-fA-F]{64}$/.test(settlement.transaction ?? '')
         || getAddress(settlement.payer) !== wallet.address) {
       throw new Error(`${operation}: missing or unexpected payment receipt. Payment may have settled; inspect the run log.`);
     }
-    record({ operation, amount: offer.amount, network: offer.network, state: 'settled', transaction: settlement.transaction });
+    record({ operation, amount: offer.amount, network: offer.network, state: 'settled', transaction: settlement.transaction,
+      requestId: paid.headers.get('x-request-id') });
     return result;
   };
 }
