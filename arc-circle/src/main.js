@@ -6,6 +6,7 @@ import { loadConfig, reportError, requireLiveKey } from './config.js';
 import { circleClient, loadWallet, sendTransaction } from './circle.js';
 import { createArcgateClient, paymentRequired, USDC } from './payment.js';
 import { runFlow } from './flow.js';
+import { getReceipt } from './receipt.js';
 
 export async function inspect(config, fetchFn = fetch, log = console.log) {
   const healthResponse = await fetchFn(`${config.apiUrl}/health`, { redirect: 'error', signal: AbortSignal.timeout(20_000) });
@@ -27,12 +28,17 @@ export async function inspect(config, fetchFn = fetch, log = console.log) {
 
 export async function main(args = process.argv.slice(2)) {
   const [command] = args;
-  if (!['inspect', 'connect', 'search', 'quote', 'preview', 'trade'].includes(command)) throw new Error('Use npm run inspect, connect, search, quote, preview or trade.');
+  if (!['inspect', 'connect', 'search', 'quote', 'preview', 'trade', 'receipt'].includes(command)) throw new Error('Use npm run inspect, connect, search, quote, preview, trade or receipt.');
   if (command === 'trade' && !args.includes('--execute')) {
     throw new Error('To spend real USDC and broadcast the swap, run: npm run trade -- --execute. Use npm run preview to inspect it first.');
   }
   const config = loadConfig();
   if (command === 'inspect') return inspect(config);
+  if (command === 'receipt') {
+    const result = await getReceipt({ config, quoteId: args[1], txHashes: args.slice(2) });
+    console.log(JSON.stringify(result, null, 2));
+    return result;
+  }
   requireLiveKey();
   const circle = circleClient();
   const wallet = await loadWallet(circle, process.env.CIRCLE_WALLET_ID, config.blockchain);
@@ -56,7 +62,8 @@ export async function main(args = process.argv.slice(2)) {
     console.log(JSON.stringify(entry));
   };
   const api = createArcgateClient({ circle, wallet, config, record });
-  return runFlow(command, { config, wallet, rpc, api,
+  return runFlow(command, { config, wallet, rpc, api, record,
+    readReceipt: request => getReceipt({ config, ...request, record }),
     send: (tx, key) => sendTransaction(circle, wallet, tx, key, record),
   });
 }

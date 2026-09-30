@@ -1,0 +1,33 @@
+// Preserve the API's next action and optional free quote for callers, without
+// automatically retrying a payment or accepting a different trade.
+export class ArcgateError extends Error {
+  constructor(operation, response, body) {
+    const requestId = response.headers.get('x-request-id');
+    super(`${operation}: HTTP ${response.status} (${body.error?.code ?? 'request_failed'})`
+      + (body.next ? `; next=${body.next}` : '')
+      + (body.retryAfterSec !== undefined ? `; retryAfterSec=${body.retryAfterSec}` : '')
+      + (body.error?.hint ? `; ${body.error.hint}` : '')
+      + (body.quote ? `; free replacement quote ${body.quote.quoteId} available for review` : '')
+      + (requestId ? `; requestId=${requestId}` : '')
+      + '. No automatic retry.');
+    this.name = 'ArcgateError';
+    this.status = response.status;
+    this.requestId = requestId;
+    this.body = body;
+  }
+}
+
+export async function readApiResponse(operation, response, record = () => {}) {
+  let body;
+  try { body = await response.json(); }
+  catch {
+    throw new Error(`${operation}: unreadable response (HTTP ${response.status}, requestId=${response.headers.get('x-request-id') ?? 'unknown'}). Outcome may be uncertain; do not automatically retry.`);
+  }
+  if (!response.ok) {
+    const error = new ArcgateError(operation, response, body);
+    record({ operation, state: 'error', status: error.status, requestId: error.requestId,
+      error: body.error, next: body.next, retryAfterSec: body.retryAfterSec, quote: body.quote });
+    throw error;
+  }
+  return body;
+}

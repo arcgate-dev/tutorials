@@ -12,6 +12,7 @@
     "quote": "node --env-file-if-exists=.env src/main.js quote",
     "preview": "node --env-file-if-exists=.env src/main.js preview",
     "trade": "node --env-file-if-exists=.env src/main.js trade",
+    "receipt": "node --env-file-if-exists=.env src/main.js receipt",
     "wallet:create": "node --env-file-if-exists=.env src/create-wallet.js",
     "test": "node --test test/*.test.js"
   },

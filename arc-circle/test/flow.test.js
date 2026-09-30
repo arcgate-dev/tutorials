@@ -6,7 +6,7 @@ import { runFlow } from '../src/flow.js';
 import { pickToken, reviewQuote, reviewSwap } from '../src/guards.js';
 import { main } from '../src/main.js';
 import { USDC } from '../src/payment.js';
-import { config, hash, other, quote, swap, swapArgs, wallet } from './fixtures.js';
+import { config, hash, other, quote, swap, swapArgs, tradeReceipt, wallet } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -64,7 +64,9 @@ function workflow() {
   const calls = [], sent = [];
   let delivered = false;
   const q = quote(), s = swap();
-  return { calls, sent, dependencies: { wallet, config, log: () => {},
+  const receiptRequests = [];
+  return { calls, sent, receiptRequests, q, dependencies: { wallet, config, log: () => {},
+    readReceipt: async request => { receiptRequests.push(request); return tradeReceipt(); },
     api: async (operation, body) => {
       calls.push({ operation, body });
       if (operation === 'search') return { network: 'eip155:5042', resolution: 'verified', results: [{ address: config.buyToken, symbol: 'cirBTC', verification: { status: 'verified' }, flags: [] }] };
@@ -89,13 +91,15 @@ test('preview runs public request flow without submitting any transaction', asyn
   const { dependencies, sent, calls } = workflow();
   await runFlow('preview', dependencies);
   assert.deepEqual(calls.map(x => x.operation), ['search', 'quote', 'swap']);
+  assert.equal(calls[1].body.taker, wallet.address);
   assert.equal(sent.length, 0);
 });
 
 test('trade sends approval then swap and verifies delivery against the quote floor', async () => {
-  const { dependencies, sent } = workflow();
+  const { dependencies, sent, receiptRequests } = workflow();
   assert.equal((await runFlow('trade', dependencies)).delivered, 1200n);
   assert.deepEqual(sent.map(x => x.purpose), ['approve', 'swap']);
+  assert.deepEqual(receiptRequests, [{ quoteId: quote().quoteId, txHashes: [hash, hash] }]);
 });
 
 test('failed approval stops execution before the swap', async () => {
@@ -103,4 +107,45 @@ test('failed approval stops execution before the swap', async () => {
   dependencies.rpc.waitForTransactionReceipt = async () => ({ status: 'reverted', logs: [] });
   await assert.rejects(runFlow('trade', dependencies), /reverted/);
   assert.equal(sent.length, 1);
+});
+
+test('unready, stop and non-executable quotes never reach swap construction or Circle sending', async () => {
+  for (const mutate of [
+    q => { q.readiness.ready = false; q.readiness.gas.enough = false; },
+    q => { q.next = 'stop'; },
+    q => { q.best.executable = false; },
+    q => { q.readiness.taker = other; },
+  ]) {
+    const { dependencies, q, sent, calls } = workflow();
+    mutate(q);
+    await assert.rejects(runFlow('trade', dependencies), /readiness|stop|another wallet/);
+    assert.deepEqual(calls.map(x => x.operation), ['search', 'quote']);
+    assert.equal(sent.length, 0);
+  }
+});
+
+test('an actionable swap response cannot be broadcast even with empty signatures', () => {
+  const s = swap(); s.next = 'sign_permit';
+  assert.throws(() => reviewSwap(s, quote(), wallet, config, 1188n), /another action/);
+});
+
+test('receipt pending, failure and lookup errors never resubmit a mined trade', async () => {
+  for (const result of ['pending', 'fail', 'unavailable']) {
+    const { dependencies, sent } = workflow();
+    dependencies.readReceipt = async () => {
+      if (result === 'unavailable') throw new Error('HTTP 503');
+      return { ...tradeReceipt(), result, delivered: null, reason: 'Inspect the transaction', next: result === 'pending' ? 'retry' : 'stop' };
+    };
+    await assert.rejects(runFlow('trade', dependencies), /already mined.*Do not rerun the trade/);
+    assert.equal(sent.length, 2);
+  }
+});
+
+test('a passing API receipt must match the original order and locally verified delivery', async () => {
+  for (const change of [{ recipient: other }, { token: other }, { delivered: '1199' }, { minAmountOut: '1187' }]) {
+    const { dependencies, sent } = workflow();
+    dependencies.readReceipt = async () => ({ ...tradeReceipt(), ...change });
+    await assert.rejects(runFlow('trade', dependencies), /differs from the locally verified fill/);
+    assert.equal(sent.length, 2);
+  }
 });

@@ -23,13 +23,18 @@ export function pickToken(search, expected) {
   return token;
 }
 
-export function reviewQuote(quote, config) {
+export function reviewQuote(quote, config, wallet) {
   ensure(quote.network === 'eip155:5042' && quote.side === 'exactIn', 'Unexpected quote network or side.');
   ensure(same(quote.sell.address, USDC) && quote.sell.decimals === 6
     && same(quote.buy.address, config.buyToken) && quote.buy.decimals === 8, 'Unexpected quote tokens or decimals.');
   ensure(quote.sell.amountRaw === parseUnits(config.amount, 6).toString()
     && parseUnits(quote.sell.amount, 6) === parseUnits(config.amount, 6), 'Quote changed the requested sell amount.');
   ensure(['ok', 'pinned'].includes(quote.safety?.verdict), 'Quote safety verdict is not accepted by this tutorial.');
+  ensure(quote.next !== 'stop' && quote.best.executable !== false, 'Quote says to stop or has no executable route. Review its warnings.');
+  if (quote.readiness) {
+    ensure(!wallet || same(quote.readiness.taker, wallet.address), 'Quote readiness is for another wallet.');
+    ensure(quote.readiness.ready === true, 'Wallet readiness failed. Review the input balance, gas and swap fee before continuing.');
+  }
   ensure(quote.slippageBps === config.slippageBps && Date.parse(quote.expiresAt) > Date.now(), 'Quote is expired or changed slippage.');
   const minOut = parseUnits(quote.best.minAmountOut, quote.buy.decimals);
   ensure(minOut > 0n, 'Quote has no positive minimum output.');
@@ -39,6 +44,7 @@ export function reviewQuote(quote, config) {
 export function reviewSwap(swap, quote, wallet, config, minOut, now = Math.floor(Date.now() / 1000)) {
   ensure(swap.quoteId === quote.quoteId && same(swap.recipient, wallet.address), 'Swap changed quote or recipient.');
   ensure(swap.signatures?.length === 0, 'Expected approval="approve" with no Permit2 signatures.');
+  ensure(swap.next === undefined, 'Swap requires another action; do not send its transactions.');
   ensure(['ok', 'pinned'].includes(swap.safety?.verdict), 'Swap safety verdict is not accepted.');
   ensure(Date.parse(swap.expiresAt) > now * 1000, 'Swap has expired.');
   const txs = swap.transactions;

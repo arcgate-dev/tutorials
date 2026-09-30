@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { recoverTypedDataAddress } from 'viem';
 import { acceptOffer, assertAuthorization, createArcgateClient } from '../src/payment.js';
 import { circleCall, loadWallet, normalizeSignature, sendTransaction, signTypedData } from '../src/circle.js';
-import { account, authorization, circleSigner, config, encodeHeader, hash, offer, other, receiptHeader, required, wallet } from './fixtures.js';
+import { account, authorization, circleSigner, config, encodeHeader, hash, offer, other, quote, receiptHeader, required, wallet } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -84,6 +84,33 @@ test('a successful HTTP response without a settlement receipt is not payment suc
   const api = createArcgateClient({ circle: circleSigner, wallet, config, fetchFn: async () => ++requests === 1
     ? new Response(JSON.stringify(required), { status: 402 }) : new Response('{}') });
   await assert.rejects(api('search', {}), /payment receipt/);
+});
+
+test('swap errors preserve the next action, free quote and request ID without retrying', async () => {
+  const body = { error: { code: 'quote_stale', hint: 'Review the fresh quote.' }, next: 'requote', quote: quote() };
+  const records = [];
+  let requests = 0;
+  const api = createArcgateClient({ circle: circleSigner, wallet, config, record: entry => records.push(entry), fetchFn: async () => ++requests === 1
+    ? new Response(JSON.stringify(required), { status: 402 })
+    : Response.json(body, { status: 409, headers: { 'x-request-id': 'request-123' } }) });
+  await assert.rejects(api('swap', {}), error => {
+    assert.equal(error.status, 409);
+    assert.equal(error.requestId, 'request-123');
+    assert.deepEqual(error.body, body);
+    assert.match(error.message, /next=requote/);
+    return true;
+  });
+  assert.equal(requests, 2);
+  assert.deepEqual(records.at(-1).quote, body.quote);
+});
+
+test('pre-payment API errors retain retry guidance without asking Circle to sign', async () => {
+  let signed = false;
+  const api = createArcgateClient({ circle: { signTypedData() { signed = true; } }, wallet, config,
+    fetchFn: async () => Response.json({ error: { code: 'swap_attempts_exhausted' }, next: 'requote', retryAfterSec: 5 }, { status: 429 }),
+  });
+  await assert.rejects(api('swap', {}), /next=requote; retryAfterSec=5/);
+  assert.equal(signed, false);
 });
 
 test('wallet connection refuses SCA, inactive and wrong-chain wallets', async () => {
