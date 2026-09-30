@@ -289,7 +289,9 @@ Replace the placeholders, omitting the brackets and optional approval hash when 
 
 ## API errors and replacement quotes
 
-Errors carry `error.code`, optional `error.hint`, and a top-level `next`: `requote`, `retry`, `fix_request`, `stop` or `pay`. `retryAfterSec`, when present, supplies the delay; `X-Request-Id` identifies the request for support. The client prints and records these fields. `sign_permit` is the action on a successful Permit2 swap response, not permission to broadcast its unfinished transaction.
+Arcgate's application errors and unpaid payment challenge carry `error.code`, optional `error.hint`, and a top-level `next`: `requote`, `retry`, `fix_request`, `stop` or `pay`. `retryAfterSec`, when present, supplies the delay; `X-Request-Id` identifies the request for support. The client prints and records these fields. `sign_permit` is the action on a successful Permit2 swap response, not permission to broadcast its unfinished transaction.
+
+**A signed payment can instead receive HTTP 402 with an empty `{}` body and no `next`.** These responses come from the x402 middleware when the payment amount is wrong, verification fails, or settlement fails. For a settlement failure, decode `PAYMENT-RESPONSE`: it carries `success: false` and `errorReason`, and nothing was charged. The client preserves that decoded header as `ArcgateError.paymentResponse` and in the run log. For a rejected payment, check the offered amount, authorization and USDC balance. Fix the cause before starting a new run with a fresh payment; the tutorial never automatically retries. A lost response has an uncertain outcome and still requires checking whether payment settled before retrying.
 
 `/swap` can return **409 `quote_stale`** or **410 `quote_expired`** with a free replacement in `quote` and `next: "requote"`. Review its price, safety and readiness before using its new `quoteId`; accepting it may change the trade's output floor. This courtesy is limited to one fresh quote per paid quote and is unavailable after some expiry/retry conditions. When it cannot offer a tradable replacement, the response may say `stop` with a reason, or `requote` without a quote. `/swap/tx` never includes this free replacement.
 
@@ -302,7 +304,7 @@ This tutorial records any replacement quote but stops for review; it does not au
 | Circle 401/403 or wallet not found | The API key, registered entity secret, and wallet ID must belong to the same Circle account and environment. |
 | `ARC-TESTNET`, `TEST_API_KEY`, or SCA refused | Use a mainnet `ARC` developer-controlled **EOA** and live credentials. |
 | Payment requirements differ | Run `npm run inspect`. Check the public service configuration and documented addresses before changing the pinned recipient or limits. |
-| 402 after signing | Check USDC balance and the payment error. The script does not keep signing new payments. |
+| 402 after signing | The body may be `{}` with no `next`. Check `PAYMENT-RESPONSE` / the logged `paymentResponse` for settlement failure details, plus the payment amount, authorization and USDC balance. Fix the cause before a fresh payment; no automatic retry. |
 | HTTP 409 `quote_stale` / 410 `quote_expired` | Review `next`, `error.hint` and any free replacement `quote` in the run log. The tutorial stops; starting a new run incurs new successful-call fees. |
 | Quote `next: "stop"` or readiness false | Review the printed balance, gas, fee and route checks. Fix the cause before paying for a new quote. |
 | HTTP 429 | Respect `next` and `retryAfterSec`. `swap_attempts_exhausted` requires a new quote; repeatedly retrying the same one will not help. |

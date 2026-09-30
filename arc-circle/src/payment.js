@@ -83,9 +83,9 @@ export function createArcgateClient({ circle, wallet, config, fetchFn = fetch, r
     let paid;
     try { paid = await request({ ...init.headers, ...httpClient.encodePaymentSignatureHeader(payload) }); }
     catch { throw new Error(`${operation}: response lost after payment was signed. It may have settled. Do not automatically retry.`); }
-    const result = await readApiResponse(operation, paid, record);
     const receipt = paid.headers.get('payment-response');
     const settlement = receipt ? decodePaymentResponseHeader(receipt) : null;
+    const result = await readApiResponse(operation, paid, record, settlement);
     if (!settlement?.success || settlement.network !== config.network
         || !/^0x[0-9a-fA-F]{64}$/.test(settlement.transaction ?? '')
         || getAddress(settlement.payer) !== wallet.address) {

@@ -113,6 +113,27 @@ test('pre-payment API errors retain retry guidance without asking Circle to sign
   assert.equal(signed, false);
 });
 
+test('empty middleware 402s retain settlement failure details and never trigger another payment', async () => {
+  for (const failure of [null, { success: false, errorReason: 'insufficient_funds', network: config.network, transaction: '' }]) {
+    let requests = 0;
+    const records = [];
+    const api = createArcgateClient({ circle: circleSigner, wallet, config, record: entry => records.push(entry), fetchFn: async () => ++requests === 1
+      ? new Response(JSON.stringify(required), { status: 402 })
+      : Response.json({}, { status: 402, headers: failure ? { 'payment-response': encodeHeader(failure) } : {} }),
+    });
+    await assert.rejects(api('search', {}), error => {
+      assert.equal(error.status, 402);
+      assert.deepEqual(error.body, {});
+      assert.deepEqual(error.paymentResponse, failure);
+      assert.match(error.message, /check the payment amount/);
+      if (failure) assert.match(error.message, /payment settlement failed: insufficient_funds/);
+      return true;
+    });
+    assert.equal(requests, 2);
+    assert.deepEqual(records.at(-1).paymentResponse, failure);
+  }
+});
+
 test('wallet connection refuses SCA, inactive and wrong-chain wallets', async () => {
   const valid = { address: wallet.address, accountType: 'EOA', state: 'LIVE', blockchain: 'ARC' };
   for (const change of [{ accountType: 'SCA' }, { state: 'FROZEN' }, { blockchain: 'ARC-TESTNET' }]) {

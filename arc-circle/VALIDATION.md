@@ -8,7 +8,7 @@ Fixed the outdated instruction to submit a signed Permit2 permit to another paid
 
 Checks completed:
 
-- `npm test`: **29 tests passed**, including readiness refusals, receipt pass/pending/fail handling, preservation of free replacement quotes and request IDs, and prevention of automatic payment or transaction retries.
+- `npm test`: **30 tests passed**, including readiness refusals, receipt pass/pending/fail handling, preservation of free replacement quotes and request IDs, empty middleware 402 bodies and settlement failure headers, and prevention of automatic payment or transaction retries.
 - Arcgate's `pnpm exec vitest run scripts/docs.test.mjs`: **12 tests passed**, including docs rendering/build checks.
 - Captured the example's actual search, quote and swap request bodies in an injected preview run and validated them, plus the receipt request, against **both published OpenAPI schemas**. The readiness and receipt response fixtures also matched both schemas.
 - Ran `node src/main.js inspect` without loading `.env`: health returned 200 with x402 enabled on `eip155:5042`; unpaid search returned 402 offering 0.005 USDC to the pinned recipient.
