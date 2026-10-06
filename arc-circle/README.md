@@ -17,7 +17,7 @@ Everything you need to run the example is in this folder. The dependencies are t
   | Public service, Arc mainnet `eip155:5042` | `LIVE_API_KEY:` | `ARC` |
   | Arcgate localnet, Arc testnet `eip155:5042002` | `TEST_API_KEY:` | `ARC-TESTNET` |
 
-- USDC on the network the API pays on. On the public service that is **Arc mainnet, chain `5042`**, for API payments and swaps alike; testnet faucet USDC cannot pay it. On the localnet, API payments use Arc testnet USDC, and the swap runs on the localnet's fork of Arc mainnet. The program reads the network from the API and refuses a key or wallet of the other kind before it calls Circle.
+- USDC on the network the API pays on. On the public service that is **Arc mainnet, chain `5042`**, for API payments and swaps alike; testnet faucet USDC cannot pay it. On the localnet, API payments use Arc testnet USDC, and the swap runs on the localnet's fork of Arc mainnet. The program reads the network from the API and refuses a key of the other kind before it calls Circle; it checks the wallet's blockchain when it reads the wallet from Circle, before any payment.
 
 The rest of this README follows the public service. The localnet needs different setup; see [Run against the arcgate localnet](#run-against-the-arcgate-localnet).
 
@@ -95,7 +95,7 @@ CIRCLE_ENTITY_SECRET=your_registered_64_character_hex_secret
 CIRCLE_WALLET_ID=your_wallet_uuid
 ```
 
-The network the API pays on decides which pair you need. `config.blockchain` is `ARC` on `eip155:5042` and `ARC-TESTNET` on `eip155:5042002`, and the key prefix must match: `LIVE_API_KEY:` with `ARC`, `TEST_API_KEY:` with `ARC-TESTNET`. The commands check this before any Circle call and refuse a mismatch. The examples here use mainnet; the localnet is covered [below](#run-against-the-arcgate-localnet).
+The network the API pays on decides which pair you need. `config.blockchain` is `ARC` on `eip155:5042` and `ARC-TESTNET` on `eip155:5042002`, and the key prefix must match: `LIVE_API_KEY:` with `ARC`, `TEST_API_KEY:` with `ARC-TESTNET`. The commands refuse a key prefix that does not match before any Circle call, and a wallet on the other blockchain when they read it from Circle. The examples here use mainnet; the localnet is covered [below](#run-against-the-arcgate-localnet).
 
 `CIRCLE_WALLET_ID` is Circle's UUID for the wallet, **not** its `0x` address. The API key and entity secret must belong to the account that owns it. Use the existing registered entity secret; do not generate a replacement for an existing account.
 
@@ -351,7 +351,7 @@ From the localnet run on October 6, 2026, a passing receipt:
 }
 ```
 
-(The `hash` of each transaction, `token`, `recipient` and `block` fields are left out here.)
+(Each transaction's `hash`, and the top-level `token`, `recipient` and `block`, are left out here.)
 
 The trade command prints a ready-to-run `npm run receipt -- ...` command with its quote ID and hashes. You can also fill them in yourself:
 
@@ -416,7 +416,7 @@ This tutorial records any replacement quote but stops for review; it does not au
 | Result | What to check |
 | --- | --- |
 | Circle 401/403 or wallet not found | The API key, registered entity secret, and wallet ID must belong to the same Circle account and environment. |
-| Key, wallet or network mismatch (`The API pays on eip155:…`) | The key type and wallet must fit the network the API reports: `LIVE_API_KEY:` with an `ARC` wallet on `eip155:5042`, `TEST_API_KEY:` with an `ARC-TESTNET` wallet on `eip155:5042002`. Use a developer-controlled **EOA**, not a smart contract account. The program refuses before any Circle call or payment. |
+| Key, wallet or network mismatch (`The API pays on eip155:…` or `Use an active … developer-controlled EOA wallet`) | The key type and wallet must fit the network the API reports: `LIVE_API_KEY:` with an `ARC` wallet on `eip155:5042`, `TEST_API_KEY:` with an `ARC-TESTNET` wallet on `eip155:5042002`. Use a developer-controlled **EOA**, not a smart contract account. A key of the wrong type is refused with `The API pays on eip155:…` before any Circle call. A wallet on the wrong blockchain is refused with `Use an active … developer-controlled EOA wallet` when the wallet is read, before any payment. |
 | Localnet payment requirements differ | The offer's `payTo` is that stack's `PAY_TO`. Run `npm run inspect`, then set `ARCGATE_PAY_TO` in `.env` to that address if you trust the stack. |
 | Payment requirements differ | Run `npm run inspect`. Check the public service configuration and documented addresses before changing the pinned recipient or limits. |
 | 402 after signing | The body may be `{}` with no `next`. Check `PAYMENT-RESPONSE` / the logged `paymentResponse` for settlement failure details, plus the payment amount, authorization and USDC balance. Fix the cause before a fresh payment; no automatic retry. |
