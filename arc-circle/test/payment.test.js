@@ -90,7 +90,7 @@ test('a successful HTTP response without a settlement receipt is not payment suc
 });
 
 test('swap errors preserve the next action, free quote and request ID without retrying', async () => {
-  const body = { error: { code: 'quote_stale', hint: 'Review the fresh quote.' }, next: 'requote', quote: quote() };
+  const body = { error: { code: 'quote_stale', message: 'the market moved since the quote was issued', hint: 'Review the fresh quote.' }, next: 'requote', quote: quote() };
   const records = [];
   let requests = 0;
   const api = createArcgateClient({ circle: circleSigner, wallet, config, record: entry => records.push(entry), fetchFn: async () => ++requests === 1
@@ -110,7 +110,7 @@ test('swap errors preserve the next action, free quote and request ID without re
 test('pre-payment API errors retain retry guidance without asking Circle to sign', async () => {
   let signed = false;
   const api = createArcgateClient({ circle: { signTypedData() { signed = true; } }, wallet, config,
-    fetchFn: async () => Response.json({ error: { code: 'swap_attempts_exhausted' }, next: 'requote', retryAfterSec: 5 }, { status: 429 }),
+    fetchFn: async () => Response.json({ error: { code: 'swap_attempts_exhausted', message: 'this quote has used its 5 failed swap attempts', hint: 'quote again' }, next: 'requote', retryAfterSec: 5 }, { status: 429 }),
   });
   await assert.rejects(api('swap', {}), /next=requote; retryAfterSec=5/);
   assert.equal(signed, false);
