@@ -10,7 +10,7 @@ globalThis.fetch = () => { throw new Error('Network access is forbidden in tests
 function workflow() {
   const calls = [], sent = [], sequence = [];
   let delivered = false;
-  const q = quote(), first = swap(), typedData = first.signatures[0].typedData, receipts = [tradeReceipt()];
+  const q = quote(), first = swap(), typedData = first.signatures[0].typedData, receipts = [tradeReceipt()], finalPatch = {};
   const dependencies = { config, log: () => {}, sleep: async () => { sequence.push('sleep'); }, wallet: { ...wallet,
     decode: async txs => { sequence.push('decode'); assert.equal(txs.at(-1).purpose, 'swap'); },
     signTypedData: async data => { sequence.push('sign'); return account.signTypedData(data); },
@@ -25,7 +25,7 @@ function workflow() {
       assert.deepEqual(Object.keys(body).sort(), ['deadlineSec', 'permit', 'quoteId', 'recipient', 'taker']);
       assert.deepEqual(body.permit, { message: typedData.message, signature: body.permit.signature });
       assert.equal(sent.length, first.transactions.filter(tx => tx.purpose === 'approve').length);
-      return swap({ typedData, signature: body.permit.signature });
+      return { ...swap({ typedData, signature: body.permit.signature }), ...finalPatch };
     }
     assert.equal(operation, 'swap'); assert.equal(body.approval, 'permit2'); assert.equal(body.permit, undefined);
     return first;
@@ -37,7 +37,7 @@ function workflow() {
       return { status: 'success', logs: [{ address: config.buyToken, topics: encodeEventTopics({ abi: erc20Abi, eventName: 'Transfer', args: { from: config.router, to: wallet.address } }), data: encodeAbiParameters([{ type: 'uint256' }], [600n]) }] };
     },
   } };
-  return { calls, sent, sequence, dependencies, first, q, receipts };
+  return { calls, sent, sequence, dependencies, first, q, receipts, finalPatch };
 }
 
 test('preview decodes the batch but never signs Permit2 or broadcasts', async () => {
@@ -95,4 +95,54 @@ test('quote expiring while approval waits stops before spending another API fee'
 test('lower output delivery is not reported as a successful trade', async () => {
   const w = workflow(); w.dependencies.rpc.readContract = async ({ address }) => address === USDC ? 3000000n : 0n;
   await assert.rejects(runFlow('trade', w.dependencies), /delivery/);
+});
+
+test('a quote that is not executable or does not say swap is never swapped', async () => {
+  for (const change of [{ best: { ...quote().best, executable: false } }, { next: 'stop' }, { next: 'requote' }, { next: 'retry' }, { next: 'fix_request' }, { next: 'pay' }]) {
+    const w = workflow(); Object.assign(w.q, change);
+    await assert.rejects(runFlow('trade', w.dependencies), undefined, JSON.stringify(change));
+    assert.deepEqual(w.calls.map(c => c.operation), ['search', 'quote']); assert.deepEqual(w.sequence, []);
+  }
+  for (const change of [{}, { next: 'swap' }]) { // deployed 603c5f1 omits next, local HEAD says swap
+    const w = workflow(); Object.assign(w.q, change);
+    assert.equal((await runFlow('quote', w.dependencies)).quote.quoteId, w.q.quoteId);
+  }
+});
+
+test('search follows the row\'s trade network', async () => {
+  const w = workflow(), api = w.dependencies.api;
+  w.dependencies.api = async (operation, body) => operation === 'search' ? { ...await api(operation, body), network: 'eip155:5042002' } : api(operation, body);
+  await assert.rejects(runFlow('search', w.dependencies), /another network/);
+  const elsewhere = workflow(); elsewhere.dependencies.config = { ...config, tradeNetwork: 'eip155:777' }; // a row whose trade network is not Arc mainnet
+  await assert.rejects(runFlow('search', elsewhere.dependencies), /another network/);
+});
+
+test('a first swap response that does not say sign_permit is not signed', async () => {
+  for (const next of [undefined, 'send', 'done', 'stop', 'pay']) {
+    const w = workflow(); if (next === undefined) delete w.first.next; else w.first.next = next;
+    await assert.rejects(runFlow('trade', w.dependencies), undefined, String(next));
+    assert.deepEqual(w.sequence, []); assert.equal(w.sent.length, 0);
+  }
+});
+
+test('a final swap response must say send, or nothing, before anything is broadcast', async () => {
+  for (const next of ['sign_permit', 'done', 'stop', 'requote', 'retry', 'pay']) {
+    const w = workflow(); w.finalPatch.next = next;
+    await assert.rejects(runFlow('trade', w.dependencies), undefined, next);
+    assert.deepEqual(w.sent.map(tx => tx.purpose), ['approve']); // only the approval, which came before the final round
+    assert(!w.sequence.includes('swap'));
+  }
+  const w = workflow(); w.finalPatch.next = 'send';
+  assert.equal((await runFlow('trade', w.dependencies)).receipt.result, 'pass');
+});
+
+test('a passing receipt must say done, or nothing', async () => {
+  for (const next of [undefined, 'done']) { // deployed 603c5f1 omits next on a pass, local HEAD says done
+    const w = workflow(); w.receipts[0] = { ...tradeReceipt(), ...next && { next } };
+    assert.equal((await runFlow('trade', w.dependencies)).receipt.result, 'pass', String(next));
+  }
+  for (const next of ['stop', 'retry', 'requote', 'sign_permit', 'send', 'pay']) {
+    const w = workflow(); w.receipts[0] = { ...tradeReceipt(), next };
+    await assert.rejects(runFlow('trade', w.dependencies), /do not rerun the trade/i, next);
+  }
 });
