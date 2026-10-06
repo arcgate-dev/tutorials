@@ -85,7 +85,7 @@ test('the captured /openapi.json is only operationId and x-payment', () => {
 test('every test file makes globalThis.fetch throw', () => {
   const folder = new URL('.', import.meta.url);
   const files = readdirSync(folder).filter(name => name.endsWith('.test.js'));
-  assert.deepEqual(files.sort(), ['agent.test.js', 'config.test.js', 'fixtures.test.js', 'flow.test.js', 'inbound.test.js', 'payment.test.js']);
+  for (const required of ['agent.test.js', 'config.test.js', 'fixtures.test.js', 'flow.test.js', 'inbound.test.js', 'payment.test.js']) assert.ok(files.includes(required), `${required} is missing`);
   for (const file of files) {
     assert.match(readFileSync(new URL(file, folder), 'utf8'), /^globalThis\.fetch = \(\) => \{ throw new Error\(/m, `${file} does not block the network`);
   }

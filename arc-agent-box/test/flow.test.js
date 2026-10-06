@@ -49,7 +49,8 @@ function context(w, replay) {
   return { ctx, logs, records, sleeps };
 }
 
-// Every step in order against one replay, so each step's requests and answers are known.
+// Every step in order against one replay, so each step's requests and answers are known. A step that
+// fails (or never ran because an earlier one failed) makes only its own tests fail: reading its result throws.
 let memoStepwise;
 function stepwise() {
   memoStepwise ??= (async () => {
@@ -57,12 +58,23 @@ function stepwise() {
     const replay = createReplay(w.fixture, { queue: withSecrets(w.fixture.exchanges) });
     const c = context(w, replay);
     const out = {};
+    let failed = null;
     for (const name of STEPS) {
+      if (failed) {
+        const message = `step ${name} did not run: step ${failed.name} failed first (${failed.error.message})`;
+        Object.defineProperty(out, name, { get() { throw new Error(message); } });
+        continue;
+      }
       const from = { consumed: replay.consumed.length, trace: replay.trace.length, logs: c.logs.length, sleeps: c.sleeps.length };
-      await steps[name](c.ctx);
-      out[name] = { exchanges: replay.consumed.slice(from.consumed), trace: apiTrace(replay.trace.slice(from.trace)), logs: c.logs.slice(from.logs), sleeps: c.sleeps.slice(from.sleeps) };
+      try {
+        await steps[name](c.ctx);
+        out[name] = { exchanges: replay.consumed.slice(from.consumed), trace: apiTrace(replay.trace.slice(from.trace)), logs: c.logs.slice(from.logs), sleeps: c.sleeps.slice(from.sleeps) };
+      } catch (error) {
+        failed = { name, error };
+        Object.defineProperty(out, name, { get() { throw error; } });
+      }
     }
-    return { w, out, replay, ...c };
+    return { w, out, replay, failed, ...c };
   })();
   return memoStepwise;
 }
@@ -395,7 +407,8 @@ test('cleanup: deletes every listed inbound address, watch and webhook channel, 
 const shape = trace => apiTrace(trace).map(e => `${e.method} ${e.path} ${e.status}`);
 
 test('start: runs the seven steps in order, then checks the box, and uses every captured exchange of the run', async () => {
-  const { replay: stepReplay } = await stepwise();
+  const { replay: stepReplay, failed } = await stepwise();
+  if (failed) throw failed.error;
   const { replay } = await startRun();
   const all = shape(stepReplay.trace);
   assert.deepEqual(shape(replay.trace).slice(0, all.length), all, 'the same requests as the seven steps one by one');
