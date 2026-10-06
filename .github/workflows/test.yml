@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tutorial: [arc-circle, arc-metamask]
+        tutorial: [arc-circle, arc-metamask, arc-agent-box]
     defaults:
       run:
         working-directory: ${{ matrix.tutorial }}

@@ -1,0 +1,27 @@
+{
+  "name": "arc-agent-box",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A box, inbound addresses, watches and channels on the Arcgate /agent/v1 API, with a private-key wallet",
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "scripts": {
+    "box": "node --env-file-if-exists=.env src/main.js box",
+    "inbound": "node --env-file-if-exists=.env src/main.js inbound",
+    "watch": "node --env-file-if-exists=.env src/main.js watch",
+    "channel": "node --env-file-if-exists=.env src/main.js channel",
+    "messages": "node --env-file-if-exists=.env src/main.js messages",
+    "topup": "node --env-file-if-exists=.env src/main.js topup",
+    "cleanup": "node --env-file-if-exists=.env src/main.js cleanup",
+    "start": "node --env-file-if-exists=.env src/main.js start",
+    "capture": "node --env-file-if-exists=.env src/main.js start --capture test/fixtures/localnet.json",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@x402/core": "2.27.0",
+    "@x402/evm": "2.27.0",
+    "viem": "2.56.9"
+  }
+}
