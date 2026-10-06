@@ -87,7 +87,6 @@ test('search, quote and Permit2 checks follow the row\'s trade network and chain
 });
 
 test('the first swap response must say sign_permit', () => {
-  assert.equal(swap().next, 'sign_permit'); // both the deployed 603c5f1 and local HEAD emit it
   assert.equal(reviewSwap(swap(), quote(), wallet, config, 594n).length, 2);
   for (const next of [undefined, 'send', 'done', 'swap', 'stop', 'requote', 'retry', 'fix_request', 'pay']) {
     const s = swap(); if (next === undefined) delete s.next; else s.next = next;

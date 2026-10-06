@@ -156,6 +156,7 @@ test('a 502 X402MiddlewareError is reported with its message and a warning that 
     assert.equal(error.status, 502);
     assert.match(error.message, /X402MiddlewareError: facilitator verify failed/);
     assert.match(error.message, /may have settled/);
+    assert.match(error.message, /PAYMENT-RESPONSE|balance/);
     assert.match(error.message, /No automatic retry/);
     return true;
   });
