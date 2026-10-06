@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { recoverTypedDataAddress } from 'viem';
 import { acceptOffer, assertAuthorization, createArcgateClient } from '../src/payment.js';
 import { circleCall, loadWallet, normalizeSignature, sendTransaction, signTypedData } from '../src/circle.js';
-import { account, authorization, circleSigner, config, encodeHeader, hash, offer, other, quote, receiptHeader, required, wallet } from './fixtures.js';
+import { account, authorization, captured, circleSigner, config, encodeHeader, hash, offer, other, pinnedTestnetConfig, quote, receiptHeader, required, testnetConfig, testnetOffer, wallet } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -161,4 +161,72 @@ test('Circle errors do not print credentials or SDK request objects', async () =
   await assert.rejects(circleCall('getWallet', () => { throw new Error('secret-api-key entity-secret'); }), error => {
     assert(!error.message.includes('secret-api-key')); return true;
   });
+});
+
+test('testnet payment policy binds offers and authorizations to eip155:5042002 and the pinned pay-to', () => {
+  const pinned = { ...testnetOffer, payTo: pinnedTestnetConfig.payTo };
+  assert.equal(pinned.network, 'eip155:5042002');
+  assert.equal(acceptOffer(pinned, pinnedTestnetConfig), true);
+  // The captured localnet pay-to is the stack's own PAY_TO; it is accepted only once the override names it.
+  assert.equal(acceptOffer(testnetOffer, testnetConfig), true);
+  assert.equal(acceptOffer(testnetOffer, pinnedTestnetConfig), false);
+  for (const change of [{ network: 'eip155:5042' }, { network: 'eip155:1' }, { payTo: other }, { asset: other }, { amount: '10001' }, { maxTimeoutSeconds: 301 }]) {
+    assert.equal(acceptOffer({ ...pinned, ...change }, pinnedTestnetConfig), false, JSON.stringify(change));
+  }
+  // Each row refuses the other row's offer.
+  assert.equal(acceptOffer(pinned, config), false);
+  assert.equal(acceptOffer({ ...offer, payTo: pinnedTestnetConfig.payTo }, pinnedTestnetConfig), false);
+  assert.equal(acceptOffer(offer, pinnedTestnetConfig), false);
+  assert.equal(acceptOffer(offer, config), true);
+
+  assertAuthorization(authorization(pinnedTestnetConfig, 5042002), wallet, pinnedTestnetConfig);
+  for (const mutate of [
+    data => { data.domain.chainId = 5042; }, data => { data.domain.chainId = 1; }, data => { data.message.to = other; },
+    data => { data.message.to = config.payTo; },
+  ]) {
+    const data = authorization(pinnedTestnetConfig, 5042002); mutate(data);
+    assert.throws(() => assertAuthorization(data, wallet, pinnedTestnetConfig), /unexpected x402 payment authorization/);
+  }
+  assert.throws(() => assertAuthorization(authorization(pinnedTestnetConfig, 5042002), wallet, config), /unexpected x402 payment authorization/);
+});
+
+test('real x402 SDK retries the captured testnet 402 once with a valid Circle-signed payment', async () => {
+  const requests = [];
+  const logs = [];
+  const settled = encodeHeader({ success: true, transaction: hash, network: 'eip155:5042002', payer: wallet.address });
+  const api = createArcgateClient({ circle: circleSigner, wallet, config: testnetConfig, record: entry => logs.push(entry), fetchFn: async (url, init) => {
+    requests.push({ url, init });
+    if (requests.length === 1) return new Response(JSON.stringify(captured.search402.body), { status: 402, headers: { 'payment-required': encodeHeader(captured.search402.paymentRequired) } });
+    const payload = JSON.parse(Buffer.from(new Headers(init.headers).get('payment-signature'), 'base64').toString());
+    assert.equal(payload.accepted.network, 'eip155:5042002');
+    assert.equal(payload.payload.authorization.to.toLowerCase(), testnetOffer.payTo.toLowerCase());
+    const typed = authorization(testnetConfig, 5042002);
+    typed.message = payload.payload.authorization;
+    assert.equal(await recoverTypedDataAddress({ ...typed, signature: payload.payload.signature }), account.address);
+    return new Response('{"resolution":"verified"}', { headers: { 'payment-response': settled } });
+  } });
+  assert.deepEqual(await api('search', { query: 'cirBTC' }), { resolution: 'verified' });
+  assert.equal(requests.length, 2);
+  assert.equal(requests[0].init.body, requests[1].init.body);
+  assert.equal(logs.at(-1).transaction, hash);
+  assert.equal(logs.at(-1).network, 'eip155:5042002');
+});
+
+test('the mainnet row never signs the testnet offer, and the testnet row never signs the mainnet offer', async () => {
+  for (const [cfg, challenge] of [[config, captured.search402.paymentRequired], [pinnedTestnetConfig, required]]) {
+    let signed = false;
+    const api = createArcgateClient({ circle: { signTypedData() { signed = true; } }, wallet, config: cfg,
+      fetchFn: async () => new Response(JSON.stringify(challenge), { status: 402 }) });
+    await assert.rejects(api('search', {}), /payment network/);
+    assert.equal(signed, false);
+  }
+});
+
+test('wallet connection accepts an ARC-TESTNET EOA on the testnet row and refuses an ARC wallet there', async () => {
+  assert.equal(testnetConfig.blockchain, 'ARC-TESTNET');
+  const valid = { address: wallet.address, accountType: 'EOA', state: 'LIVE' };
+  const client = blockchain => ({ getWallet: async () => ({ data: { wallet: { ...valid, blockchain } } }) });
+  assert.deepEqual(await loadWallet(client('ARC-TESTNET'), 'id', testnetConfig.blockchain), { id: 'id', address: wallet.address, blockchain: 'ARC-TESTNET' });
+  await assert.rejects(loadWallet(client('ARC'), 'id', testnetConfig.blockchain), /active ARC-TESTNET/);
+  await assert.rejects(loadWallet(client('ARC-TESTNET'), 'id', config.blockchain), /active ARC\b/);
 });
