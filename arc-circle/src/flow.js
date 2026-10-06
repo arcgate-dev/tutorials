@@ -64,7 +64,7 @@ export async function runFlow(command, { wallet, config, api, rpc, send, readRec
   }
   if (result.quoteId !== quote.quoteId || getAddress(result.token) !== config.buyToken
       || getAddress(result.recipient) !== wallet.address || BigInt(result.minAmountOut) < minOut
-      || BigInt(result.delivered) !== delivered || delivered < BigInt(result.minAmountOut)) {
+      || result.next !== 'done' || BigInt(result.delivered) !== delivered || delivered < BigInt(result.minAmountOut)) {
     throw new Error('Arcgate receipt differs from the locally verified fill. The swap already mined; inspect it and do not rerun the trade.');
   }
   return { quote, swap, delivered, receipts, receipt: result };

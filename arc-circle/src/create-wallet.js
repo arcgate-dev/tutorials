@@ -1,10 +1,11 @@
 import { circleClient, circleCall, loadWallet } from './circle.js';
-import { loadConfig, reportError, requireLiveKey } from './config.js';
+import { loadConfig, reportError, requireApiKey } from './config.js';
+import { inspect } from './main.js';
 
 async function main() {
-  requireLiveKey();
+  const config = await inspect(loadConfig());
+  requireApiKey(config);
   const client = circleClient();
-  const config = loadConfig();
   if (process.env.CIRCLE_WALLET_ID) {
     const wallet = await loadWallet(client, process.env.CIRCLE_WALLET_ID, config.blockchain);
     console.log(`Existing wallet: ${wallet.address}. Nothing created.`);
@@ -21,7 +22,7 @@ async function main() {
   if (!wallet?.id) throw new Error('Circle returned no wallet. Inspect the wallet set in Circle Console before rerunning.');
   console.log(`CIRCLE_WALLET_ID=${wallet.id}`);
   console.log(`Address: ${wallet.address} (${wallet.blockchain}). Paste the wallet ID into .env.`);
-  console.log('Fund this address with USDC on Arc mainnet. Leave additional USDC for transaction fees.');
+  console.log(`Fund this address with USDC on ${config.network}. Leave additional USDC for transaction fees.`);
 }
 
 main().catch(reportError);
