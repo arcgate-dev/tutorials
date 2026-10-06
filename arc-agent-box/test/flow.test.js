@@ -443,6 +443,22 @@ test('start: ends with a check that the box holds an inbound message and a watch
   }
 });
 
+test('the per-run cap spans the whole start run: the payment that would pass it is not signed', async () => {
+  const w = world();
+  const queue = withSecrets(w.fixture.exchanges);
+  const settled = queue.filter(e => ok(e.status) && e.headers['payment-response']);
+  const total = settled.reduce((sum, e) => sum + BigInt(w.price[operationOfExchange(e)]), 0n);
+  const replay = createReplay(w.fixture, { queue });
+  const c = context({ ...w, config: { ...w.config, maxTotal: total - 1n } }, replay);
+  const error = await steps.start(c.ctx).then(() => null, failure => failure);
+  assert.ok(error, 'one unit under the cost of the run, start must stop');
+  assert.ok(ownFailure(error), `start failed for the wrong reason: ${error?.message}`);
+  const t = apiTrace(replay.trace);
+  assert.equal(paid(t).length, settled.length - 1, 'every payment but the last was signed');
+  assert.equal(t.at(-1).operation, settled.at(-1) && operationOfExchange(settled.at(-1)), 'the run stopped at its last payment');
+  assert.equal(t.at(-1).headers['payment-signature'], undefined, 'the payment past the cap was not signed');
+});
+
 // the whole run ---------------------------------------------------------------------------------
 
 test('the run pays exactly the captured paid calls, each at the API terms, to one payTo on the health network, within the caps', async () => {
