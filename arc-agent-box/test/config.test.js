@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { ALLOWED_NETWORKS, apiOrigin, loadConfig, reportError } from '../src/config.js';
 import { postInbound } from '../src/inbound.js';
 import { loadTerms } from '../src/terms.js';
-import { clone, health, loadFixture, openapi, operationOf, prices, staticFetch } from './replay.js';
+import { PAID, clone, health, loadFixture, openapi, operationOf, prices, runExchanges, staticFetch } from './replay.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -46,8 +46,8 @@ test('the default caps are positive, per run at least per call, and cover the wh
   assert.equal(typeof config.maxPayment, 'bigint');
   assert.equal(typeof config.maxTotal, 'bigint');
   assert.ok(config.maxPayment > 0n && config.maxTotal >= config.maxPayment);
-  for (const [operationId, baseUnits] of Object.entries(price)) assert.ok(BigInt(baseUnits) <= config.maxPayment, `${operationId} costs more than the per-call cap`);
-  const paid = fixture.exchanges.filter(e => e.status < 300 && e.headers['payment-response']);
+  for (const operationId of PAID) assert.ok(BigInt(price[operationId]) <= config.maxPayment, `${operationId} costs more than the per-call cap`);
+  const paid = runExchanges(fixture).filter(e => e.status < 300 && e.headers['payment-response']);
   assert.ok(paid.length > 0);
   const total = paid.reduce((sum, e) => sum + BigInt(price[operationId(e)]), 0n);
   assert.ok(total <= config.maxTotal, `a full run pays ${total}, over the per-run cap ${config.maxTotal}`);

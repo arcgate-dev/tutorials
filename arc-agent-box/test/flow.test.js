@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as steps from '../src/steps.js';
 import { ALLOWED_NETWORKS, loadConfig } from '../src/config.js';
-import { INBOUND_POST, PAID, acceptedOf, apiTrace, clone, createReplay, health, hmacHex, isFree, loadFixture, makeWallet, operationOf, prices } from './replay.js';
+import { INBOUND_POST, PAID, acceptedOf, apiTrace, clone, createReplay, health, hmacHex, isFree, loadFixture, makeWallet, operationOf, prices, runExchanges } from './replay.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -358,7 +358,7 @@ test('topup: 409 allowance_full is reported as not charged and the step passes',
   const w = world();
   const exchanges = w.fixture.exchanges;
   const at = exchanges.findIndex(e => e.status === 409 && e.body?.error?.code === 'allowance_full');
-  assert.ok(at >= 0, 'the capture must hold a boxTopUp answered 409 allowance_full: run the topup step a second time under capture');
+  assert.ok(at >= 0, 'the capture must hold a boxTopUp answered 409 allowance_full: capture = start, then topup run twice more under the same recorder, each as its own command run with its own paid client and per-run cap; the first is charged and grants the messages used during the run, the second is the 409');
   let from = at;
   while (from > 0 && exchanges[from - 1].path === exchanges[at].path && exchanges[from - 1].status === 402) from--;
   const run = await runStep('topup', clone(exchanges.slice(from, at + 1)));
@@ -446,7 +446,7 @@ test('start: ends with a check that the box holds an inbound message and a watch
 test('the per-run cap spans the whole start run: the payment that would pass it is not signed', async () => {
   const w = world();
   const queue = withSecrets(w.fixture.exchanges);
-  const settled = queue.filter(e => ok(e.status) && e.headers['payment-response']);
+  const settled = runExchanges(w.fixture).filter(e => ok(e.status) && e.headers['payment-response']);
   const total = settled.reduce((sum, e) => sum + BigInt(w.price[operationOfExchange(e)]), 0n);
   const replay = createReplay(w.fixture, { queue });
   const c = context({ ...w, config: { ...w.config, maxTotal: total - 1n } }, replay);
