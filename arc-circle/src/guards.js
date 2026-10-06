@@ -15,10 +15,10 @@ export const routerAbi = parseAbi([
 const same = (left, right) => getAddress(left) === getAddress(right);
 const ensure = (ok, message) => { if (!ok) throw new Error(message); };
 
-export function pickToken(search, expected) {
-  ensure(search.network === 'eip155:5042' && ['verified', 'clear_leader', 'single'].includes(search.resolution), 'Search is unresolved or on another network.');
+export function pickToken(search, config) {
+  ensure(search.network === config.tradeNetwork && ['verified', 'clear_leader', 'single'].includes(search.resolution), 'Search is unresolved or on another network.');
   const token = search.results?.[0];
-  ensure(token && same(token.address, expected) && token.verification?.status === 'verified'
+  ensure(token && same(token.address, config.buyToken) && token.verification?.status === 'verified'
     && Array.isArray(token.flags) && token.flags.length === 0, 'Search did not resolve to the expected verified token without flags.');
   return token;
 }

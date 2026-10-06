@@ -34,6 +34,14 @@ export async function inspect(config, fetchFn = fetch, log = console.log, env = 
   return resolved;
 }
 
+// The network row decides how a transaction is sent: impersonated on the localnet fork,
+// or signed and broadcast by Circle. `forkRequest` lets tests stand in for the fork node.
+export function broadcaster(config, { circle, wallet, record, forkRequest }) {
+  return config.broadcast === 'fork'
+    ? tx => sendOnFork(config.rpcUrl, wallet.address, tx, forkRequest)
+    : (tx, key) => sendTransaction(circle, wallet, tx, key, record);
+}
+
 export async function main(args = process.argv.slice(2)) {
   const [command] = args;
   if (!['inspect', 'connect', 'search', 'quote', 'preview', 'trade', 'receipt'].includes(command)) throw new Error('Use npm run inspect, connect, search, quote, preview, trade or receipt.');
@@ -77,9 +85,7 @@ export async function main(args = process.argv.slice(2)) {
   const api = createArcgateClient({ circle, wallet, config, record });
   return runFlow(command, { config, wallet, rpc, api, record,
     readReceipt: request => getReceipt({ config, ...request, record }),
-    send: config.broadcast === 'fork'
-      ? tx => sendOnFork(config.rpcUrl, wallet.address, tx)
-      : (tx, key) => sendTransaction(circle, wallet, tx, key, record),
+    send: broadcaster(config, { circle, wallet, record }),
   });
 }
 

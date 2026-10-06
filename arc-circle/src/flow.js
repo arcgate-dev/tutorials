@@ -9,7 +9,7 @@ export async function runFlow(command, { wallet, config, api, rpc, send, readRec
   if (!['search', 'quote', 'preview', 'trade'].includes(command)) throw new Error('Unknown tutorial command.');
   const search = await api('search', { query: 'cirBTC', limit: 5 });
   log(JSON.stringify({ resolution: search.resolution, results: search.results.map(({ address, symbol, verification, flags }) => ({ address, symbol, verification, flags })) }, null, 2));
-  const token = pickToken(search, config.buyToken);
+  const token = pickToken(search, config);
   if (command === 'search') return { search };
 
   const quote = await api('quote', { sell: USDC, buy: token.address, amount: config.amount, side: 'exactIn', slippageBps: config.slippageBps, taker: wallet.address });
