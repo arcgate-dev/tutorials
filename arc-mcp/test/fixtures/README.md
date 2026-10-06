@@ -16,7 +16,7 @@ Captured on 2026-10-06 from the localnet whose `/health` answered `ok: true` and
 | `trade-quote.payment-required.json` | unpaid `tradeQuote` USDC to cirBTC, amount `1`: 10000 base units |
 | `box-create.payment-required.json` | unpaid `boxCreate` for a random scratch address: 50000 base units |
 | `box-status.signature-required.json` | `boxStatus` without `agentSignature`: the 401 `signature_required` result |
-| `mcp-get.json` | `GET /mcp` (the server offers no event stream) |
+| `mcp-get.event-stream.json` | `GET /mcp` with `accept: text/event-stream`, the request the SDK makes: status 405, the server offers no event stream (the body's `id` is `null`) |
 
 Not captured yet, because capturing them settles payments on Arc testnet and needs a funded throwaway payer:
 

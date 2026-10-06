@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":null,"error":{"code":-32000,"message":"Method not allowed: this server offers no event stream; POST JSON-RPC requests"}}

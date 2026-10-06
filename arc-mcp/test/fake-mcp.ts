@@ -1,6 +1,8 @@
 // The only test double: a `fetch` for StreamableHTTPClientTransport's `fetch` option that plays the
 // arcgate MCP server. It answers each JSON-RPC request with a captured localnet response, verbatim:
-// only the JSON-RPC id is rewritten to match the request. It chooses a tools/call answer by tool
+// only the JSON-RPC id is rewritten to match the request (the GET answer's id is null and stays so).
+// It answers the SDK's GET /mcp (Accept: text/event-stream) with the 405 the server sends, because the
+// server offers no event stream and the SDK stops there. It chooses a tools/call answer by tool
 // name, then by whether the call carries a payment in params._meta["x402/payment"] (a tool that
 // takes no payment, boxStatus, is chosen by whether it carries agentSignature). It records every
 // request on one timeline, together with the lines tests log through `log`, so a test can say what
@@ -50,9 +52,9 @@ export function fakeMcp() {
     const url = input instanceof Request ? input.url : String(input);
     const method = init?.method ?? 'GET';
     if (method === 'GET') {
-      // What the server answers a GET /mcp with (it offers no event stream).
+      // The SDK's GET asks for an event stream; the server answers 405 and the SDK stops.
       timeline.push({ kind: 'request', url, method: 'GET' });
-      return reply(fixture('mcp-get'));
+      return reply(fixture('mcp-get.event-stream'), 405);
     }
     const message = JSON.parse(String(init?.body));
     const id = message.id;
