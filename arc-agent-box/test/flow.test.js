@@ -277,6 +277,20 @@ test('channel: a channel that never answers its ownership challenge is waited fo
   assert.equal(ofOp(run.trace, 'webhookRotate').length, 0);
 });
 
+test('channel: a verified channel listed with a different filter than the one sent fails the step before rotating', async () => {
+  const { out } = await stepwise();
+  const queue = clone(out.channel.exchanges.slice(0, 2));
+  const list = clone(out.channel.exchanges.find(e => operationOfExchange(e) === 'webhookList'));
+  for (const channel of list.body.webhooks) Object.assign(channel, { verifiedAt: 1, filter: ['inbound'] });
+  queue.push(list);
+  const run = await runStep('channel', queue);
+  assert.ok(run.error, 'a channel listed with another filter is a failed step');
+  assert.ok(ownFailure(run.error), `the step failed for the wrong reason: ${run.error?.message}`);
+  assert.match(run.error.message, /\["inbound"\]/);
+  assert.match(run.error.message, /\["inbound","watch"\]/);
+  assert.equal(ofOp(run.trace, 'webhookRotate').length, 0);
+});
+
 // messages --------------------------------------------------------------------------------------
 
 test('messages: waits for a watch hit, lists every page by cursor, fetches one message and deletes it, keeping an inbound message', async () => {

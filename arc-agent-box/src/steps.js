@@ -10,6 +10,7 @@ import { loadTerms } from './terms.js';
 const CHANNEL_WAIT_MS = 60_000;
 const MESSAGE_WAIT_MS = 180_000;
 const POLL_MS = { channel: 2_000, messages: 5_000 };
+const CHANNEL_FILTER = ['inbound', 'watch'];
 const isWatchHit = message => message.type?.startsWith('watch.');
 const show = value => JSON.stringify(value);
 
@@ -109,7 +110,7 @@ async function watchStep(ctx, { pay, own }) {
 
 async function channelStep(ctx, { pay, own }) {
   const { log, now, sleep, config } = ctx;
-  const created = await pay('webhookCreate', { url: config.webhookUrl, filter: ['inbound', 'watch'] });
+  const created = await pay('webhookCreate', { url: config.webhookUrl, filter: CHANNEL_FILTER });
   log(`Webhook channel ${created.id} to ${created.url}, filter ${show(created.filter)}. Its secret is shown once and is not kept.`);
 
   // Arcgate POSTs a challenge to the url once the payment settles; nothing is delivered until the url answers it.
@@ -117,7 +118,11 @@ async function channelStep(ctx, { pay, own }) {
   for (;;) {
     const { webhooks } = await own('webhookList');
     const channel = webhooks.find(item => item.id === created.id);
-    if (channel?.verifiedAt) { log(`The url answered the ownership challenge: ${show(channel)}`); break; }
+    if (channel?.verifiedAt) {
+      if (show([...channel.filter].sort()) !== show([...CHANNEL_FILTER].sort())) throw new Error(`The channel is listed with filter ${show(channel.filter)}, not the ${show(CHANNEL_FILTER)} that was sent.`);
+      log(`The url answered the ownership challenge: ${show(channel)}`);
+      break;
+    }
     if (now() >= deadline) throw new Error(`The url did not answer the ownership challenge within ${CHANNEL_WAIT_MS / 1000} s. Is ${config.webhookUrl} reachable by arcgate?`);
     await sleep(POLL_MS.channel);
   }
