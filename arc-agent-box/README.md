@@ -65,7 +65,7 @@ Each `npm run` command is a step or a group of steps. Every command starts a new
 | `npm run capture` | npm start, whose topup is charged, then two extra topup runs of which at least one is 409 allowance_full and the first may be charged or 409; recorded to test/fixtures/localnet.json with secrets redacted | whatever the recorded run settled: the start run plus any charged extra topup (0.105 USDC in the recorded run) |
 | `npm test` | Replays test/fixtures/localnet.json offline | Free |
 
-Prices are read once per run from `GET /openapi.json` (x-payment.baseUnits) at runtime and enforced within your per-call cap (0.05 USDC) and per-run cap (0.16 USDC). An offer that differs is refused. API errors are not charged. A 409 (box_exists, allowance_full) or 403 payer_not_box is answered without settlement, so nothing is charged (paymentResponse is null in the log). Each `npm run watch` or `npm start` adds three watches with no dedupe: run `npm run cleanup` between attempts.
+Prices are read once per run from `GET /openapi.json` (x-payment.baseUnits) at runtime and enforced within your per-call cap (0.05 USDC) and per-run cap (0.16 USDC). An offer that differs is refused. A 409 (box_exists, allowance_full) or 403 payer_not_box is answered without settlement, so nothing is charged (paymentResponse is null in the log). A 502 on a paid call, or a settlement failure with `payment_response_expired`, may have settled; the error then says `; the payment may have settled; check the PAYMENT-RESPONSE transaction or your USDC balance before paying again`. Each `npm run watch` or `npm start` adds three watches with no dedupe: run `npm run cleanup` between attempts.
 
 ## How each call is authenticated
 
@@ -130,22 +130,6 @@ Example boxStatus (existing box, not paid):
   "registeredAgents": {
     "chainId": 5042,
     "agents": []
-  }
-}
-```
-
-Example boxCreate response, from the 2026-10-06 capture (arcgate 917dd4a, a fresh key; exchange 4 of that fixture, no longer in localnet.json):
-
-```json
-{
-  "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-  "granted": {
-    "messages": 500,
-    "days": 30
-  },
-  "allowance": {
-    "messagesLeft": 500,
-    "expiresAt": 1793918600
   }
 }
 ```
@@ -690,6 +674,7 @@ Telegram channels work the same way as webhooks: they are created with a cost, h
 - **box_not_found**: boxStatus returned 404 before a successful boxCreate. Expected on the first run; the step creates the box.
 - **allowance_full**: The box is at 1000 messages and 60 days. No payment is charged and the run continues.
 - **payer_not_box** (403): A paid call was made by a different address. The API did not settle, so nothing was charged (paymentResponse is null).
+- **possibly settled** (paid 502, or `payment_response_expired`): A paid 502 or a settlement failure with `payment_response_expired` may have settled. Check the run log, the PAYMENT-RESPONSE transaction or the USDC balance before another paid run. There is no automatic retry.
 - **inbound_unauthorized** (401): An inbound post used an old secret or wrong signature. Rotate kills the old secret at once.
 - **signature_* or nonce_reused** (401): An owner call's signature was invalid or stale. Sign again with a fresh nonce and expiry.
 - **rate_limited** (429): The address hit a rate limit. Retry after a delay.
