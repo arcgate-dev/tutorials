@@ -1,5 +1,18 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
+
+The epic branch `epic/7` at `18adb0a` ran `npm start` against the arcgate localnet from 23:53:24Z to 23:53:32Z. Every step passed. Source: `.runs/start-epic.log`, not committed.
+
+- API `http://127.0.0.1:19800`, MCP at `http://127.0.0.1:19800/mcp`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `commit: null`, so the arcgate checkout is `5addf63f`; the service does not confirm it.
+- `PRIVATE_KEY` and `AGENT_PRIVATE_KEY` were the same key, address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. No key is recorded here.
+- `tools/list` returned **32** tools. `health` ok, `tradeVenues` ok.
+- `tradeSearch`: 5000 base units, settlement `0xa9a9008828cb699107718bdb3a9ef8efa8469b1c2ceb2be192993dde7cced9c3`.
+- `tradeQuote`: 10000 base units, settlement `0xa219c16a03b79a22f59cbe47c40f7980a015eecdb3e2b890b05023531c7dce90`.
+- `boxStatus` found the existing box, so no `boxCreate` was paid.
+- Payer balance 593776 -> 578776 base units (the next run's start balance), which reconciles with the 15000 spent.
+- `npm test`: **39** tests passed; `npm run typecheck` printed no diagnostics.
+
 ## Production check, 2026-10-07 (UTC)
 
 POST https://api.arcgate.dev/mcp answers HTTP 404 text/html; /health is ok at commit 603c5f1. Production does not serve /mcp.

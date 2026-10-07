@@ -1,5 +1,30 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
+
+The epic branch `epic/7` at `18adb0a` ran `npm start` against the arcgate localnet from 23:55:17Z to 23:55:47Z, last of the five tutorials because its cleanup empties the shared box. Every step passed (box, inbound, watch, channel, messages, topup, cleanup) and so did the final check. Sources: `.runs/start-epic.log` and the run log `.runs/2e732838-909a-4a46-9fb8-b732ed1d373e.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `commit: null`, so the arcgate checkout is `5addf63f`; the service does not confirm it. `ARC_RPC_URL` the public `https://rpc.testnet.arc.io`; `WEBHOOK_URL` the default `https://192.0.2.10/arc-agent-box`.
+- Agent (box) address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. The box already existed, so there was no `boxCreate`. No key is recorded here.
+
+| Operation | Amount (base units) | Settlement | Request ID |
+| --- | --- | --- | --- |
+| `inboundCreate` | 10000 | `0xe71d43371cece1f5906e40bd1e9abcbc0a9f5afb33b4d7f9ff0b64bc1b04a43c` | `e2dc61ee` |
+| `watchCreate` (token) | 10000 | `0xf415b98f346f7561e30ed843b88a77be5a21d11719b5d338fdcaa497acdd4311` | `8434fdc7` |
+| `watchCreate` (screen) | 10000 | `0x88a1e9eb1f0259407cc26c4da1ea116f0d59419e536f4ce59aa63265f4ffc57c` | `91191d72` |
+| `watchCreate` (agents) | 10000 | `0x3f11d951d15788de194cc812614e954a21fd99f707caf2141ae33d49274564ca` | `8e071bb3` |
+| `tradeSearch` | 5000 | `0x952bf9dfaae3593e0ad8c32db0b3352bf8433ac31be5a5eaf922015254939e51` | `df794e3a` |
+| `webhookCreate` | 10000 | `0x6512fdaa59f069e40944d68fa74824548ad28dddcee4f24a76d889501fdbe978` | `7d243197` |
+| `boxTopUp` | 50000 | `0x64da387be915a54d7a34a78c1a1885d9ec5b58f2d3809a525bcc915e2ab97dc9` | `ce7af91b` |
+
+Total **105000** base units (0.105 USDC). The run printed a start balance of 0.558776; a balance read on Arc testnet afterward showed 453776 base units, which reconciles: 558776 - 105000 = 453776.
+
+- The inbound post was stored (201). The token watch fired on FAZE: the box held 22 inbound, 23 inbound and 24 `watch.token`; seq 23 was deleted. The top-up granted 4 messages and 0 days.
+- Cleanup deleted 2 inbound addresses, 4 watches and 1 webhook channel. One inbound address (`fMOpihnijPYUq2_PXc2RKA`) and one watch (screen `U1qr7JRzse8QX1zn1EqElg`) were arc-claude-agent's from its run minutes earlier; the screen id is in the watch list this run printed.
+- The final check left 22 inbound and 24 `watch.token` in the box.
+
+Offline: `npm test` passed **78** tests. `npm run capture` was not run, so `test/fixtures/localnet.json` stays the `12b0368f` capture.
+
 ## Localnet run at arcgate 5addf63f — 2026-10-07 (UTC)
 
 `npm start` ran on October 7, 2026 (about 23:05 UTC) against an arcgate localnet. Every step passed (box, inbound, watch, channel, messages, topup, cleanup), and so did the final check. Sources: `.runs/start-5addf63f.log` and the run log `.runs/52f308c9-b5c9-40fe-b1c6-938162adca94.jsonl`.

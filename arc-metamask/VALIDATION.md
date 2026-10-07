@@ -1,5 +1,21 @@
 # Validation
 
+## Epic #7 check: Beast Mode preview on the arcgate localnet, October 7, 2026 (UTC)
+
+The epic branch `epic/7` at `18adb0a` ran `npm run preview` (23:54:17Z to 23:55:07Z) and `npm run trade -- --execute` (23:55:10Z) against the arcgate localnet. Sources: `.runs/preview-epic.log`, `.runs/trade-epic.log` and the run log `.runs/7d93ef69-d046-4e94-99b0-f115eea05f5e.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`, so the arcgate checkout is `5addf63f`; the service does not confirm it. `ARCGATE_PAY_TO` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`.
+- `mm wallet trading-mode get --json` reported `beast` for `0x72e17261e04e6162a62f034d8d71053ea37d35a3` before the run; it was not switched.
+- `preview` passed. Testnet USDC was 0.055 at the start:
+  - search `0x1b158d3153774f159d0972317bb7b90467730866120ad4971779d376138aac0e` (`4c2831e4`, 5000 base units)
+  - quote `0xcb6c278f9817cbaab770b3b0a4dbd491e50bec18313d7c0b202b37f2e0b72023` (`8b075782`, 10000)
+  - swap `0x3349fe53505b343a34d632666fbdd11b70f753fd300b32527db4b758203ef8ed` (`a8905d58`, 10000)
+- Quote `q_d3451165bb2b9778`: sell 0.5 USDC, quoted 0.00000596 cirBTC, minimum 0.0000059. `mm decode` read `executeGraph` through router `0x0ea7461542fe051c013ab0f5860190bc847f3271`, `amountIn` 500000, `minOut` 590, recipient the wallet, funding Permit2, `permitAttached` false. The permit was not signed and nothing was sent.
+- `trade -- --execute` was refused before any payment, as designed on this row: "The API pays on eip155:5042002 but trades on eip155:5042. mm broadcasts to the real chain, so the trade runs only where the API pays on Arc mainnet. Use npm run preview here. No payment signed."
+- A balance read on Arc testnet afterward showed 0.030 USDC, which reconciles with the 25000 base units spent.
+
+Offline: `npm test` reports 67 pass, 0 fail.
+
 ## October 7, 2026 (UTC): Beast Mode on the arcgate localnet (testnet x402)
 
 Beast Mode, against the arcgate localnet at `http://127.0.0.1:19800`. The API takes its x402 payments on Arc testnet (`eip155:5042002`) and trades on a fork of Arc mainnet, so `trade` is refused before any payment. The run logs (`.runs/e946fb7f-41fb-4ff5-a3e7-f8376b9e30af.jsonl` and `.runs/135bf36b-066a-48a1-a38b-6114fe51aa88.jsonl`) are not committed.

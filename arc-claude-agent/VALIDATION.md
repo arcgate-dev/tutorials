@@ -1,5 +1,21 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
+
+The epic branch `epic/7` at `18adb0a` ran `npm start -- "<request>"` (23:53:38Z to 23:53:54Z), a POST to the new inbound url, and `npm run watch -- --once` (23:53:59Z to 23:54:07Z) against the arcgate localnet. Every step passed. Sources: `.runs/start-epic.log`, `.runs/post-epic.log` and `.runs/watch-epic.log`, not committed. The model ran on a logged-in Claude Code (`ANTHROPIC_API_KEY` empty), `CLAUDE_MODEL` `claude-sonnet-5-5`.
+
+- API `http://127.0.0.1:19800`, MCP at `http://127.0.0.1:19800/mcp`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `commit: null`, so the arcgate checkout is `5addf63f`; the service does not confirm it.
+- Payer and box address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`; the box already existed, so nothing was paid for it. No key is recorded here.
+- Request: `tell me when any token with verified safety passes 50k 24h volume, and give me an address my other bot can post to`.
+- Screen `U1qr7JRzse8QX1zn1EqElg`, `volume_24h` `gt` `50000` and `safety_verdict` `eq` `ok`. `watchCreate` settlement `0xa442e3c02b3156544ddf72e6913c26424e498ec2a3496bdc8f23ff4eb9ceb158`.
+- Inbound address `http://127.0.0.1:19803/fMOpihnijPYUq2_PXc2RKA` (secret `<redacted>`). `inboundCreate` settlement `0x317d57ec8073789679461ccdf3c62e59c9b9407a78157e507e6f3d291ed7702a`.
+- Spend line: `spent: x402 20000 base units (0.02 USDC) in 2 payments (20000 reserved under a cap of 80000); model $0.0237 (SDK estimate)`.
+- The POST answered `HTTP 201` `{"stored":true,...}`.
+- `watch --once` summarised and deleted seq 18 (an inbound post left by arc-agent-box's earlier run), seq 20 (a token watch hit) and seq 21 (the POST, signature not verified), and reported that none tried to give it instructions; model $0.0157 (SDK estimate).
+- Payer balance 578776 -> 558776 base units (the next run's start balance), which reconciles with the 20000 spent.
+- The screen and the inbound address were deleted minutes later by arc-agent-box's cleanup, which empties the shared box.
+- `npm test`: **62** tests passed; `npm run typecheck` printed no diagnostics.
+
 ## Localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
 
 `npm start`, a POST to the inbound url and `npm run watch -- --once` ran on October 7, 2026 against an arcgate localnet. Sources: `.runs/start-5addf63f.log` and `.runs/watch-5addf63f.log`. The start log prints the inbound secret in clear; it is recorded here as `<redacted>`.

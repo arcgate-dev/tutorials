@@ -1,5 +1,24 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
+
+The epic branch `epic/7` at `18adb0a` (origin/main merged, already up to date) ran `npm run inspect`, `npm run connect` and `npm run trade -- --execute` against the arcgate localnet between 23:52:37Z and 23:53:14Z. Every step passed. Sources: `.runs/inspect-epic.log`, `.runs/connect-epic.log`, `.runs/trade-epic.log` and the run log `.runs/979066ae-d82c-4e30-9e76-94d49a6c640a.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`, so the arcgate checkout is `5addf63f`; the service does not confirm it. `payTo` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`, set as `ARCGATE_PAY_TO`.
+- Taker `0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD` (`ARC-TESTNET`), `SELL_AMOUNT` `1`. Quote `q_8b75efecaa67ae43`, `next` `swap`, `approve.needs` `approve` (the fork no longer held the earlier allowance).
+
+| Step | Result | Detail |
+| --- | --- | --- |
+| search | pass | 5000 units, settlement `0x479d4ac7d2abb0c58e577178fc42a971d5375e1b3c4cdd9fb6fcdaf978f1c051`, request ID `09875e72` |
+| quote | pass | 10000 units, settlement `0xa96e028374ad4ae7e8ae4017769d4b4fc3de11be8c8aa3cfccc6f1e0dc0abaf4`, request ID `1bb9bf9e` |
+| swap | pass | 10000 units, settlement `0x524a9834778c4197b06a250eb0eeb69c8924dee5a2004dd1ecfc4a5f7b2676c9`, request ID `006fde66` |
+| send | pass | Approve `0x3ebd9621c69cf073c3c1ac3a514d9cb94d81dc97b20f8635ca7dced32af591c9` (block 23585402) and swap `0xd4b772592dcf913fe1c2ce4ed171dec493373157ac89fb905086888f62c8b04e` (block 23585403), both success. No `anvil_mine` was needed. |
+| receipt | pass | `result` `pass`, `next` `done`, delivered **1192** cirBTC units against `minAmountOut` **1180** |
+
+Fees 25000 units (0.025 USDC). The wallet's USDC went from `10.001048` (`connect`) to `9.976048` (Arc testnet balance read afterward), which reconciles.
+
+Offline: `npm test` passed **59** tests. No Circle keys, entity secrets or wallet IDs are recorded here.
+
 ## Localnet run — October 7, 2026
 
 The tutorial ran against the arcgate localnet on **October 7, 2026 (UTC)** in two attempts. The first stopped at the approval (the send step); the second passed every step and the free receipt returned `pass`. Settlement hashes and request IDs below are copied from the run logs in `.runs/`.
