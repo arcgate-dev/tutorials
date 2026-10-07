@@ -715,4 +715,6 @@ CAPTURE_API_COMMIT=<arcgate HEAD> npm run capture
 
 This runs the start command (whose topup is charged) under a recording fetch, then captures two extra topup runs, and writes test/fixtures/localnet.json with redacted secrets.
 
+A box keeps an earlier run's watch hit (message retention), and the run accepts any watch hit it holds. A re-capture that reuses the default FAZE can therefore finish and write a fixture whose own token watch never fired, and `npm test` then fails on the watch-hit test. Before re-capturing, run `npm run cleanup` and set WATCH_TOKEN to a token this localnet has not checked.
+
 For more information, see [Arcgate docs](https://docs.arcgate.dev) and the test evidence in [VALIDATION.md](VALIDATION.md).
