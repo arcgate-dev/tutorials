@@ -91,13 +91,20 @@ async function tradingMode(run) {
   return (await run(['wallet', 'trading-mode', 'get'])).mode;
 }
 
-// Guard unless the owner opted into beast with --beast; the wallet must already be in that mode.
-export async function loadWallet(run = runMm, expectedMode = 'guard') {
+// The tutorial runs only in Beast Mode, which the owner enables once by hand. It never switches the mode itself.
+function requireBeast(mode) {
+  if (mode === 'beast') return;
+  throw new Error(mode === 'guard'
+    ? 'The wallet is in Guard Mode and this tutorial runs only in Beast Mode. The owner switches it once with: mm wallet trading-mode set beast (email MFA). The tutorial never switches it.'
+    : `The wallet reports trading mode ${JSON.stringify(mode)}; this tutorial runs only in Beast Mode.`);
+}
+
+export async function loadWallet(run = runMm) {
   const doctor = await run(['doctor']);
   if (doctor.cli !== '7.0.0') throw new Error('This tutorial requires @metamask/agent-wallet@7.0.0.');
   if (!doctor.authenticated || !doctor.initialized) throw new Error('Complete mm login and mm init, then recheck mm doctor.');
   const mode = await tradingMode(run);
-  if (mode !== expectedMode) throw new Error(`The wallet is in ${mode} mode; this run expects ${expectedMode}. Pass --beast only for a wallet you switched to beast yourself; this tutorial never switches it.`);
+  requireBeast(mode);
   const { chains } = await run(['chains', 'list']);
   for (const [key, id] of [['arc', 5042], ['arc-testnet', 5042002]]) {
     if (!chains?.some(chain => chain.key === key && chain.chainId === id && chain.caip2 === `eip155:${id}`)) {
@@ -105,8 +112,7 @@ export async function loadWallet(run = runMm, expectedMode = 'guard') {
     }
   }
   const address = getAddress((await run(['wallet', 'address'])).address);
-  return { address, walletMode: 'server-wallet', tradingMode: mode, chains: chains.filter(chain => ['arc', 'arc-testnet'].includes(chain.key)),
-    policy: (await run(['wallet', 'policy', 'get'])).policy };
+  return { address, walletMode: 'server-wallet', tradingMode: mode, chains: chains.filter(chain => ['arc', 'arc-testnet'].includes(chain.key)) };
 }
 
 function complete(result, field) {
@@ -118,19 +124,23 @@ function complete(result, field) {
   return result[field];
 }
 
-export function createWallet(address, run = runMm, record = () => {}, expectedMode = 'guard') {
+export function createWallet(address, run = runMm, record = () => {}, config) {
   const wallet = getAddress(address);
   async function sameWallet() {
     if (getAddress((await run(['wallet', 'address'])).address) !== wallet) throw new Error('The active mm wallet changed. Refusing to sign or send.');
-    if (await tradingMode(run) !== expectedMode) throw new Error('The mm wallet mode changed.');
+    requireBeast(await tradingMode(run));
   }
   return {
     address: wallet,
     async signTypedData(data) {
-      if (BigInt(data.domain.chainId) !== 5042n) throw new Error('Only Arc mainnet typed data is allowed.');
+      // x402 signs on the payment chain and Permit2 on the trade chain; mm signs for the chain in the typed data's domain.
+      const chainId = BigInt(data.domain.chainId);
+      if (![config.paymentChainId, config.tradeChainId].some(allowed => BigInt(allowed) === chainId)) {
+        throw new Error(`Typed data for chain ${chainId} is not allowed; only ${config.paymentChainId} and ${config.tradeChainId}.`);
+      }
       await sameWallet();
-      record({ state: 'signing', primaryType: data.primaryType, chainId: 5042, verifyingContract: data.domain.verifyingContract });
-      const result = await run(['wallet', 'sign-typed-data', '--chain-id', '5042', '--payload', json(data), '--wait', '--wallet-timeout', '60']);
+      record({ state: 'signing', primaryType: data.primaryType, chainId: Number(chainId), verifyingContract: data.domain.verifyingContract });
+      const result = await run(['wallet', 'sign-typed-data', '--chain-id', String(chainId), '--payload', json(data), '--wait', '--wallet-timeout', '60']);
       record({ state: result.status, operation: 'sign-typed-data', pollingId: result.pollingId });
       const signature = complete(result, 'signature');
       if (getAddress(await recoverTypedDataAddress({ ...data, signature })) !== wallet) throw new Error('MetaMask signature did not recover to the selected wallet.');
@@ -151,7 +161,7 @@ export function createWallet(address, run = runMm, record = () => {}, expectedMo
       await sameWallet();
       const payload = { to: getAddress(tx.to), data: tx.data, value: numberToHex(BigInt(tx.value)), gas: numberToHex(BigInt(tx.gas)) };
       record({ state: 'submitting', purpose: tx.purpose, to: payload.to, value: tx.value });
-      const result = await run(['wallet', 'send-transaction', '--chain-id', '5042', '--payload', json(payload), '--wait', '--wallet-timeout', '60']);
+      const result = await run(['wallet', 'send-transaction', '--chain-id', String(config.tradeChainId), '--payload', json(payload), '--wait', '--wallet-timeout', '60']);
       record({ state: result.status, purpose: tx.purpose, pollingId: result.pollingId, transaction: result.hash });
       return complete(result, 'hash');
     },

@@ -1,0 +1,368 @@
+{
+  "capturedAt": "2026-10-06T23:48:51.722Z",
+  "source": "arcgate localnet at http://127.0.0.1:19800, unpaid requests and free calls only (no payment signed)",
+  "healthCommit": null,
+  "arcgateCheckoutCommit": "cf70f87",
+  "health": {
+    "ok": true,
+    "db": {
+      "ok": true,
+      "tokens": 217898,
+      "verified": 68,
+      "importedAt": 1790388601
+    },
+    "rulesVersion": "r2-383954828c",
+    "commit": null,
+    "caches": {
+      "response": {
+        "hits": 0,
+        "misses": 0,
+        "size": 0,
+        "bytes": 0
+      },
+      "candidates": {
+        "hits": 0,
+        "misses": 0,
+        "size": 0,
+        "bytes": 0
+      },
+      "generations": {
+        "keys": 0,
+        "bumps": 0
+      },
+      "abuse": {
+        "missCacheSize": 0,
+        "payersTracked": 0,
+        "rateLimited": 0
+      },
+      "singleflight": {
+        "response": {
+          "hits": 0,
+          "leaders": 0
+        },
+        "probe": {
+          "hits": 0,
+          "leaders": 0
+        },
+        "depth": {
+          "hits": 0,
+          "leaders": 0
+        }
+      },
+      "quote": {
+        "lastEthCalls": 0,
+        "lastSafetyEthCalls": 0,
+        "lastCollapsed": false
+      }
+    },
+    "rpc": {
+      "counts": {
+        "arc_anvil_local:eth_getCode": 2
+      },
+      "total": 2,
+      "endpoints": [
+        {
+          "id": "arc_anvil_local",
+          "health": 1,
+          "circuit": "closed",
+          "circuits": {
+            "logs": "closed",
+            "call": "closed",
+            "simulate": "closed",
+            "probe": "closed"
+          },
+          "weight": 100,
+          "priority": 1,
+          "capabilities": [
+            "logs",
+            "call",
+            "simulate",
+            "probe",
+            "backfill"
+          ],
+          "calls": 2,
+          "budget": {
+            "used": 2007,
+            "limit": null,
+            "pct": 0,
+            "state": "ok"
+          },
+          "byCapability": {
+            "logs": {
+              "used": 0,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            },
+            "call": {
+              "used": 1174,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            },
+            "simulate": {
+              "used": 833,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            }
+          },
+          "queue": {
+            "waiting": 0,
+            "max": 180000,
+            "rejected": 0
+          }
+        }
+      ]
+    },
+    "spend": {
+      "counts": {
+        "arc_anvil_local:eth_getCode": 2
+      },
+      "month": [
+        {
+          "provider": "arc_public",
+          "method": "eth_blockNumber",
+          "month": "2026-09",
+          "calls": 8260
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getLogs",
+          "month": "2026-09",
+          "calls": 191776
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 17696
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getCode",
+          "month": "2026-09",
+          "calls": 156
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-09",
+          "calls": 97
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_simulateV1",
+          "month": "2026-09",
+          "calls": 272
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-09",
+          "calls": 1290
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 427
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getCode",
+          "month": "2026-09",
+          "calls": 390
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 644
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-09",
+          "calls": 377
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_simulateV1",
+          "month": "2026-09",
+          "calls": 650
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getBalance",
+          "month": "2026-09",
+          "calls": 105
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getTransactionByHash",
+          "month": "2026-09",
+          "calls": 27
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getTransactionReceipt",
+          "month": "2026-09",
+          "calls": 27
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getCode",
+          "month": "2026-10",
+          "calls": 220
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_call",
+          "month": "2026-10",
+          "calls": 585
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-10",
+          "calls": 278
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_simulateV1",
+          "month": "2026-10",
+          "calls": 659
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getBalance",
+          "month": "2026-10",
+          "calls": 89
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getTransactionByHash",
+          "month": "2026-10",
+          "calls": 88
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getTransactionReceipt",
+          "month": "2026-10",
+          "calls": 88
+        }
+      ],
+      "budgets": {
+        "arc_anvil_local": {
+          "used": 2007,
+          "limit": null,
+          "pct": 0,
+          "state": "ok"
+        }
+      }
+    },
+    "indexer": null,
+    "safety": {
+      "enqueued": 0,
+      "collapsed": 0,
+      "dropped": 0,
+      "running": 0,
+      "done": 0,
+      "failed": 0,
+      "simulateCalls": 0,
+      "skippedPinned": 0
+    },
+    "payerIdentity": "x402",
+    "x402": {
+      "enabled": true,
+      "network": "eip155:5042002"
+    }
+  },
+  "search402": {
+    "status": 402,
+    "requestId": "7264a6a5",
+    "requestBody": {
+      "query": "cirBTC",
+      "limit": 5
+    },
+    "paymentRequired": {
+      "x402Version": 2,
+      "error": "Payment required",
+      "resource": {
+        "url": "http://127.0.0.1:19800/trade/v1/search",
+        "description": "Token search",
+        "mimeType": ""
+      },
+      "accepts": [
+        {
+          "scheme": "exact",
+          "network": "eip155:5042002",
+          "amount": "5000",
+          "asset": "0x3600000000000000000000000000000000000000",
+          "payTo": "0x987F719b516f528f4080EF0853E37aD5d7E773A0",
+          "maxTimeoutSeconds": 300,
+          "extra": {
+            "name": "USDC",
+            "version": "2"
+          }
+        }
+      ]
+    },
+    "body": {
+      "error": {
+        "code": "payment_required",
+        "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+        "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042002, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See http://127.0.0.1:19801/#arcgate/description/paying-arcgate-from-your-own-code"
+      },
+      "next": "pay"
+    }
+  },
+  "swapTx": {
+    "status": 409,
+    "requestId": "3350e5e5",
+    "requestBody": {
+      "quoteId": "q_0123456789abcdef",
+      "taker": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+      "recipient": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+      "deadlineSec": 300,
+      "permit": {
+        "message": {
+          "details": {
+            "token": "0x3600000000000000000000000000000000000000",
+            "amount": "500000",
+            "expiration": "1793000000",
+            "nonce": "0"
+          },
+          "spender": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
+          "sigDeadline": "1790000000"
+        },
+        "signature": "0xababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab"
+      }
+    },
+    "body": {
+      "error": {
+        "code": "no_pending_swap",
+        "message": "no pending permit round for this quoteId/taker/recipient - call POST /trade/v1/swap first, which is paid and returns the permit this call takes"
+      },
+      "next": "fix_request"
+    }
+  },
+  "receiptUnknown": {
+    "status": 404,
+    "requestId": "3588dcc7",
+    "requestBody": {
+      "quoteId": "q_0123456789abcdef",
+      "txHashes": [
+        "0xabababababababababababababababababababababababababababababababab"
+      ]
+    },
+    "body": {
+      "error": {
+        "code": "swap_not_found",
+        "message": "no /trade/v1/swap answer was issued for that quoteId in the last hour"
+      },
+      "next": "stop"
+    }
+  }
+}
