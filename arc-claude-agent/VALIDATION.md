@@ -1,5 +1,22 @@
 # Validation
 
+## Localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
+
+`npm start`, a POST to the inbound url and `npm run watch -- --once` ran on October 7, 2026 against an arcgate localnet. Sources: `.runs/start-5addf63f.log` and `.runs/watch-5addf63f.log`. The start log prints the inbound secret in clear; it is recorded here as `<redacted>`.
+
+- API: `http://127.0.0.1:19800`, MCP at `http://127.0.0.1:19800/mcp`. `/health` reports `commit: null` on localnet, so the arcgate checkout is `5addf63f`; the service does not confirm it.
+- Payer and box address: `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. The box already existed, so nothing was paid for it. No key is recorded here.
+- Request: `tell me when any token with verified safety passes 50k 24h volume, and give me an address my other bot can post to`.
+- Screen `1GaY52Muj9By8NI1HzvGzA`, condition `volume_24h` `gt` `50000` and `safety_verdict` `eq` `ok`. Settlement for `watchCreate`: `0xd1819b07df83e1fdaf9dad49ccf87d741811f8f20880d4082d6259c49ddf64f9`.
+- Inbound address `http://127.0.0.1:19803/j_JpOCeMTNJQwYwkWlkrMg`; the log line reads `inbound address: http://127.0.0.1:19803/j_JpOCeMTNJQwYwkWlkrMg secret <redacted> (shown once: store it)`. Settlement for `inboundCreate`: `0xedb456286b9a2662ce165dce5be7582ab26355ad67e3cf3f4b4ed18625cf6020`.
+- Spend line: `spent: x402 20000 base units (0.02 USDC) in 2 payments (20000 reserved under a cap of 80000); model $0.0838 (SDK estimate)`.
+- The POST's 201 is not in a log. Its evidence is that `watch --once` listed seq 17, "a message from my other bot", signature not verified (`watch-5addf63f.log`), so the note was stored.
+- `npm run watch -- --once` summarised and deleted seq 12, 14, 15 and 17; model $0.0244 (SDK estimate).
+- Payer balance 718776 -> 698776 base units, which reconciles with the 20000 spent.
+- The screen and the inbound address were deleted later the same day by arc-agent-box's cleanup, which empties the shared box.
+- `npm test`: **62** tests passed; `npm run typecheck` is clean.
+- `npm run capture` was not rerun, so the fixtures stay the `94806e7` capture recorded below.
+
 ## Localnet run, 2026-10-07 (UTC)
 
 `npm run capture`, `npm start`, a POST to the inbound url and `npm run watch -- --once` ran on October 7, 2026 against an arcgate localnet:
