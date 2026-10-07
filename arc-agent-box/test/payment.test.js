@@ -385,6 +385,17 @@ test('other failures do not say may have settled', async () => {
   assert.equal(healthError.status, 502);
   assert.match(healthError.message, /X402MiddlewareError: facilitator verify failed/);
 
+  // The same 502 on the first, unsigned request of a paid operation: nothing was signed, so nothing may have settled.
+  const unsigned = scripted(middleware502);
+  const unsignedClient = await setup(w, unsigned.fetchFn);
+  const unsignedError = await unsignedClient.call(...topUp(w)).then(() => assert.fail('expected a refusal'), failure => failure);
+  assert.ok(unsignedError instanceof ArcgateError);
+  assert.equal(unsignedError.status, 502);
+  assert.match(unsignedError.message, /X402MiddlewareError: facilitator verify failed/);
+  assert.doesNotMatch(unsignedError.message, /may have settled/);
+  assert.equal(unsignedClient.signed(), 0, 'nothing was signed');
+  assert.equal(unsigned.requests.length, 1);
+
   // The same 502 on a paid call does warn, so the checks above are not satisfied by a warning that never appears.
   const control = scripted(respond(w.unpaid), middleware502);
   const controlClient = await setup(w, control.fetchFn);
