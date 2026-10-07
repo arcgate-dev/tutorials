@@ -1,5 +1,21 @@
 # Validation
 
+## October 7, 2026 (UTC): Beast Mode only, network row, captured responses; the mainnet trade is blocked at payment
+
+The tutorial now runs every wallet command in Beast Mode only (no `--beast` flag, no policy script), takes its payment network from `/health` and the 402, and its tests clone every API response from a capture. **No Beast Mode trade was completed on October 7, so there is no `test/fixtures/mainnet-trade.json` and `npm test` has one failing test, 'the captured mainnet trade passes runFlow(trade) offline'.** It passes once that capture is committed.
+
+Offline: 68 tests, 67 pass. `every wallet command refuses to run in Guard Mode` passes (connect, search, quote, preview and `trade --execute` read `wallet trading-mode get`, refuse with the Guard Mode message, and sign, send and fetch nothing). The same test fails against the code before this change (commit `7ddf913`'s source): with only `src/config.js` updated so the import resolves, `main()` ignores the injected `mm` runner, so it never reads the trading mode and tries to start the real `mm` (`message must name Guard Mode: Could not start mm`).
+
+Live, against `https://api.arcgate.dev` (commit `603c5f1`, `/health` ok, `x402.network` `eip155:5042`):
+
+- `mm wallet trading-mode get --json` reported `beast`. `npm run inspect` and `npm run connect` passed; the wallet held 7.959815 USDC on Arc mainnet.
+- `npm run trade -- --execute` ran twice (09:20:24Z and 09:20:45Z, the allowed maximum). Both stopped at the first paid call: `search` signed its x402 payment with `mm`, and the API answered **HTTP 402 with an empty body and no `PAYMENT-RESPONSE`** (`requestId` `a80a73bc` and `a9ceb06e`; run logs `.runs/2855b233-d189-493d-92e2-0b981eee9a17.jsonl` and `.runs/d48846c0-d13d-47d6-a6f1-3234ffef4b26.jsonl`, not committed). No settlement hash was returned, the USDC balance was unchanged at 7.959815 afterward, and no transaction was sent. The 0.50 USDC order was never started.
+- Earlier on October 7 (00:09Z to 02:58Z), 38 runs mostly failed at the same facilitator step (`402 invalid_exact_evm_transaction_failed` "Request exceeds defined limit", or no `PAYMENT-RESPONSE`) and spent 0.23 USDC. The production preview that did succeed is captured in `test/fixtures/mainnet-run.json` (00:23:19Z).
+
+Against the arcgate localnet (`http://127.0.0.1:19800`, payment on `eip155:5042002`): `inspect` and `connect` passed with `ARCGATE_PAY_TO` taken from the 402. The `mm` wallet held 0.005 testnet USDC, less than the 0.025 a preview costs, so `preview` was not rerun; the preview that is recorded is the 2026-10-07T00:11Z one in `test/fixtures/localnet-run.json`. `trade` on this row is refused before any payment, because `mm` broadcasts to the real chain and the localnet is a fork.
+
+OpenAPI gate (Ajv 2020 with ajv-formats, outside the repository) over every request and response in `test/fixtures/*.json` against `arcgate/docs/openapi.json` (sha256 `a7bbe7e4ea6730df974bb1b7c9b9b11cdff77c5bc9cf3520702d2890253ee698`): 46 checks, 44 pass. Both failures are the deployed API's own drift from that spec in `mainnet-run.json`: the search result lacks `evidence.trades24h`, `sells24h`, `sellers24h`, `topTraderShare24h` and `origin.website`/`twitter`, and the quote lacks the required `next` and has extra `buy.verification` properties. Every localnet capture passes. The trade schemas match `cf70f87`, where the localnet capture was taken, except one description line in `QuoteBestOut`. They differ from the deployed `https://api.arcgate.dev/openapi.json`, which lags (26 of the 37 trade, health and payment schemas differ).
+
 ## Retest on September 30, 2026 (UTC): current API, same MetaMask blocker
 
 The tutorial now uses the current Arcgate API: the Permit2 second round is the **free `POST /trade/v1/swap/tx`** (not a second paid `/swap`), and a finished trade is confirmed with the **free `POST /trade/v1/receipt`**. The executing command's API budget fell from 0.035 to **0.025 USDC**. All 36 offline tests pass.
