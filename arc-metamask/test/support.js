@@ -46,3 +46,19 @@ export function guardRefusal(error) {
   assert(!/--beast/.test(error.message), `message must not offer a --beast flag: ${error.message}`);
   return true;
 }
+
+// Answers JSON-RPC POSTs by URL and records each as { url, method, params }. endpoints maps an RPC URL to a function of
+// { method, params } returning the result; a URL or method it does not know is an error, so a stray request cannot pass silently.
+export function rpcFetch(endpoints, seen = []) {
+  return async (url, init = {}) => {
+    const { method, params = [], id } = JSON.parse(init.body);
+    const at = String(url).replace(/\/$/, ''); // viem requests the origin with a trailing slash
+    seen.push({ url: at, method, params });
+    const answer = endpoints[at];
+    if (!answer) throw new Error(`Unexpected RPC request to ${at}: ${method}`);
+    return Response.json({ jsonrpc: '2.0', id, result: answer({ method, params }) });
+  };
+}
+
+// The ABI word for an unsigned integer, as an eth_call returns balanceOf.
+export const word = value => `0x${BigInt(value).toString(16).padStart(64, '0')}`;
