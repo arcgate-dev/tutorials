@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { erc20Abi, formatUnits } from 'viem';
 import { createAgentClient, signedPath } from './agent.js';
-import { ALLOWED_NETWORKS, PAID_OPERATIONS, SCREEN_WATCH, tokenWatch } from './config.js';
+import { AGENTS_WATCH, ALLOWED_NETWORKS, PAID_OPERATIONS, SCREEN_WATCH, tokenWatch } from './config.js';
 import { ArcgateError } from './http.js';
 import { postInbound } from './inbound.js';
 import { createArcgateClient, USDC } from './payment.js';
@@ -96,14 +96,14 @@ async function inboundStep(ctx, { pay, own }) {
 
 async function watchStep(ctx, { pay, own }) {
   const { log, config } = ctx;
-  for (const condition of [tokenWatch(config.watchToken), SCREEN_WATCH]) {
+  for (const condition of [tokenWatch(config.watchToken), SCREEN_WATCH, AGENTS_WATCH]) {
     log(`Watch created: ${show(await pay('watchCreate', { condition }))}`);
   }
   log(`The box's watches: ${show(await own('watchList'))}`);
-  // A watch fires when the index changes something about its token. With the indexer off, a search that
-  // names the token is what gets it checked, and the check is what the index reports.
+  // The token watch and the screen wait for the index to change something about a token; the agent screen waits for the
+  // agent directory. With the indexer off, a search that names the token is what gets it checked, and the check is what the index reports.
   const found = await pay('tradeSearch', { query: config.watchToken, limit: 5 });
-  log(`Searched for ${config.watchToken} (${found.results?.length ?? 0} results): this makes the index name the token, which is what the watches wait for.`);
+  log(`Searched for ${config.watchToken} (${found.results?.length ?? 0} results): this makes the index name the token, which is what the token watch and the screen wait for (the agent screen waits for the directory).`);
 }
 
 // channel -----------------------------------------------------------------------------------------

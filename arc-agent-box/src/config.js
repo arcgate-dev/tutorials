@@ -29,11 +29,13 @@ export const OWNER_OPERATIONS = {
 // that finds its evidence missing or stale and checks it, and a token is checked once. A pinned asset such as cirBTC
 // is never checked. So the default is the token the recorded run searched, and WATCH_TOKEN picks another for a rerun.
 const FAZE = '0xf81afef268aca40717e0adcae7c41514327cfaab';
-export const tokenWatch = token => ({ kind: 'volume_24h', token, direction: 'above', value: 100_000 });
+export const tokenWatch = token => ({ kind: 'token', token, where: [{ field: 'volume_24h', op: 'gt', value: 100_000 }] });
 export const SCREEN_WATCH = { kind: 'screen', where: [
   { field: 'volume_24h', op: 'gt', value: 100_000 },
   { field: 'safety_verdict', op: 'eq', value: 'ok' },
 ] };
+// chainId is the agent directory's chain (Arc mainnet, the one the deployment serves, shown in boxStatus.registeredAgents), not the payment network.
+export const AGENTS_WATCH = { kind: 'agents', chainId: 5042, on: ['registered'] };
 
 // The one origin rule: https, or http only for localhost and 127.0.0.1, with no credentials, query or fragment.
 function checkOrigin(url) {
@@ -70,7 +72,7 @@ export function loadConfig(env = process.env) {
     webhookUrl: env.WEBHOOK_URL || 'https://192.0.2.10/arc-agent-box',
     watchToken: watchToken(env.WATCH_TOKEN || FAZE),
     maxPayment: 50_000n, // 0.05 USDC per API call
-    maxTotal: 150_000n, // per command run: box 0.05 + inbound 0.01 + 2 watches 0.02 + search 0.005 + webhook 0.01 + topup 0.05. Never reset after a timeout.
+    maxTotal: 160_000n, // per command run: box 0.05 + inbound 0.01 + 3 watches 0.03 + search 0.005 + webhook 0.01 + topup 0.05 = 0.155. Never reset after a timeout.
   };
 }
 
