@@ -80,9 +80,9 @@ export function swap({ args, approval = false } = {}) {
   return response;
 }
 
-// TODO(#8): the /swap/tx answer and the /receipt answer below are not captured. The Beast Mode mainnet trade (`npm run trade -- --execute`)
-// failed at the production facilitator's x402 settlement on both attempts, so test/fixtures/mainnet-trade.json does not exist yet.
-// Replace both with clones of it. Until then they are the captured first swap with only the fields the final round changes.
+// TODO(#11): the /swap/tx answer and the /receipt answer below are not captured. /swap/tx needs a Permit2 signature for chain 5042, and the
+// localnet's fork router stands in for the real mainnet router, so that permit must not be signed there. Replace both with clones of the
+// Beast Mode mainnet trade capture when #11 records it. Until then they are the captured first swap with only the fields the final round changes.
 export function finalSwap(signed, args = swapArgs(signed)) {
   const response = first();
   delete response.next; // the deployed API omits next on /swap/tx; the local one says send
