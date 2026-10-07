@@ -93,7 +93,7 @@ export function createArcgateClient({ wallet, config, health, terms, fetchFn = f
     catch { throw new Error(`${operationId}: response lost after payment was signed. It may have settled. Do not automatically retry.`); }
     const receipt = paid.headers.get('payment-response');
     const settlement = receipt ? decodePaymentResponseHeader(receipt) : null;
-    const result = await readApiResponse(operationId, paid, record, settlement);
+    const result = await readApiResponse(operationId, paid, record, settlement, true);
     if (!settlement?.success || settlement.network !== network
         || !/^0x[0-9a-fA-F]{64}$/.test(settlement.transaction ?? '')
         || getAddress(settlement.payer) !== wallet.address) {

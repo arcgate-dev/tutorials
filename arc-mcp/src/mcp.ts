@@ -60,7 +60,14 @@ export async function connectArcgate({ config, fetchFn, log }: { config: Config;
     /** A tool call: free, or paid once. An error result is returned, not thrown. */
     async call(tool: string, args: Record<string, unknown>) {
       signing.tool = tool;
-      const out = await mcp.callTool(tool, args);
+      signing.offer = undefined as PaymentRequirements | undefined; // the hook sets it when a payment is signed
+      // A signed payment that gets no answer (an HTTP 502, a failed fetch) may have settled: the reservation stays and nothing is sent again.
+      let out;
+      try { out = await mcp.callTool(tool, args); }
+      catch (error) {
+        if (!signing.offer) throw error;
+        throw new Error(`${tool}: no answer after the payment was sent (${error instanceof Error ? error.message : String(error)}); the payment may have settled. Check the transaction or your USDC balance before paying again.`);
+      }
       const result: ToolResult = { content: out.content as ToolResult['content'], isError: out.isError };
       if (!out.paymentMade) return { result, charged: false as const };
       // The payment is signed and sent: whatever comes back, its reservation stays.
