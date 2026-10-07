@@ -39,3 +39,21 @@ test('the captured bodies are refused once the API says otherwise or a field is 
   refuses(({ swap }) => { swap.transactions[0].to = wallet.address; }, ({ swap }) => reviewSwap(swap, quote, wallet, row, 590n, null, now));
   assert.equal(reviewQuote(quote, row), 590n); // the unchanged capture still passes
 });
+
+// The same, for production (603c5f1): captured from `npm run preview` on Arc mainnet, where the deployed API omits `next` on a quote.
+const production = JSON.parse(readFileSync(new URL('./fixtures/mainnet-run.json', import.meta.url), 'utf8'));
+
+test('the captured production quote and first swap pass every guard on the Arc mainnet row', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.parse(production.capturedAt) });
+  const now = Math.floor(Date.parse(production.capturedAt) / 1000);
+  const mainnet = forNetwork(loadConfig({}), 'eip155:5042', {});
+  const { search, quote, swap } = structuredClone({ search: production.search.paid.body, quote: production.quote.paid.body, swap: production.swap.paid.body });
+  assert.equal(production.search.unpaid.paymentRequired.accepts[0].payTo, mainnet.payTo); // the pinned payee is what production asks for
+  assert.equal(quote.next, undefined);
+  assert.equal(pickToken(search, mainnet).symbol, 'cirBTC');
+  const minimum = reviewQuote(quote, mainnet);
+  assert.equal(swap.next, 'sign_permit');
+  assert.deepEqual(reviewSwap(swap, quote, { address: getAddress(production.taker) }, mainnet, minimum, null, now).map(tx => tx.purpose), ['swap']);
+  quote.next = 'stop'; // the same capture, with the API telling the caller to stop
+  assert.throws(() => reviewQuote(quote, mainnet));
+});
