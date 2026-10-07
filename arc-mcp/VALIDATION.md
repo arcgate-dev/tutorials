@@ -4,6 +4,21 @@
 
 POST https://api.arcgate.dev/mcp answers HTTP 404 text/html; /health is ok at commit 603c5f1. Production does not serve /mcp.
 
+## Localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
+
+`npm start` ran on October 7, 2026 against an arcgate localnet. Source: `.runs/start-5addf63f.log`.
+
+- API: `http://127.0.0.1:19800`, MCP at `http://127.0.0.1:19800/mcp`. `/health` reports `commit: null` on localnet, so the arcgate checkout is `5addf63f`; the service does not confirm it.
+- `PRIVATE_KEY` and `AGENT_PRIVATE_KEY` were the same key, address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. No key is recorded here.
+- `tools/list` returned **32** tools, which matches the fixture and the README.
+- `health` ok and `tradeVenues` ok.
+- `tradeSearch`: 5000 base units (0.005 USDC), settlement `0x5869d21aa762b3a034d9132748028221ad8fc221a1033544466481340c962878`.
+- `tradeQuote`: 10000 base units (0.01 USDC), settlement `0x34a7f0da78b96271f0dda54717345444eaa41609caeed6dccb3f100139ed8049`.
+- `boxStatus` found the existing box, so no `boxCreate` was paid.
+- Payer balance 733776 -> 718776 base units, which reconciles: 5000 + 10000 = 15000.
+- `npm test`: **39** tests passed; `npm run typecheck` is clean.
+- `npm run capture` was not rerun because it needs an agent address with no box, so the fixtures stay the `d85271c` capture recorded below.
+
 ## Localnet run, 2026-10-07 (UTC)
 
 `npm run capture`, then `npm start`, ran on October 7, 2026 against an arcgate localnet:
