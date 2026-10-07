@@ -74,7 +74,9 @@ export async function captureFixtures({ config, fetchFn, dir, log }: { config: C
 
   const second = await connectArcgate({ config, fetchFn: tee, log });
   try {
-    await second.call('boxCreate', { address });
+    const exists = await second.call('boxCreate', { address });
+    // A settlement failure or a verify refusal is not the box_exists answer, and must not be filed as it.
+    if (!exists.result.isError || errorOf(exists.result).code !== 'box_exists') throw refusal('boxCreate', exists.result);
   } finally {
     await second.close();
   }
