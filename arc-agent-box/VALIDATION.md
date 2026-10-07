@@ -1,5 +1,35 @@
 # Validation
 
+## Localnet run at arcgate 5addf63f — 2026-10-07 (UTC)
+
+`npm start` ran on October 7, 2026 (about 23:05 UTC) against an arcgate localnet. Every step passed (box, inbound, watch, channel, messages, topup, cleanup), and so did the final check. Sources: `.runs/start-5addf63f.log` and the run log `.runs/52f308c9-b5c9-40fe-b1c6-938162adca94.jsonl`.
+
+- API: `http://127.0.0.1:19800`. `/health` reports `commit: null` on localnet, so the arcgate checkout is `5addf63f`; the service does not confirm it.
+- Agent (box) address: `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. The box already existed, so there was no `boxCreate`.
+- `ARC_RPC_URL` was the public `https://rpc.testnet.arc.io`.
+- Order: this run went last, after arc-mcp, arc-claude-agent and arc-circle, because its cleanup empties the shared box.
+
+| Operation | Amount (base units) | Settlement | Request ID |
+| --- | --- | --- | --- |
+| `inboundCreate` | 10000 | `0xa7697214d7a8d2a801cbf7ff2f80b57558c2f6c847a931c14150311e6d216d20` | `8f55182b` |
+| `watchCreate` | 10000 | `0x87a328cdd418c16da29ec5b9afee934c843d95f05370b9fee0149ebb8c02b014` | `b255ab82` |
+| `watchCreate` | 10000 | `0xf87ebf2e743c31286188891fc22734ede6e0a9591daff74241ea09731efe145a` | `45dbc1af` |
+| `watchCreate` | 10000 | `0x4dfe76c1c16cc66391eff020475d6c3f3318f0fcf945d4230c915b933067bc38` | `6c420e97` |
+| `tradeSearch` | 5000 | `0xc5acd86a6add424c552593701ca7f8cab43363b3f35f09dcbe3f98ad99d2a04d` | `da527b8b` |
+| `webhookCreate` | 10000 | `0x925164348b7c02cd2df31c23152848f370e288e4743fa2569b4fedb4ed8f98ec` | `a6de2210` |
+| `boxTopUp` | 50000 | `0xf3c16b41953d7db7be0824ab94c2cc2646d7e86713e25305814070cb0a62ae9d` | `9b3595e6` |
+
+Total **105000** base units (0.105 USDC). The payer's USDC balance went from 698776 (the log prints `0.698776` at the start) to 593776, which reconciles: 698776 - 105000 = 593776.
+
+Cleanup deleted 4 watches, 2 inbound addresses and 1 webhook channel. Because the box is shared, that included work left by an earlier tutorial's run:
+
+- One of the 4 watches was arc-claude-agent's screen `1GaY52Muj9By8NI1HzvGzA`. That id is confirmed: it appears in the watch list this run printed.
+- One of the 2 inbound addresses was arc-claude-agent's `j_JpOCeMTNJQwYwkWlkrMg`. That is inferred, because the log prints only the count (`inboundDelete: deleted 2`).
+
+Offline tests: `npm test` in `arc-agent-box` passed **78** tests.
+
+`npm run capture` was not run, so `test/fixtures/localnet.json` stays the `12b0368f` capture recorded below. No key is recorded here.
+
 ## Localnet run — 2026-10-07 (UTC)
 
 `CAPTURE_API_COMMIT=12b0368f npm run capture` ran on October 7, 2026 against an arcgate localnet:
