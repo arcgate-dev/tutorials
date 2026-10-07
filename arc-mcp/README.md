@@ -15,6 +15,7 @@ Connect an MCP client to Arcgate's `/mcp` endpoint, list its 32 tools, call the 
 - **Node.js 22.18 or newer** and npm.
 - **A payer key** in `.env`: a throwaway key with USDC on Arc testnet (`eip155:5042002`), where the localnet settles. `npm start` is one connection and spends under 0.07 USDC. `npm run capture` is two connections: it signs up to 0.115 USDC (5000 + 10000 + 50000 + 50000 base units), settles about 0.065 and needs an agent address with no box, so fund 0.115 USDC to be safe. Payments are EIP-3009 authorizations the facilitator submits, so the client reads no chain and needs no RPC URL.
 - **An agent key** in `.env`, for an address with no box. A box is for good (a second `boxCreate` answers `box_exists`), so use a key you can spare. It signs and holds no funds. It may be the payer's key.
+- **One box per address.** The box belongs to `AGENT_PRIVATE_KEY`'s address. One wallet address means one box, shared by every tutorial run with the same key (arc-agent-box, arc-claude-agent), and arc-agent-box's cleanup deletes every watch and inbound address in it.
 
 ```sh
 git clone https://github.com/arcgate-dev/tutorials.git
@@ -63,8 +64,9 @@ When a paid call comes back as an error, the tutorial tells you what that means 
 
 - `not charged: <tool> <code>`: the server refused the call after the payment was sent, for a reason of its own such as `box_exists`. The result carries no receipt and nothing settled. The tour prints it and goes on for `box_exists`, and stops for any other code with its code and its `next`.
 - `not settled: <tool> payment_required (check the balance before running again)`: the payment did not settle cleanly. The facilitator may have broadcast the authorization before it failed, and the authorization stays valid for its `maxTimeoutSeconds`, so the tutorial cannot say that no money moved. Read your USDC balance before you run again.
+- `<tool>: no answer after the payment was sent (...); the payment may have settled. Check the transaction or your USDC balance before paying again.`: a signed paid call got an HTTP 502 or no answer at all. The tutorial throws this and the run stops. The payment stays reserved against the run's cap, and nothing is sent again.
 
-In both cases the payment stays reserved against the run's cap. The same advice holds when a call stops with `payment may have settled; no receipt`: check the balance before you run again.
+In all these cases the payment stays reserved against the run's cap. The same advice holds when a call stops with `payment may have settled; no receipt`: check the balance before you run again.
 
 ## The box: boxStatus first
 
@@ -74,7 +76,7 @@ A box is an agent's inbound address and message store, and it is for good: a sec
 
 - Without a signature: a 401 `signature_required` result (`box-status.signature-required.json`), `next` is `fix_request`.
 - Signed, for an address with no box: a 404 `box_not_found` result (`box-status.not-found.json`). The tour then pays `boxCreate` once and signs `boxStatus` again, with a fresh nonce.
-- Signed, for an address with a box: the box, with its address, `createdAt`, `allowance` and `counts` (`box-status.json`). That box is the box: the tour calls and pays no `boxCreate`.
+- Signed, for an address with a box: the box, with its `address`, `createdAt`, `allowance`, `counts`, `unstoredWatchHits` (a number) and `registeredAgents` (`{ chainId, agents }`) (`box-status.json`). That box is the box: the tour calls and pays no `boxCreate`.
 - A paid `boxCreate` for an address that already has a box: a `box_exists` result, `next` is `stop`, and no receipt (`box-create.exists.json`). `box_exists` answers for the address the tour sent, which is the agent's own, so that box is the box and the tour goes on. Nothing settles.
 
 Any other `boxStatus` refusal, such as `signature_expired` or `nonce_reused`, stops the tour before `boxCreate` is paid.
