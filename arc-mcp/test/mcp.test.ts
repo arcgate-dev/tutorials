@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { formatUnits, getAddress } from 'viem';
+import { connectArcgate } from '../src/mcp.ts';
 import { connect } from './connect.ts';
 import { fakeMcp } from './fake-mcp.ts';
 import { testConfig } from './test-config.ts';
@@ -195,4 +196,26 @@ test('a settlement failure after payment is not settled, and the reservation sta
     'not settled: tradeSearch payment_required (check the balance before running again)',
   ]);
   assert.equal(arcgate.budget.reserved, 5_000n, 'and the reservation is not released');
+});
+
+test('a paid tools/call that gets HTTP 502 may have settled: thrown with that warning, reservation kept, no second paid call', async (t) => {
+  const config = testConfig();
+  const fake = fakeMcp();
+  // Override: the fake server receives the paid tools/call, and the gateway in front of it answers 502 to the caller.
+  const fetchFn: typeof fetch = async (input, init) => {
+    const answer = await fake.fetch(input, init);
+    const message = init?.body === undefined ? {} : JSON.parse(String(init.body));
+    return message.method === 'tools/call' && message.params?._meta?.[PAYMENT_META] !== undefined ? new Response('Bad Gateway', { status: 502 }) : answer;
+  };
+  const arcgate = await connectArcgate({ config, fetchFn, log: fake.log });
+  t.after(() => arcgate.close());
+
+  await assert.rejects(arcgate.call('tradeSearch', search), (error: Error) => {
+    assert.match(error.message, /may have settled/);
+    assert.match(error.message, /balance/);
+    return true;
+  });
+
+  assert.equal(arcgate.budget.reserved, 5_000n, 'the reservation is not released');
+  assert.equal(fake.paidCalls().length, 1, 'the paid call is not sent again');
 });
