@@ -6,12 +6,13 @@ import { errorOf, refusal, textOf, type Arcgate } from './mcp.ts';
 import { SpendCapError } from './payment.ts';
 import { wrapPage } from './untrusted.ts';
 
-type Mode = 'setup' | 'watch';
+export type Mode = 'setup' | 'watch';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Args = Record<string, any>;
 type Result = { content: { type: 'text'; text: string }[]; isError?: boolean };
 
-const TOOLS: Record<Mode, string[]> = {
+/** The one mode-to-tools table: the in-process server exposes these tools and the query's allowedTools names them. */
+export const TOOLS: Record<Mode, string[]> = {
   setup: ['boxCreate', 'watchCreate', 'inboundCreate'],
   watch: ['boxMessageList', 'boxMessageDelete'],
 };

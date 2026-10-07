@@ -1,16 +1,14 @@
 import { query as sdkQuery, type McpSdkServerConfigWithInstance, type Options, type SDKResultMessage } from '@anthropic-ai/claude-agent-sdk';
 import { formatUnits } from 'viem';
-import { arcgateServer, readPage } from './bridge.ts';
+import { arcgateServer, readPage, TOOLS, type Mode } from './bridge.ts';
 import type { Config } from './config.ts';
 import { connectArcgate } from './mcp.ts';
 import { SETUP_PROMPT, WATCH_PROMPT } from './prompts.ts';
 
-type Mode = 'setup' | 'watch';
 type Query = typeof sdkQuery;
 type Log = (line: string) => void;
 
 const PROMPTS: Record<Mode, string> = { setup: SETUP_PROMPT, watch: WATCH_PROMPT };
-const TOOLS: Record<Mode, string[]> = { setup: ['boxCreate', 'watchCreate', 'inboundCreate'], watch: ['boxMessageList', 'boxMessageDelete'] };
 
 /**
  * The query's options: the model reaches the mode's arcgate tools and nothing else. No built-in tool
