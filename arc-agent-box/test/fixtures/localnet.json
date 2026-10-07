@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-10-06T22:43:51.434Z",
+  "capturedAt": "2026-10-07T15:52:38.752Z",
   "apiUrl": "http://127.0.0.1:19800",
-  "apiCommit": "917dd4a",
-  "address": "0x4189Bc425BD880b163f386e5D5270FCcb2C0A478",
+  "apiCommit": "12b0368f",
+  "address": "0x06E594c677Cd28643B82477B7B5328Ac6817b2A0",
   "exchanges": [
     {
       "method": "GET",
@@ -10,7 +10,7 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "151233dd"
+        "x-request-id": "3a3a188a"
       },
       "body": {
         "ok": true,
@@ -25,19 +25,19 @@
         "caches": {
           "response": {
             "hits": 0,
-            "misses": 28,
-            "size": 3,
-            "bytes": 12144
+            "misses": 0,
+            "size": 0,
+            "bytes": 0
           },
           "candidates": {
-            "hits": 3,
-            "misses": 9,
-            "size": 1,
-            "bytes": 279477
+            "hits": 0,
+            "misses": 0,
+            "size": 0,
+            "bytes": 0
           },
           "generations": {
-            "keys": 7,
-            "bumps": 365
+            "keys": 0,
+            "bumps": 0
           },
           "abuse": {
             "missCacheSize": 0,
@@ -47,7 +47,7 @@
           "singleflight": {
             "response": {
               "hits": 0,
-              "leaders": 14
+              "leaders": 0
             },
             "probe": {
               "hits": 0,
@@ -55,26 +55,20 @@
             },
             "depth": {
               "hits": 0,
-              "leaders": 10
+              "leaders": 0
             }
           },
           "quote": {
-            "lastEthCalls": 3,
+            "lastEthCalls": 0,
             "lastSafetyEthCalls": 0,
             "lastCollapsed": false
           }
         },
         "rpc": {
           "counts": {
-            "arc_anvil_local:eth_getCode": 10,
-            "arc_anvil_local:eth_call": 49,
-            "arc_anvil_local:eth_getBlockByNumber": 33,
-            "arc_anvil_local:eth_simulateV1": 75,
-            "arc_anvil_local:eth_getBalance": 8,
-            "arc_anvil_local:eth_getTransactionByHash": 4,
-            "arc_anvil_local:eth_getTransactionReceipt": 4
+            "arc_anvil_local:eth_getCode": 2
           },
-          "total": 183,
+          "total": 2,
           "endpoints": [
             {
               "id": "arc_anvil_local",
@@ -95,9 +89,9 @@
                 "probe",
                 "backfill"
               ],
-              "calls": 183,
+              "calls": 2,
               "budget": {
-                "used": 1620,
+                "used": 2838,
                 "limit": null,
                 "pct": 0,
                 "state": "ok"
@@ -110,13 +104,13 @@
                   "spillover": false
                 },
                 "call": {
-                  "used": 1004,
+                  "used": 1743,
                   "limit": null,
                   "reserveMonthly": null,
                   "spillover": false
                 },
                 "simulate": {
-                  "used": 616,
+                  "used": 1095,
                   "limit": null,
                   "reserveMonthly": null,
                   "spillover": false
@@ -132,13 +126,7 @@
         },
         "spend": {
           "counts": {
-            "arc_anvil_local:eth_getCode": 10,
-            "arc_anvil_local:eth_call": 49,
-            "arc_anvil_local:eth_getBlockByNumber": 33,
-            "arc_anvil_local:eth_simulateV1": 75,
-            "arc_anvil_local:eth_getBalance": 8,
-            "arc_anvil_local:eth_getTransactionByHash": 4,
-            "arc_anvil_local:eth_getTransactionReceipt": 4
+            "arc_anvil_local:eth_getCode": 2
           },
           "month": [
             {
@@ -235,48 +223,48 @@
               "provider": "arc_anvil_local",
               "method": "eth_getCode",
               "month": "2026-10",
-              "calls": 200
+              "calls": 636
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_call",
               "month": "2026-10",
-              "calls": 482
+              "calls": 693
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getBlockByNumber",
               "month": "2026-10",
-              "calls": 217
+              "calls": 357
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_simulateV1",
               "month": "2026-10",
-              "calls": 479
+              "calls": 870
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getBalance",
               "month": "2026-10",
-              "calls": 70
+              "calls": 102
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getTransactionByHash",
               "month": "2026-10",
-              "calls": 86
+              "calls": 90
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getTransactionReceipt",
               "month": "2026-10",
-              "calls": 86
+              "calls": 90
             }
           ],
           "budgets": {
             "arc_anvil_local": {
-              "used": 1620,
+              "used": 2838,
               "limit": null,
               "pct": 0,
               "state": "ok"
@@ -285,14 +273,14 @@
         },
         "indexer": null,
         "safety": {
-          "enqueued": 38,
-          "collapsed": 5,
+          "enqueued": 0,
+          "collapsed": 0,
           "dropped": 0,
           "running": 0,
-          "done": 21,
+          "done": 0,
           "failed": 0,
-          "simulateCalls": 60,
-          "skippedPinned": 12
+          "simulateCalls": 0,
+          "skippedPinned": 0
         },
         "payerIdentity": "x402",
         "x402": {
@@ -307,7 +295,7 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "2b4d543d"
+        "x-request-id": "32dc7309"
       },
       "body": {
         "paths": {
@@ -584,79 +572,24 @@
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/status",
-      "status": 404,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "x-request-id": "b493b045"
-      },
-      "body": {
-        "error": {
-          "code": "box_not_found",
-          "message": "this address has no box"
-        },
-        "next": "fix_request"
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box",
-      "status": 402,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0NzgvYm94IiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggY3JlYXRlIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
-        "x-request-id": "1c595f8f"
-      },
-      "body": {
-        "error": {
-          "code": "payment_required",
-          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
-          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042002, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See http://127.0.0.1:19801/#arcgate/description/paying-arcgate-from-your-own-code"
-        },
-        "next": "pay"
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/status",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHgyNTg5NDU4ZjM5NzRmOTE1YjdmYWVlNTBjMjgyYTdjZmNhNDQ0OTIwZDEyMjE5OTliZDlhOTUyMjY4ZGFhZTg2IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "60b3adaa"
+        "x-request-id": "313bf51b"
       },
       "body": {
-        "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-        "granted": {
-          "messages": 500,
-          "days": 30
-        },
+        "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+        "createdAt": 1791365243,
         "allowance": {
-          "messagesLeft": 500,
-          "expiresAt": 1793918600
-        }
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/status",
-      "status": 200,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "x-request-id": "d87197ca"
-      },
-      "body": {
-        "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-        "createdAt": 1791326605,
-        "allowance": {
-          "messagesLeft": 500,
-          "expiresAt": 1793918605,
+          "messagesLeft": 999,
+          "expiresAt": 1796549243,
           "expired": false
         },
         "counts": {
           "messages": 0,
-          "inboundAddresses": 0,
-          "watches": 0,
+          "inboundAddresses": 1,
+          "watches": 1,
           "channels": 0
         },
         "unstoredWatchHits": 0,
@@ -668,12 +601,12 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/inbound",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/inbound",
       "status": 402,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0NzgvaW5ib3VuZCIsImRlc2NyaXB0aW9uIjoiQWdlbnQgaW5ib3VuZCBhZGRyZXNzIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
-        "x-request-id": "411ff747"
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvaW5ib3VuZCIsImRlc2NyaXB0aW9uIjoiQWdlbnQgaW5ib3VuZCBhZGRyZXNzIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "c18b3fae"
       },
       "body": {
         "error": {
@@ -686,27 +619,27 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/inbound",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/inbound",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHg1MGYxMmUwYjBkOGRiYTAxMmViMGJkOGJhODg4YTI1ZDc5YjQxZTg1NWQ3ZTI3YzU5YThlNGE5ZWE5MDk2YTJkIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "f81c5f35"
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHg1MjhhNDUxZTI0NTA3Nzc4YWJmYTM1ZGY2NzZiMjdiODM4M2E5Y2Y2NzBlZDNkNzY2MGNlZTMxMDk2NWM5NzhiIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "b120ff4a"
       },
       "body": {
-        "id": "wvzarH5ZijOgl4vgSHPfYA",
-        "url": "http://127.0.0.1:19803/wvzarH5ZijOgl4vgSHPfYA",
+        "id": "jGzJwc9Ho_38jtTnloOKug",
+        "url": "http://127.0.0.1:19803/jGzJwc9Ho_38jtTnloOKug",
         "secret": "<redacted>",
-        "createdAt": 1791326605
+        "createdAt": 1791388325
       }
     },
     {
       "method": "POST",
-      "path": "/wvzarH5ZijOgl4vgSHPfYA",
+      "path": "/jGzJwc9Ho_38jtTnloOKug",
       "requestBody": {
-        "run": "907ca447-2e67-4ec9-9115-e66bd9b0d4ad",
+        "run": "ab561c2f-7aa0-4d70-a810-604c62e4269d",
         "via": "signature",
-        "sentAt": 1791326609749,
+        "sentAt": 1791388330266,
         "note": "a message from an outside service"
       },
       "status": 201,
@@ -715,30 +648,30 @@
       },
       "body": {
         "stored": true,
-        "idempotencyKey": "0x8f3bf71f9d741dfaef5bdadbdf87886422e33926d2bfbc7a145a65444e9bd984"
+        "idempotencyKey": "0xddb848e2dc335c12908245546090a6f32f5b4f9711d554579fe1763cd9f77f7b"
       }
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/inbound/wvzarH5ZijOgl4vgSHPfYA/rotate",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/inbound/jGzJwc9Ho_38jtTnloOKug/rotate",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "2c79a30e"
+        "x-request-id": "4c2daa4f"
       },
       "body": {
-        "id": "wvzarH5ZijOgl4vgSHPfYA",
-        "url": "http://127.0.0.1:19803/wvzarH5ZijOgl4vgSHPfYA",
+        "id": "jGzJwc9Ho_38jtTnloOKug",
+        "url": "http://127.0.0.1:19803/jGzJwc9Ho_38jtTnloOKug",
         "secret": "<redacted>"
       }
     },
     {
       "method": "POST",
-      "path": "/wvzarH5ZijOgl4vgSHPfYA",
+      "path": "/jGzJwc9Ho_38jtTnloOKug",
       "requestBody": {
-        "run": "907ca447-2e67-4ec9-9115-e66bd9b0d4ad",
+        "run": "ab561c2f-7aa0-4d70-a810-604c62e4269d",
         "via": "signature",
-        "sentAt": 1791326609768,
+        "sentAt": 1791388330281,
         "note": "a message from an outside service"
       },
       "status": 401,
@@ -755,11 +688,11 @@
     },
     {
       "method": "POST",
-      "path": "/wvzarH5ZijOgl4vgSHPfYA",
+      "path": "/jGzJwc9Ho_38jtTnloOKug",
       "requestBody": {
-        "run": "907ca447-2e67-4ec9-9115-e66bd9b0d4ad",
+        "run": "ab561c2f-7aa0-4d70-a810-604c62e4269d",
         "via": "secret",
-        "sentAt": 1791326609770,
+        "sentAt": 1791388330285,
         "note": "a message from an outside service"
       },
       "status": 201,
@@ -768,25 +701,30 @@
       },
       "body": {
         "stored": true,
-        "idempotencyKey": "0x363665ed5a1fa1ef2b522a466dc76b63d43989e91f26b2118848cf7eb0bf29f7"
+        "idempotencyKey": "0xc5dcdb22b6b6f4fb7902d1a4966adc51a3752ff8ad52050d2e8d9505e58fc05d"
       }
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch",
       "requestBody": {
         "condition": {
-          "kind": "volume_24h",
+          "kind": "token",
           "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
-          "direction": "above",
-          "value": 100000
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            }
+          ]
         }
       },
       "status": 402,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0Nzgvd2F0Y2giLCJkZXNjcmlwdGlvbiI6IkFnZW50IHdhdGNoIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
-        "x-request-id": "5df79313"
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvd2F0Y2giLCJkZXNjcmlwdGlvbiI6IkFnZW50IHdhdGNoIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "ffafa153"
       },
       "body": {
         "error": {
@@ -799,35 +737,45 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch",
       "requestBody": {
         "condition": {
-          "kind": "volume_24h",
+          "kind": "token",
           "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
-          "direction": "above",
-          "value": 100000
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            }
+          ]
         }
       },
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHhhYjRkMTcyN2I4ZTA2ZGRlZTc5MTRiNWJhMDk3YjkxZWIzNGNjYmQ4NTVjMjg5NTZkODYzMGFhZGE0ZjRlODI0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "4994bf2c"
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHg3YjU3ZDUwMzdlOWJmY2FkNWQxNWMwMGQ4ZThlMDc1MzFiM2UwZjJlZjE2NDVhYjJmMmNiM2QyNzY1YmFjOTliIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "eeae98b7"
       },
       "body": {
-        "id": "_a5hBBSFy7MU2k_jnHHuig",
+        "id": "dvxnlleAXUxG4_oP5ZLgmw",
         "condition": {
-          "kind": "volume_24h",
+          "kind": "token",
           "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
-          "direction": "above",
-          "value": 100000
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            }
+          ]
         },
-        "createdAt": 1791326609
+        "createdAt": 1791388330
       }
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch",
       "requestBody": {
         "condition": {
           "kind": "screen",
@@ -848,8 +796,8 @@
       "status": 402,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0Nzgvd2F0Y2giLCJkZXNjcmlwdGlvbiI6IkFnZW50IHdhdGNoIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
-        "x-request-id": "889c867b"
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvd2F0Y2giLCJkZXNjcmlwdGlvbiI6IkFnZW50IHdhdGNoIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "58618e9a"
       },
       "body": {
         "error": {
@@ -862,7 +810,7 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch",
       "requestBody": {
         "condition": {
           "kind": "screen",
@@ -883,11 +831,11 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHhmY2UxNmMxM2I3NDM1ZTJhYjUzZGI0OTY2MTg3NjA1OTkxMTkzNzU5ODk1Nzc1Y2E4OTMzNjE5NmQ1N2EyMWQ3IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "94aa9975"
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHgxZWU0NjJkZDYxMDVmNGE5Yzk4NDA1MTAxMzI1ZTM4MGQwYWYzOTYwMTNhZjg4OThmYWY5YjhhYWI5NWE0YTE0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "250f0181"
       },
       "body": {
-        "id": "-EfjanCGMZyo7OhGDCLYgg",
+        "id": "F8erlRYeh-WMOo5n5jq97Q",
         "condition": {
           "kind": "screen",
           "where": [
@@ -903,33 +851,116 @@
             }
           ]
         },
-        "createdAt": 1791326611
+        "createdAt": 1791388335
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "agents",
+          "chainId": 5042,
+          "on": [
+            "registered"
+          ]
+        }
+      },
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvd2F0Y2giLCJkZXNjcmlwdGlvbiI6IkFnZW50IHdhdGNoIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "7406d212"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042002, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See http://127.0.0.1:19801/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "agents",
+          "chainId": 5042,
+          "on": [
+            "registered"
+          ]
+        }
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHg2OWNkYzdhNDMyMWYyOWRiNGMxY2JmZDcyZDAxMGYwMzA0NmQ3ZmE4MzM0MjhiZWU5YmViMzcyMTRlNjI4MjJiIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "3b57047c"
+      },
+      "body": {
+        "id": "0nmkWVwaNxE2B6OkZfruLw",
+        "condition": {
+          "kind": "agents",
+          "chainId": 5042,
+          "on": [
+            "registered"
+          ]
+        },
+        "createdAt": 1791388339
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch/list",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch/list",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "e0378f31"
+        "x-request-id": "48e1a1b8"
       },
       "body": {
         "watches": [
           {
-            "id": "_a5hBBSFy7MU2k_jnHHuig",
+            "id": "oGnXYai82uHjRH_M6rQtVg",
             "condition": {
-              "kind": "volume_24h",
-              "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
-              "direction": "above",
-              "value": 100000
+              "kind": "screen",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 50000
+                },
+                {
+                  "field": "safety_verdict",
+                  "op": "eq",
+                  "value": "ok"
+                }
+              ]
             },
-            "createdAt": 1791326611,
+            "createdAt": 1791386194,
+            "lastFiredAt": null,
+            "matchingTokens": 0
+          },
+          {
+            "id": "dvxnlleAXUxG4_oP5ZLgmw",
+            "condition": {
+              "kind": "token",
+              "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 100000
+                }
+              ]
+            },
+            "createdAt": 1791388335,
             "lastFiredAt": null,
             "matchingTokens": null
           },
           {
-            "id": "-EfjanCGMZyo7OhGDCLYgg",
+            "id": "F8erlRYeh-WMOo5n5jq97Q",
             "condition": {
               "kind": "screen",
               "where": [
@@ -945,9 +976,22 @@
                 }
               ]
             },
-            "createdAt": 1791326612,
+            "createdAt": 1791388339,
             "lastFiredAt": null,
             "matchingTokens": 0
+          },
+          {
+            "id": "0nmkWVwaNxE2B6OkZfruLw",
+            "condition": {
+              "kind": "agents",
+              "chainId": 5042,
+              "on": [
+                "registered"
+              ]
+            },
+            "createdAt": 1791388344,
+            "lastFiredAt": null,
+            "matchingTokens": null
           }
         ]
       }
@@ -963,7 +1007,7 @@
       "headers": {
         "content-type": "application/json; charset=utf-8",
         "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC90cmFkZS92MS9zZWFyY2giLCJkZXNjcmlwdGlvbiI6IlRva2VuIHNlYXJjaCIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiNTAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
-        "x-request-id": "d2cb8728"
+        "x-request-id": "78f771c5"
       },
       "body": {
         "error": {
@@ -984,8 +1028,8 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHg5NjBjOWViYjg1YmViZDJiMzViZGY4NWI4YmU1NWFkYzUzZDJjZWJjNWYyYTE3M2I3N2ZiYzQyNDFjZjQxY2FkIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "4ff67e80"
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHhkMzE4OTYzM2Q0ZTJmODY0M2FmNTM4NGQxYjc1ZGE1MWM0ZDhlZjM2MDI1MzZiNmZjM2NkODQ0NjhhYTc3ZGMyIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "93189073"
       },
       "body": {
         "query": "0xf81afef268aca40717e0adcae7c41514327cfaab",
@@ -1042,7 +1086,27 @@
             "depth2PctUsd": null,
             "volume24hUsd": "6112809.322525",
             "holders": null,
-            "safety": null,
+            "safety": {
+              "routeId": "uniswap_v4:0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
+              "route": {
+                "venue": "uniswap_v4",
+                "poolId": "0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
+                "pair": "USDC"
+              },
+              "verdict": "inconclusive",
+              "canSell": null,
+              "buyTaxBps": 10000,
+              "sellTaxBps": null,
+              "buyImpactBps": 0,
+              "roundTripLossBps": null,
+              "sellImpactBps": null,
+              "sellDelaySec": 60,
+              "exitSellTaxBps": null,
+              "scope": {
+                "block": 23584000,
+                "walletProfile": "fresh_eoa"
+              }
+            },
             "safetyByRoute": [
               {
                 "routeId": "uniswap_v4:0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
@@ -1051,17 +1115,17 @@
                   "poolId": "0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
                   "pair": "USDC"
                 },
-                "verdict": null,
-                "buyTaxBps": null,
+                "verdict": "inconclusive",
+                "buyTaxBps": 10000,
                 "sellTaxBps": null,
-                "checkedBlock": null
+                "checkedBlock": 23584000
               }
             ],
             "flags": [
               "ambiguous_ticker",
+              "buy_tax",
               "hooked_pool",
-              "impersonates_verified",
-              "safety_pending"
+              "impersonates_verified"
             ]
           }
         ]
@@ -1069,7 +1133,7 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook",
       "requestBody": {
         "url": "https://192.0.2.10/arc-agent-box",
         "filter": [
@@ -1080,8 +1144,8 @@
       "status": 402,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0Nzgvd2ViaG9vayIsImRlc2NyaXB0aW9uIjoiQWdlbnQgd2ViaG9vayBjaGFubmVsIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
-        "x-request-id": "e2db7ab1"
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvd2ViaG9vayIsImRlc2NyaXB0aW9uIjoiQWdlbnQgd2ViaG9vayBjaGFubmVsIGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIiwiYW1vdW50IjoiMTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHg5ODdGNzE5YjUxNmY1MjhmNDA4MEVGMDg1M0UzN2FENWQ3RTc3M0EwIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "8f3664b6"
       },
       "body": {
         "error": {
@@ -1094,7 +1158,7 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook",
       "requestBody": {
         "url": "https://192.0.2.10/arc-agent-box",
         "filter": [
@@ -1105,32 +1169,32 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHg3NTUzOGY0Mzk0ZjY5NTRlOTE5ZDU2MmEyNjkwZDNlOWQyYjYzMjM3MDY1NDdmMDBlNGE1MmM3MGUwMGE0YTUxIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "d4828db2"
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHg2NWUxYmFhYmU2OWIxYmY3YTBhMWU3ODY5MzE4OGMzZGYzYTMzNjkxNmE4OThkZGRjOThjN2MwMmI1ZGFlOTcyIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "75d0b4f1"
       },
       "body": {
-        "id": "_menTTt2BgZu1t3HGrvmsg",
+        "id": "_XsK9A9S7cox8eD0TPl7Kg",
         "url": "https://192.0.2.10/arc-agent-box",
         "secret": "<redacted>",
         "filter": [
           "inbound",
           "watch"
         ],
-        "createdAt": 1791326614
+        "createdAt": 1791388349
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook/list",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook/list",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "bb77f75d"
+        "x-request-id": "88c74bbb"
       },
       "body": {
         "webhooks": [
           {
-            "id": "_menTTt2BgZu1t3HGrvmsg",
+            "id": "_XsK9A9S7cox8eD0TPl7Kg",
             "url": "https://192.0.2.10/arc-agent-box",
             "filter": [
               "inbound",
@@ -1140,182 +1204,182 @@
             "verifiedAt": null,
             "failures": 0,
             "lastError": null,
-            "createdAt": 1791326618
+            "createdAt": 1791388354
           }
         ]
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook/list",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook/list",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "2a499528"
+        "x-request-id": "74190cbe"
       },
       "body": {
         "webhooks": [
           {
-            "id": "_menTTt2BgZu1t3HGrvmsg",
+            "id": "_XsK9A9S7cox8eD0TPl7Kg",
             "url": "https://192.0.2.10/arc-agent-box",
             "filter": [
               "inbound",
               "watch"
             ],
             "enabled": true,
-            "verifiedAt": 1791326619,
+            "verifiedAt": 1791388354,
             "failures": 0,
             "lastError": null,
-            "createdAt": 1791326618
+            "createdAt": 1791388354
           }
         ]
       }
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook/_menTTt2BgZu1t3HGrvmsg/rotate",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook/_XsK9A9S7cox8eD0TPl7Kg/rotate",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "c065de91"
+        "x-request-id": "95b9f519"
       },
       "body": {
-        "id": "_menTTt2BgZu1t3HGrvmsg",
+        "id": "_XsK9A9S7cox8eD0TPl7Kg",
         "secret": "<redacted>"
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/messages?cursor=0",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/messages?cursor=0",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "76591501"
+        "x-request-id": "d8e1d690"
       },
       "body": {
         "messages": [
           {
             "kind": "inbound",
             "type": "inbound",
-            "idempotencyKey": "0x8f3bf71f9d741dfaef5bdadbdf87886422e33926d2bfbc7a145a65444e9bd984",
-            "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-            "seq": 1,
-            "createdAt": 1791326609,
-            "expiresAt": 1793918609,
+            "idempotencyKey": "0xddb848e2dc335c12908245546090a6f32f5b4f9711d554579fe1763cd9f77f7b",
+            "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+            "seq": 12,
+            "createdAt": 1791388330,
+            "expiresAt": 1793980330,
             "payload": {
               "untrusted": true,
               "contentType": "application/json",
               "encoding": "utf8",
-              "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"signature\",\"sentAt\":1791326609749,\"note\":\"a message from an outside service\"}"
+              "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"signature\",\"sentAt\":1791388330266,\"note\":\"a message from an outside service\"}"
             },
             "source": {
-              "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+              "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
               "signatureVerified": true
             }
           },
           {
             "kind": "inbound",
             "type": "inbound",
-            "idempotencyKey": "0x363665ed5a1fa1ef2b522a466dc76b63d43989e91f26b2118848cf7eb0bf29f7",
-            "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-            "seq": 2,
-            "createdAt": 1791326609,
-            "expiresAt": 1793918609,
+            "idempotencyKey": "0xc5dcdb22b6b6f4fb7902d1a4966adc51a3752ff8ad52050d2e8d9505e58fc05d",
+            "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+            "seq": 13,
+            "createdAt": 1791388330,
+            "expiresAt": 1793980330,
             "payload": {
               "untrusted": true,
               "contentType": "application/json",
               "encoding": "utf8",
-              "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"secret\",\"sentAt\":1791326609770,\"note\":\"a message from an outside service\"}"
+              "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"secret\",\"sentAt\":1791388330285,\"note\":\"a message from an outside service\"}"
             },
             "source": {
-              "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+              "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
               "signatureVerified": false
             }
           },
           {
             "kind": "watch",
             "type": "watch.token",
-            "idempotencyKey": "0xab54c44ab0dfd94d561fc822497bf5b8c34b221c39f9c38ac7779b4b0f9e822b",
-            "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-            "seq": 3,
-            "createdAt": 1791326613,
-            "expiresAt": 1793918613,
+            "idempotencyKey": "0xa05cc9bae9b714557beaf80775aec9618718c8133d7fe590ec8ab20a7a9ad0c3",
+            "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+            "seq": 14,
+            "createdAt": 1791388345,
+            "expiresAt": 1793980345,
             "payload": {
               "untrusted": true,
               "contentType": "application/json",
               "encoding": "utf8",
-              "content": "{\"watchId\":\"_a5hBBSFy7MU2k_jnHHuig\",\"condition\":{\"kind\":\"volume_24h\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"direction\":\"above\",\"value\":100000},\"changeId\":35,\"observed\":6112809.322525,\"previous\":null}"
+              "content": "{\"watchId\":\"dvxnlleAXUxG4_oP5ZLgmw\",\"condition\":{\"kind\":\"token\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"where\":[{\"field\":\"volume_24h\",\"op\":\"gt\",\"value\":100000}]},\"changeId\":61,\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"symbol\":\"FAZE\",\"observed\":{\"volume_24h\":6112809.322525}}"
             },
             "source": {
-              "watchId": "_a5hBBSFy7MU2k_jnHHuig"
+              "watchId": "dvxnlleAXUxG4_oP5ZLgmw"
             }
           }
         ],
-        "nextCursor": 3
+        "nextCursor": 14
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/messages?cursor=3",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/messages?cursor=14",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "c21fb358"
+        "x-request-id": "332a7f48"
       },
       "body": {
         "messages": [],
-        "nextCursor": 3
+        "nextCursor": 14
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/messages/2",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/messages/13",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "7a93889e"
+        "x-request-id": "ee1bcd2a"
       },
       "body": {
         "kind": "inbound",
         "type": "inbound",
-        "idempotencyKey": "0x363665ed5a1fa1ef2b522a466dc76b63d43989e91f26b2118848cf7eb0bf29f7",
-        "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-        "seq": 2,
-        "createdAt": 1791326609,
-        "expiresAt": 1793918609,
+        "idempotencyKey": "0xc5dcdb22b6b6f4fb7902d1a4966adc51a3752ff8ad52050d2e8d9505e58fc05d",
+        "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+        "seq": 13,
+        "createdAt": 1791388330,
+        "expiresAt": 1793980330,
         "payload": {
           "untrusted": true,
           "contentType": "application/json",
           "encoding": "utf8",
-          "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"secret\",\"sentAt\":1791326609770,\"note\":\"a message from an outside service\"}"
+          "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"secret\",\"sentAt\":1791388330285,\"note\":\"a message from an outside service\"}"
         },
         "source": {
-          "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+          "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
           "signatureVerified": false
         }
       }
     },
     {
       "method": "DELETE",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/messages/2",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/messages/13",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "2dc8b20e"
+        "x-request-id": "2d5e3b96"
       },
       "body": {
         "deleted": true,
-        "seq": 2
+        "seq": 13
       }
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/topup",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/topup",
       "status": 402,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0NzgvYm94L3RvcHVwIiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggdG9wLXVwIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
-        "x-request-id": "2336ad15"
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvYm94L3RvcHVwIiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggdG9wLXVwIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
+        "x-request-id": "64e13072"
       },
       "body": {
         "error": {
@@ -1328,80 +1392,124 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/topup",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/topup",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHhhYzQ1YmRhM2FmOTkwZWFkZDA3YzNkYWIzNDM4OTg1Yjc3N2IyMTZiZTRjYTAyMDI2OTFiYmExMjMwZWM5MDU5IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "7aa5b5f4"
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4MDZFNTk0YzY3N0NkMjg2NDNCODI0NzdCN0I1MzI4QWM2ODE3YjJBMCIsInRyYW5zYWN0aW9uIjoiMHgyOGQ4MjU3NjY3OWFhMDcxNGRmZjg2YjM1ODg3YzRlNzJhN2U2NGU1MDliZDdjNzhiMWJjMjMxZGEzZWIzNzdkIiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
+        "x-request-id": "26b00df7"
       },
       "body": {
-        "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
+        "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
         "granted": {
-          "messages": 500,
-          "days": 30
+          "messages": 4,
+          "days": 0
         },
         "allowance": {
-          "messagesLeft": 997,
-          "expiresAt": 1796510605
+          "messagesLeft": 1000,
+          "expiresAt": 1796549243
         }
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/inbound/list",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/inbound/list",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "0efe4847"
+        "x-request-id": "b3a4a398"
       },
       "body": {
         "addresses": [
           {
-            "id": "wvzarH5ZijOgl4vgSHPfYA",
-            "url": "http://127.0.0.1:19803/wvzarH5ZijOgl4vgSHPfYA",
-            "createdAt": 1791326609
+            "id": "B-kc4oaEnh61HHv96lHpag",
+            "url": "http://127.0.0.1:19803/B-kc4oaEnh61HHv96lHpag",
+            "createdAt": 1791386196
+          },
+          {
+            "id": "jGzJwc9Ho_38jtTnloOKug",
+            "url": "http://127.0.0.1:19803/jGzJwc9Ho_38jtTnloOKug",
+            "createdAt": 1791388330
           }
         ]
       }
     },
     {
       "method": "DELETE",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/inbound/wvzarH5ZijOgl4vgSHPfYA",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/inbound/B-kc4oaEnh61HHv96lHpag",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "5811d400"
+        "x-request-id": "053f3b16"
       },
       "body": {
         "deleted": true,
-        "id": "wvzarH5ZijOgl4vgSHPfYA"
+        "id": "B-kc4oaEnh61HHv96lHpag"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/inbound/jGzJwc9Ho_38jtTnloOKug",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "aab5233a"
+      },
+      "body": {
+        "deleted": true,
+        "id": "jGzJwc9Ho_38jtTnloOKug"
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch/list",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch/list",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "2e099224"
+        "x-request-id": "4cc61faf"
       },
       "body": {
         "watches": [
           {
-            "id": "_a5hBBSFy7MU2k_jnHHuig",
+            "id": "oGnXYai82uHjRH_M6rQtVg",
             "condition": {
-              "kind": "volume_24h",
-              "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
-              "direction": "above",
-              "value": 100000
+              "kind": "screen",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 50000
+                },
+                {
+                  "field": "safety_verdict",
+                  "op": "eq",
+                  "value": "ok"
+                }
+              ]
             },
-            "createdAt": 1791326611,
-            "lastFiredAt": 1791326613,
+            "createdAt": 1791386194,
+            "lastFiredAt": null,
+            "matchingTokens": 0
+          },
+          {
+            "id": "dvxnlleAXUxG4_oP5ZLgmw",
+            "condition": {
+              "kind": "token",
+              "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 100000
+                }
+              ]
+            },
+            "createdAt": 1791388335,
+            "lastFiredAt": 1791388345,
             "matchingTokens": null
           },
           {
-            "id": "-EfjanCGMZyo7OhGDCLYgg",
+            "id": "F8erlRYeh-WMOo5n5jq97Q",
             "condition": {
               "kind": "screen",
               "where": [
@@ -1417,92 +1525,131 @@
                 }
               ]
             },
-            "createdAt": 1791326612,
+            "createdAt": 1791388339,
             "lastFiredAt": null,
             "matchingTokens": 0
+          },
+          {
+            "id": "0nmkWVwaNxE2B6OkZfruLw",
+            "condition": {
+              "kind": "agents",
+              "chainId": 5042,
+              "on": [
+                "registered"
+              ]
+            },
+            "createdAt": 1791388344,
+            "lastFiredAt": null,
+            "matchingTokens": null
           }
         ]
       }
     },
     {
       "method": "DELETE",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch/_a5hBBSFy7MU2k_jnHHuig",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch/oGnXYai82uHjRH_M6rQtVg",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "5c5e0c1b"
+        "x-request-id": "74e1fbfe"
       },
       "body": {
         "deleted": true,
-        "id": "_a5hBBSFy7MU2k_jnHHuig"
+        "id": "oGnXYai82uHjRH_M6rQtVg"
       }
     },
     {
       "method": "DELETE",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/watch/-EfjanCGMZyo7OhGDCLYgg",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch/dvxnlleAXUxG4_oP5ZLgmw",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "45f14f39"
+        "x-request-id": "dc46915e"
       },
       "body": {
         "deleted": true,
-        "id": "-EfjanCGMZyo7OhGDCLYgg"
+        "id": "dvxnlleAXUxG4_oP5ZLgmw"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch/F8erlRYeh-WMOo5n5jq97Q",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "40d163c4"
+      },
+      "body": {
+        "deleted": true,
+        "id": "F8erlRYeh-WMOo5n5jq97Q"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/watch/0nmkWVwaNxE2B6OkZfruLw",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "b7b83c77"
+      },
+      "body": {
+        "deleted": true,
+        "id": "0nmkWVwaNxE2B6OkZfruLw"
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook/list",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook/list",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "4e41afc3"
+        "x-request-id": "dfe80b6e"
       },
       "body": {
         "webhooks": [
           {
-            "id": "_menTTt2BgZu1t3HGrvmsg",
+            "id": "_XsK9A9S7cox8eD0TPl7Kg",
             "url": "https://192.0.2.10/arc-agent-box",
             "filter": [
               "inbound",
               "watch"
             ],
             "enabled": true,
-            "verifiedAt": 1791326619,
+            "verifiedAt": 1791388354,
             "failures": 0,
             "lastError": null,
-            "createdAt": 1791326618
+            "createdAt": 1791388354
           }
         ]
       }
     },
     {
       "method": "DELETE",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/webhook/_menTTt2BgZu1t3HGrvmsg",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/webhook/_XsK9A9S7cox8eD0TPl7Kg",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "d9670fab"
+        "x-request-id": "ed7088a7"
       },
       "body": {
         "deleted": true,
-        "id": "_menTTt2BgZu1t3HGrvmsg"
+        "id": "_XsK9A9S7cox8eD0TPl7Kg"
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/status",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/status",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "7546649a"
+        "x-request-id": "7ed76712"
       },
       "body": {
-        "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-        "createdAt": 1791326605,
+        "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+        "createdAt": 1791365243,
         "allowance": {
-          "messagesLeft": 997,
-          "expiresAt": 1796510605,
+          "messagesLeft": 1000,
+          "expiresAt": 1796549243,
           "expired": false
         },
         "counts": {
@@ -1520,18 +1667,18 @@
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/status",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/status",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "2d0d8d02"
+        "x-request-id": "173bd37b"
       },
       "body": {
-        "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-        "createdAt": 1791326605,
+        "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+        "createdAt": 1791365243,
         "allowance": {
-          "messagesLeft": 997,
-          "expiresAt": 1796510605,
+          "messagesLeft": 1000,
+          "expiresAt": 1796549243,
           "expired": false
         },
         "counts": {
@@ -1549,66 +1696,66 @@
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/messages?cursor=0",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/messages?cursor=0",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "e6787588"
+        "x-request-id": "80ab0d91"
       },
       "body": {
         "messages": [
           {
             "kind": "inbound",
             "type": "inbound",
-            "idempotencyKey": "0x8f3bf71f9d741dfaef5bdadbdf87886422e33926d2bfbc7a145a65444e9bd984",
-            "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-            "seq": 1,
-            "createdAt": 1791326609,
-            "expiresAt": 1793918609,
+            "idempotencyKey": "0xddb848e2dc335c12908245546090a6f32f5b4f9711d554579fe1763cd9f77f7b",
+            "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+            "seq": 12,
+            "createdAt": 1791388330,
+            "expiresAt": 1793980330,
             "payload": {
               "untrusted": true,
               "contentType": "application/json",
               "encoding": "utf8",
-              "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"signature\",\"sentAt\":1791326609749,\"note\":\"a message from an outside service\"}"
+              "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"signature\",\"sentAt\":1791388330266,\"note\":\"a message from an outside service\"}"
             },
             "source": {
-              "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+              "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
               "signatureVerified": true
             }
           },
           {
             "kind": "watch",
             "type": "watch.token",
-            "idempotencyKey": "0xab54c44ab0dfd94d561fc822497bf5b8c34b221c39f9c38ac7779b4b0f9e822b",
-            "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-            "seq": 3,
-            "createdAt": 1791326613,
-            "expiresAt": 1793918613,
+            "idempotencyKey": "0xa05cc9bae9b714557beaf80775aec9618718c8133d7fe590ec8ab20a7a9ad0c3",
+            "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+            "seq": 14,
+            "createdAt": 1791388345,
+            "expiresAt": 1793980345,
             "payload": {
               "untrusted": true,
               "contentType": "application/json",
               "encoding": "utf8",
-              "content": "{\"watchId\":\"_a5hBBSFy7MU2k_jnHHuig\",\"condition\":{\"kind\":\"volume_24h\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"direction\":\"above\",\"value\":100000},\"changeId\":35,\"observed\":6112809.322525,\"previous\":null}"
+              "content": "{\"watchId\":\"dvxnlleAXUxG4_oP5ZLgmw\",\"condition\":{\"kind\":\"token\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"where\":[{\"field\":\"volume_24h\",\"op\":\"gt\",\"value\":100000}]},\"changeId\":61,\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"symbol\":\"FAZE\",\"observed\":{\"volume_24h\":6112809.322525}}"
             },
             "source": {
-              "watchId": "_a5hBBSFy7MU2k_jnHHuig"
+              "watchId": "dvxnlleAXUxG4_oP5ZLgmw"
             }
           }
         ],
-        "nextCursor": 3
+        "nextCursor": 14
       }
     },
     {
       "method": "GET",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/messages?cursor=3",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/messages?cursor=14",
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "c1afb28d"
+        "x-request-id": "fcbcc0ba"
       },
       "body": {
         "messages": [],
-        "nextCursor": 3
+        "nextCursor": 14
       }
     },
     {
@@ -1617,7 +1764,7 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "f21e8022"
+        "x-request-id": "c08245fd"
       },
       "body": {
         "ok": true,
@@ -1632,19 +1779,19 @@
         "caches": {
           "response": {
             "hits": 0,
-            "misses": 32,
-            "size": 4,
-            "bytes": 13631
+            "misses": 2,
+            "size": 1,
+            "bytes": 1926
           },
           "candidates": {
-            "hits": 4,
-            "misses": 9,
-            "size": 1,
-            "bytes": 279477
+            "hits": 0,
+            "misses": 0,
+            "size": 0,
+            "bytes": 0
           },
           "generations": {
-            "keys": 9,
-            "bumps": 370
+            "keys": 2,
+            "bumps": 5
           },
           "abuse": {
             "missCacheSize": 0,
@@ -1654,7 +1801,7 @@
           "singleflight": {
             "response": {
               "hits": 0,
-              "leaders": 16
+              "leaders": 1
             },
             "probe": {
               "hits": 0,
@@ -1662,26 +1809,23 @@
             },
             "depth": {
               "hits": 0,
-              "leaders": 12
+              "leaders": 1
             }
           },
           "quote": {
-            "lastEthCalls": 3,
+            "lastEthCalls": 0,
             "lastSafetyEthCalls": 0,
             "lastCollapsed": false
           }
         },
         "rpc": {
           "counts": {
-            "arc_anvil_local:eth_getCode": 11,
-            "arc_anvil_local:eth_call": 56,
-            "arc_anvil_local:eth_getBlockByNumber": 36,
-            "arc_anvil_local:eth_simulateV1": 79,
-            "arc_anvil_local:eth_getBalance": 9,
-            "arc_anvil_local:eth_getTransactionByHash": 4,
-            "arc_anvil_local:eth_getTransactionReceipt": 4
+            "arc_anvil_local:eth_getCode": 2,
+            "arc_anvil_local:eth_call": 1,
+            "arc_anvil_local:eth_getBlockByNumber": 1,
+            "arc_anvil_local:eth_simulateV1": 2
           },
-          "total": 199,
+          "total": 6,
           "endpoints": [
             {
               "id": "arc_anvil_local",
@@ -1702,9 +1846,9 @@
                 "probe",
                 "backfill"
               ],
-              "calls": 199,
+              "calls": 6,
               "budget": {
-                "used": 1636,
+                "used": 2842,
                 "limit": null,
                 "pct": 0,
                 "state": "ok"
@@ -1717,13 +1861,13 @@
                   "spillover": false
                 },
                 "call": {
-                  "used": 1014,
+                  "used": 1744,
                   "limit": null,
                   "reserveMonthly": null,
                   "spillover": false
                 },
                 "simulate": {
-                  "used": 622,
+                  "used": 1098,
                   "limit": null,
                   "reserveMonthly": null,
                   "spillover": false
@@ -1739,13 +1883,10 @@
         },
         "spend": {
           "counts": {
-            "arc_anvil_local:eth_getCode": 11,
-            "arc_anvil_local:eth_call": 56,
-            "arc_anvil_local:eth_getBlockByNumber": 36,
-            "arc_anvil_local:eth_simulateV1": 79,
-            "arc_anvil_local:eth_getBalance": 9,
-            "arc_anvil_local:eth_getTransactionByHash": 4,
-            "arc_anvil_local:eth_getTransactionReceipt": 4
+            "arc_anvil_local:eth_getCode": 2,
+            "arc_anvil_local:eth_call": 1,
+            "arc_anvil_local:eth_getBlockByNumber": 1,
+            "arc_anvil_local:eth_simulateV1": 2
           },
           "month": [
             {
@@ -1842,48 +1983,48 @@
               "provider": "arc_anvil_local",
               "method": "eth_getCode",
               "month": "2026-10",
-              "calls": 201
+              "calls": 636
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_call",
               "month": "2026-10",
-              "calls": 489
+              "calls": 694
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getBlockByNumber",
               "month": "2026-10",
-              "calls": 220
+              "calls": 358
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_simulateV1",
               "month": "2026-10",
-              "calls": 483
+              "calls": 872
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getBalance",
               "month": "2026-10",
-              "calls": 71
+              "calls": 102
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getTransactionByHash",
               "month": "2026-10",
-              "calls": 86
+              "calls": 90
             },
             {
               "provider": "arc_anvil_local",
               "method": "eth_getTransactionReceipt",
               "month": "2026-10",
-              "calls": 86
+              "calls": 90
             }
           ],
           "budgets": {
             "arc_anvil_local": {
-              "used": 1636,
+              "used": 2842,
               "limit": null,
               "pct": 0,
               "state": "ok"
@@ -1892,14 +2033,14 @@
         },
         "indexer": null,
         "safety": {
-          "enqueued": 41,
-          "collapsed": 6,
+          "enqueued": 1,
+          "collapsed": 0,
           "dropped": 0,
-          "running": 1,
-          "done": 21,
+          "running": 0,
+          "done": 1,
           "failed": 0,
-          "simulateCalls": 60,
-          "skippedPinned": 13
+          "simulateCalls": 2,
+          "skippedPinned": 0
         },
         "payerIdentity": "x402",
         "x402": {
@@ -1914,7 +2055,7 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "3c8d68f1"
+        "x-request-id": "8f330e76"
       },
       "body": {
         "paths": {
@@ -2191,12 +2332,12 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/topup",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/topup",
       "status": 402,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0NzgvYm94L3RvcHVwIiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggdG9wLXVwIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
-        "x-request-id": "63371290"
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvYm94L3RvcHVwIiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggdG9wLXVwIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
+        "x-request-id": "26f0c13e"
       },
       "body": {
         "error": {
@@ -2209,628 +2350,617 @@
     },
     {
       "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/topup",
-      "status": 200,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4NDE4OUJjNDI1QkQ4ODBiMTYzZjM4NmU1RDUyNzBGQ2NiMkMwQTQ3OCIsInRyYW5zYWN0aW9uIjoiMHgxZDhhODdlN2UyMzcwOTliZjRhNjY0NWNlZDE0YWE0NmZiOTNmY2Y4M2Y2ZmZmNmU0YTk0M2U0NDdhYTIxNzM1IiwibmV0d29yayI6ImVpcDE1NTo1MDQyMDAyIn0=",
-        "x-request-id": "55818e7b"
-      },
-      "body": {
-        "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-        "granted": {
-          "messages": 3,
-          "days": 0
-        },
-        "allowance": {
-          "messagesLeft": 1000,
-          "expiresAt": 1796510605
-        }
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/health",
-      "status": 200,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "x-request-id": "b1772395"
-      },
-      "body": {
-        "ok": true,
-        "db": {
-          "ok": true,
-          "tokens": 217898,
-          "verified": 68,
-          "importedAt": 1790388601
-        },
-        "rulesVersion": "r2-383954828c",
-        "commit": null,
-        "caches": {
-          "response": {
-            "hits": 0,
-            "misses": 32,
-            "size": 4,
-            "bytes": 13631
-          },
-          "candidates": {
-            "hits": 4,
-            "misses": 9,
-            "size": 1,
-            "bytes": 279477
-          },
-          "generations": {
-            "keys": 9,
-            "bumps": 370
-          },
-          "abuse": {
-            "missCacheSize": 0,
-            "payersTracked": 0,
-            "rateLimited": 0
-          },
-          "singleflight": {
-            "response": {
-              "hits": 0,
-              "leaders": 16
-            },
-            "probe": {
-              "hits": 0,
-              "leaders": 0
-            },
-            "depth": {
-              "hits": 0,
-              "leaders": 12
-            }
-          },
-          "quote": {
-            "lastEthCalls": 3,
-            "lastSafetyEthCalls": 0,
-            "lastCollapsed": false
-          }
-        },
-        "rpc": {
-          "counts": {
-            "arc_anvil_local:eth_getCode": 11,
-            "arc_anvil_local:eth_call": 56,
-            "arc_anvil_local:eth_getBlockByNumber": 36,
-            "arc_anvil_local:eth_simulateV1": 79,
-            "arc_anvil_local:eth_getBalance": 9,
-            "arc_anvil_local:eth_getTransactionByHash": 4,
-            "arc_anvil_local:eth_getTransactionReceipt": 4
-          },
-          "total": 199,
-          "endpoints": [
-            {
-              "id": "arc_anvil_local",
-              "health": 1,
-              "circuit": "closed",
-              "circuits": {
-                "logs": "closed",
-                "call": "closed",
-                "simulate": "closed",
-                "probe": "closed"
-              },
-              "weight": 100,
-              "priority": 1,
-              "capabilities": [
-                "logs",
-                "call",
-                "simulate",
-                "probe",
-                "backfill"
-              ],
-              "calls": 199,
-              "budget": {
-                "used": 1636,
-                "limit": null,
-                "pct": 0,
-                "state": "ok"
-              },
-              "byCapability": {
-                "logs": {
-                  "used": 0,
-                  "limit": null,
-                  "reserveMonthly": null,
-                  "spillover": false
-                },
-                "call": {
-                  "used": 1014,
-                  "limit": null,
-                  "reserveMonthly": null,
-                  "spillover": false
-                },
-                "simulate": {
-                  "used": 622,
-                  "limit": null,
-                  "reserveMonthly": null,
-                  "spillover": false
-                }
-              },
-              "queue": {
-                "waiting": 0,
-                "max": 180000,
-                "rejected": 0
-              }
-            }
-          ]
-        },
-        "spend": {
-          "counts": {
-            "arc_anvil_local:eth_getCode": 11,
-            "arc_anvil_local:eth_call": 56,
-            "arc_anvil_local:eth_getBlockByNumber": 36,
-            "arc_anvil_local:eth_simulateV1": 79,
-            "arc_anvil_local:eth_getBalance": 9,
-            "arc_anvil_local:eth_getTransactionByHash": 4,
-            "arc_anvil_local:eth_getTransactionReceipt": 4
-          },
-          "month": [
-            {
-              "provider": "arc_public",
-              "method": "eth_blockNumber",
-              "month": "2026-09",
-              "calls": 8260
-            },
-            {
-              "provider": "arc_public",
-              "method": "eth_getLogs",
-              "month": "2026-09",
-              "calls": 191776
-            },
-            {
-              "provider": "arc_public",
-              "method": "eth_call",
-              "month": "2026-09",
-              "calls": 17696
-            },
-            {
-              "provider": "arc_public",
-              "method": "eth_getCode",
-              "month": "2026-09",
-              "calls": 156
-            },
-            {
-              "provider": "chainstack",
-              "method": "eth_getBlockByNumber",
-              "month": "2026-09",
-              "calls": 97
-            },
-            {
-              "provider": "chainstack",
-              "method": "eth_simulateV1",
-              "month": "2026-09",
-              "calls": 272
-            },
-            {
-              "provider": "arc_public",
-              "method": "eth_getBlockByNumber",
-              "month": "2026-09",
-              "calls": 1290
-            },
-            {
-              "provider": "chainstack",
-              "method": "eth_call",
-              "month": "2026-09",
-              "calls": 427
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getCode",
-              "month": "2026-09",
-              "calls": 390
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_call",
-              "month": "2026-09",
-              "calls": 644
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getBlockByNumber",
-              "month": "2026-09",
-              "calls": 377
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_simulateV1",
-              "month": "2026-09",
-              "calls": 650
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getBalance",
-              "month": "2026-09",
-              "calls": 105
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getTransactionByHash",
-              "month": "2026-09",
-              "calls": 27
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getTransactionReceipt",
-              "month": "2026-09",
-              "calls": 27
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getCode",
-              "month": "2026-10",
-              "calls": 201
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_call",
-              "month": "2026-10",
-              "calls": 489
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getBlockByNumber",
-              "month": "2026-10",
-              "calls": 220
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_simulateV1",
-              "month": "2026-10",
-              "calls": 483
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getBalance",
-              "month": "2026-10",
-              "calls": 71
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getTransactionByHash",
-              "month": "2026-10",
-              "calls": 86
-            },
-            {
-              "provider": "arc_anvil_local",
-              "method": "eth_getTransactionReceipt",
-              "month": "2026-10",
-              "calls": 86
-            }
-          ],
-          "budgets": {
-            "arc_anvil_local": {
-              "used": 1636,
-              "limit": null,
-              "pct": 0,
-              "state": "ok"
-            }
-          }
-        },
-        "indexer": null,
-        "safety": {
-          "enqueued": 41,
-          "collapsed": 6,
-          "dropped": 0,
-          "running": 1,
-          "done": 21,
-          "failed": 0,
-          "simulateCalls": 60,
-          "skippedPinned": 13
-        },
-        "payerIdentity": "x402",
-        "x402": {
-          "enabled": true,
-          "network": "eip155:5042002"
-        }
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/openapi.json",
-      "status": 200,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "x-request-id": "a8f9b3dc"
-      },
-      "body": {
-        "paths": {
-          "/trade/v1/search": {
-            "post": {
-              "operationId": "tradeSearch",
-              "x-payment": {
-                "configKey": "trade.search.price",
-                "baseUnits": "5000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/trade/v1/quote": {
-            "post": {
-              "operationId": "tradeQuote",
-              "x-payment": {
-                "configKey": "trade.quote.price",
-                "baseUnits": "10000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/trade/v1/swap": {
-            "post": {
-              "operationId": "tradeSwap",
-              "x-payment": {
-                "asset": "USDC",
-                "decimals": 6,
-                "tiers": [
-                  {
-                    "configKey": "trade.swap.price",
-                    "baseUnits": "10000",
-                    "appliesToUsdNotional": "< 1,000, a quote with no USD valuation, or unknown/expired quoteId"
-                  },
-                  {
-                    "configKey": "trade.swap.price_mid",
-                    "baseUnits": "50000",
-                    "appliesToUsdNotional": "1,000-10,000 inclusive"
-                  },
-                  {
-                    "configKey": "trade.swap.price_large",
-                    "baseUnits": "500000",
-                    "appliesToUsdNotional": "> 10,000-100,000 inclusive"
-                  },
-                  {
-                    "configKey": "trade.swap.price_max",
-                    "baseUnits": "5000000",
-                    "appliesToUsdNotional": "> 100,000"
-                  }
-                ]
-              }
-            }
-          },
-          "/trade/v1/swap/tx": {
-            "post": {
-              "operationId": "tradeSwapTx"
-            }
-          },
-          "/trade/v1/receipt": {
-            "post": {
-              "operationId": "tradeReceipt"
-            }
-          },
-          "/trade/v1/venues": {
-            "get": {
-              "operationId": "tradeVenues"
-            }
-          },
-          "/mcp": {
-            "get": {
-              "operationId": "mcpInfo"
-            },
-            "post": {
-              "operationId": "mcp"
-            }
-          },
-          "/agents/v1/{chainId}/search": {
-            "post": {
-              "operationId": "agentSearch",
-              "x-payment": {
-                "configKey": "agents.search.price",
-                "baseUnits": "5000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agents/v1/{chainId}/agent/{agentId}": {
-            "get": {
-              "operationId": "agentProfile",
-              "x-payment": {
-                "configKey": "agents.profile.price",
-                "baseUnits": "100",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agents/v1/{chainId}/wallet/{address}": {
-            "get": {
-              "operationId": "agentWallet",
-              "x-payment": {
-                "configKey": "agents.wallet.price",
-                "baseUnits": "100",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/box": {
-            "post": {
-              "operationId": "boxCreate",
-              "x-payment": {
-                "configKey": "agent.box.price",
-                "baseUnits": "50000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/box/topup": {
-            "post": {
-              "operationId": "boxTopUp",
-              "x-payment": {
-                "configKey": "agent.box.topup_price",
-                "baseUnits": "50000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/box/status": {
-            "get": {
-              "operationId": "boxStatus"
-            }
-          },
-          "/agent/v1/{address}/box/messages": {
-            "get": {
-              "operationId": "boxMessageList"
-            }
-          },
-          "/agent/v1/{address}/box/messages/{seq}": {
-            "get": {
-              "operationId": "boxMessageFetch"
-            },
-            "delete": {
-              "operationId": "boxMessageDelete"
-            }
-          },
-          "/agent/v1/{address}/inbound": {
-            "post": {
-              "operationId": "inboundCreate",
-              "x-payment": {
-                "configKey": "agent.inbound.price",
-                "baseUnits": "10000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/inbound/list": {
-            "get": {
-              "operationId": "inboundList"
-            }
-          },
-          "/agent/v1/{address}/inbound/{id}": {
-            "delete": {
-              "operationId": "inboundDelete"
-            }
-          },
-          "/agent/v1/{address}/inbound/{id}/rotate": {
-            "post": {
-              "operationId": "inboundRotate"
-            }
-          },
-          "/agent/v1/{address}/watch": {
-            "post": {
-              "operationId": "watchCreate",
-              "x-payment": {
-                "configKey": "agent.watch.price",
-                "baseUnits": "10000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/watch/list": {
-            "get": {
-              "operationId": "watchList"
-            }
-          },
-          "/agent/v1/{address}/watch/{id}": {
-            "delete": {
-              "operationId": "watchDelete"
-            }
-          },
-          "/agent/v1/{address}/webhook": {
-            "post": {
-              "operationId": "webhookCreate",
-              "x-payment": {
-                "configKey": "agent.channel.price",
-                "baseUnits": "10000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/webhook/list": {
-            "get": {
-              "operationId": "webhookList"
-            }
-          },
-          "/agent/v1/{address}/webhook/{id}": {
-            "delete": {
-              "operationId": "webhookDelete"
-            }
-          },
-          "/agent/v1/{address}/webhook/{id}/rotate": {
-            "post": {
-              "operationId": "webhookRotate"
-            }
-          },
-          "/agent/v1/{address}/webhook/{id}/enable": {
-            "post": {
-              "operationId": "webhookEnable"
-            }
-          },
-          "/agent/v1/{address}/telegram": {
-            "post": {
-              "operationId": "telegramCreate",
-              "x-payment": {
-                "configKey": "agent.channel.price",
-                "baseUnits": "10000",
-                "asset": "USDC",
-                "decimals": 6
-              }
-            }
-          },
-          "/agent/v1/{address}/telegram/list": {
-            "get": {
-              "operationId": "telegramList"
-            }
-          },
-          "/agent/v1/{address}/telegram/{id}": {
-            "delete": {
-              "operationId": "telegramDelete"
-            }
-          },
-          "/agent/v1/{address}/telegram/{id}/link": {
-            "post": {
-              "operationId": "telegramLink"
-            }
-          },
-          "/health": {
-            "get": {
-              "operationId": "health"
-            }
-          },
-          "/openapi.json": {
-            "get": {
-              "operationId": "openapi"
-            }
-          },
-          "/.well-known/agent-registration.json": {
-            "get": {
-              "operationId": "agentRegistration"
-            }
-          }
-        }
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/topup",
-      "status": 402,
-      "headers": {
-        "content-type": "application/json; charset=utf-8",
-        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDQxODliYzQyNWJkODgwYjE2M2YzODZlNWQ1MjcwZmNjYjJjMGE0NzgvYm94L3RvcHVwIiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggdG9wLXVwIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
-        "x-request-id": "61e2ab12"
-      },
-      "body": {
-        "error": {
-          "code": "payment_required",
-          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
-          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042002, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See http://127.0.0.1:19801/#arcgate/description/paying-arcgate-from-your-own-code"
-        },
-        "next": "pay"
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/agent/v1/0x4189bc425bd880b163f386e5d5270fccb2c0a478/box/topup",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/topup",
       "status": 409,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "x-request-id": "1f6b3e2f"
+        "x-request-id": "c56ba96a"
+      },
+      "body": {
+        "error": {
+          "code": "allowance_full",
+          "message": "the box already has 1000 messages left and an expiry 60 days ahead, the most it can hold: a top-up would add nothing"
+        },
+        "next": "stop"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "b67751f6"
+      },
+      "body": {
+        "ok": true,
+        "db": {
+          "ok": true,
+          "tokens": 217898,
+          "verified": 68,
+          "importedAt": 1790388601
+        },
+        "rulesVersion": "r2-383954828c",
+        "commit": null,
+        "caches": {
+          "response": {
+            "hits": 0,
+            "misses": 2,
+            "size": 1,
+            "bytes": 1926
+          },
+          "candidates": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0,
+            "bytes": 0
+          },
+          "generations": {
+            "keys": 2,
+            "bumps": 5
+          },
+          "abuse": {
+            "missCacheSize": 0,
+            "payersTracked": 0,
+            "rateLimited": 0
+          },
+          "singleflight": {
+            "response": {
+              "hits": 0,
+              "leaders": 1
+            },
+            "probe": {
+              "hits": 0,
+              "leaders": 0
+            },
+            "depth": {
+              "hits": 0,
+              "leaders": 1
+            }
+          },
+          "quote": {
+            "lastEthCalls": 0,
+            "lastSafetyEthCalls": 0,
+            "lastCollapsed": false
+          }
+        },
+        "rpc": {
+          "counts": {
+            "arc_anvil_local:eth_getCode": 2,
+            "arc_anvil_local:eth_call": 1,
+            "arc_anvil_local:eth_getBlockByNumber": 1,
+            "arc_anvil_local:eth_simulateV1": 2
+          },
+          "total": 6,
+          "endpoints": [
+            {
+              "id": "arc_anvil_local",
+              "health": 1,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "simulate": "closed",
+                "probe": "closed"
+              },
+              "weight": 100,
+              "priority": 1,
+              "capabilities": [
+                "logs",
+                "call",
+                "simulate",
+                "probe",
+                "backfill"
+              ],
+              "calls": 6,
+              "budget": {
+                "used": 2842,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 0,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 1744,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "simulate": {
+                  "used": 1098,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 180000,
+                "rejected": 0
+              }
+            }
+          ]
+        },
+        "spend": {
+          "counts": {
+            "arc_anvil_local:eth_getCode": 2,
+            "arc_anvil_local:eth_call": 1,
+            "arc_anvil_local:eth_getBlockByNumber": 1,
+            "arc_anvil_local:eth_simulateV1": 2
+          },
+          "month": [
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 8260
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 191776
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 17696
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 156
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 97
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 272
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 1290
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 427
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 390
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 644
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 377
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 650
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 105
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getTransactionByHash",
+              "month": "2026-09",
+              "calls": 27
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getTransactionReceipt",
+              "month": "2026-09",
+              "calls": 27
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getCode",
+              "month": "2026-10",
+              "calls": 636
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 694
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 358
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_simulateV1",
+              "month": "2026-10",
+              "calls": 872
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBalance",
+              "month": "2026-10",
+              "calls": 102
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getTransactionByHash",
+              "month": "2026-10",
+              "calls": 90
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getTransactionReceipt",
+              "month": "2026-10",
+              "calls": 90
+            }
+          ],
+          "budgets": {
+            "arc_anvil_local": {
+              "used": 2842,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            }
+          }
+        },
+        "indexer": null,
+        "safety": {
+          "enqueued": 1,
+          "collapsed": 0,
+          "dropped": 0,
+          "running": 0,
+          "done": 1,
+          "failed": 0,
+          "simulateCalls": 2,
+          "skippedPinned": 0
+        },
+        "payerIdentity": "x402",
+        "x402": {
+          "enabled": true,
+          "network": "eip155:5042002"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "37868e6e"
+      },
+      "body": {
+        "paths": {
+          "/trade/v1/search": {
+            "post": {
+              "operationId": "tradeSearch",
+              "x-payment": {
+                "configKey": "trade.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/quote": {
+            "post": {
+              "operationId": "tradeQuote",
+              "x-payment": {
+                "configKey": "trade.quote.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/swap": {
+            "post": {
+              "operationId": "tradeSwap",
+              "x-payment": {
+                "asset": "USDC",
+                "decimals": 6,
+                "tiers": [
+                  {
+                    "configKey": "trade.swap.price",
+                    "baseUnits": "10000",
+                    "appliesToUsdNotional": "< 1,000, a quote with no USD valuation, or unknown/expired quoteId"
+                  },
+                  {
+                    "configKey": "trade.swap.price_mid",
+                    "baseUnits": "50000",
+                    "appliesToUsdNotional": "1,000-10,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_large",
+                    "baseUnits": "500000",
+                    "appliesToUsdNotional": "> 10,000-100,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_max",
+                    "baseUnits": "5000000",
+                    "appliesToUsdNotional": "> 100,000"
+                  }
+                ]
+              }
+            }
+          },
+          "/trade/v1/swap/tx": {
+            "post": {
+              "operationId": "tradeSwapTx"
+            }
+          },
+          "/trade/v1/receipt": {
+            "post": {
+              "operationId": "tradeReceipt"
+            }
+          },
+          "/trade/v1/venues": {
+            "get": {
+              "operationId": "tradeVenues"
+            }
+          },
+          "/mcp": {
+            "get": {
+              "operationId": "mcpInfo"
+            },
+            "post": {
+              "operationId": "mcp"
+            }
+          },
+          "/agents/v1/{chainId}/search": {
+            "post": {
+              "operationId": "agentSearch",
+              "x-payment": {
+                "configKey": "agents.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/agent/{agentId}": {
+            "get": {
+              "operationId": "agentProfile",
+              "x-payment": {
+                "configKey": "agents.profile.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/wallet/{address}": {
+            "get": {
+              "operationId": "agentWallet",
+              "x-payment": {
+                "configKey": "agents.wallet.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box": {
+            "post": {
+              "operationId": "boxCreate",
+              "x-payment": {
+                "configKey": "agent.box.price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/topup": {
+            "post": {
+              "operationId": "boxTopUp",
+              "x-payment": {
+                "configKey": "agent.box.topup_price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/status": {
+            "get": {
+              "operationId": "boxStatus"
+            }
+          },
+          "/agent/v1/{address}/box/messages": {
+            "get": {
+              "operationId": "boxMessageList"
+            }
+          },
+          "/agent/v1/{address}/box/messages/{seq}": {
+            "get": {
+              "operationId": "boxMessageFetch"
+            },
+            "delete": {
+              "operationId": "boxMessageDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound": {
+            "post": {
+              "operationId": "inboundCreate",
+              "x-payment": {
+                "configKey": "agent.inbound.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/inbound/list": {
+            "get": {
+              "operationId": "inboundList"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}": {
+            "delete": {
+              "operationId": "inboundDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}/rotate": {
+            "post": {
+              "operationId": "inboundRotate"
+            }
+          },
+          "/agent/v1/{address}/watch": {
+            "post": {
+              "operationId": "watchCreate",
+              "x-payment": {
+                "configKey": "agent.watch.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/watch/list": {
+            "get": {
+              "operationId": "watchList"
+            }
+          },
+          "/agent/v1/{address}/watch/{id}": {
+            "delete": {
+              "operationId": "watchDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook": {
+            "post": {
+              "operationId": "webhookCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/webhook/list": {
+            "get": {
+              "operationId": "webhookList"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}": {
+            "delete": {
+              "operationId": "webhookDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/rotate": {
+            "post": {
+              "operationId": "webhookRotate"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/enable": {
+            "post": {
+              "operationId": "webhookEnable"
+            }
+          },
+          "/agent/v1/{address}/telegram": {
+            "post": {
+              "operationId": "telegramCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/telegram/list": {
+            "get": {
+              "operationId": "telegramList"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}": {
+            "delete": {
+              "operationId": "telegramDelete"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}/link": {
+            "post": {
+              "operationId": "telegramLink"
+            }
+          },
+          "/health": {
+            "get": {
+              "operationId": "health"
+            }
+          },
+          "/openapi.json": {
+            "get": {
+              "operationId": "openapi"
+            }
+          },
+          "/.well-known/agent-registration.json": {
+            "get": {
+              "operationId": "agentRegistration"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/topup",
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cDovLzEyNy4wLjAuMToxOTgwMC9hZ2VudC92MS8weDA2ZTU5NGM2NzdjZDI4NjQzYjgyNDc3YjdiNTMyOGFjNjgxN2IyYTAvYm94L3RvcHVwIiwiZGVzY3JpcHRpb24iOiJBZ2VudCBib3ggdG9wLXVwIiwibWltZVR5cGUiOiIifSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoiZWlwMTU1OjUwNDIwMDIiLCJhbW91bnQiOiI1MDAwMCIsImFzc2V0IjoiMHgzNjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwicGF5VG8iOiIweDk4N0Y3MTliNTE2ZjUyOGY0MDgwRUYwODUzRTM3YUQ1ZDdFNzczQTAiLCJtYXhUaW1lb3V0U2Vjb25kcyI6MzAwLCJleHRyYSI6eyJuYW1lIjoiVVNEQyIsInZlcnNpb24iOiIyIn19XX0=",
+        "x-request-id": "603e12a3"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042002, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See http://127.0.0.1:19801/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0x06e594c677cd28643b82477b7b5328ac6817b2a0/box/topup",
+      "status": 409,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "6acbf000"
       },
       "body": {
         "error": {
