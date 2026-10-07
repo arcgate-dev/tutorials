@@ -7,7 +7,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 export async function runFlow(command, { wallet, config, api, rpc, log = console.log, sleep = pause }) {
   if (!['search', 'quote', 'preview', 'trade'].includes(command)) throw new Error('Unknown tutorial command.');
   const search = await api('search', { query: 'cirBTC', limit: 5 });
-  const token = pickToken(search, config.buyToken);
+  const token = pickToken(search, config);
   log(JSON.stringify({ resolution: search.resolution, token: token.address, symbol: token.symbol }));
   if (command === 'search') return { search };
   // V3 uses ERC-20 USDC input. A native-funded V4 route would skip Permit2.
@@ -82,7 +82,8 @@ export async function runFlow(command, { wallet, config, api, rpc, log = console
     throw new Error(`The swap already mined and local delivery checks passed. Arcgate receipt lookup failed: ${error.message} Check only the receipt with: ${receiptCommand}. Do not rerun the trade.`, { cause: error });
   }
   log(JSON.stringify({ receipt: result }, null, 2));
-  if (result.result !== 'pass') {
+  // The deployed API omits next on a pass; the local one says done.
+  if (result.result !== 'pass' || (result.next !== undefined && result.next !== 'done')) {
     throw new Error(`The swap already mined. Arcgate receipt is ${result.result}: ${result.reason ?? 'inspect the transactions'}; next=${result.next ?? 'stop'}. Wait at least 5 seconds and run ${receiptCommand}. Do not rerun the trade.`);
   }
   if (getAddress(result.token) !== config.buyToken || getAddress(result.recipient) !== wallet.address

@@ -1,0 +1,659 @@
+{
+  "capturedAt": "2026-10-06T23:48:51.743Z",
+  "source": "https://api.arcgate.dev production, unpaid requests and free calls only (no payment signed)",
+  "healthCommit": "603c5f15143bc4e54c69dccf0539a10c0ff18ddf",
+  "arcgateCheckoutCommit": null,
+  "health": {
+    "ok": true,
+    "db": {
+      "ok": true,
+      "tokens": 248343,
+      "verified": 68,
+      "importedAt": 1791330526
+    },
+    "rulesVersion": "r2-383954828c",
+    "commit": "603c5f15143bc4e54c69dccf0539a10c0ff18ddf",
+    "caches": {
+      "response": {
+        "hits": 0,
+        "misses": 0,
+        "size": 0,
+        "bytes": 0
+      },
+      "candidates": {
+        "hits": 0,
+        "misses": 0,
+        "size": 0,
+        "bytes": 0
+      },
+      "generations": {
+        "keys": 0,
+        "bumps": 12379890
+      },
+      "abuse": {
+        "missCacheSize": 0,
+        "payersTracked": 0,
+        "rateLimited": 0
+      },
+      "singleflight": {
+        "response": {
+          "hits": 0,
+          "leaders": 0
+        },
+        "probe": {
+          "hits": 0,
+          "leaders": 0
+        },
+        "depth": {
+          "hits": 0,
+          "leaders": 0
+        }
+      },
+      "quote": {
+        "lastEthCalls": 0,
+        "lastSafetyEthCalls": 0,
+        "lastCollapsed": false
+      }
+    },
+    "rpc": {
+      "counts": {
+        "chainstack:eth_getCode": 2,
+        "chainstack:eth_getBlockByNumber": 8890,
+        "alchemy:eth_call": 191,
+        "arc_public:eth_call": 158,
+        "chainstack:eth_blockNumber": 35454,
+        "alchemy:eth_getLogs": 281026,
+        "chainstack:eth_call": 43556,
+        "arc_public:eth_getLogs": 277002,
+        "alchemy:eth_blockNumber": 19,
+        "arc_public:eth_blockNumber": 15,
+        "alchemy:eth_getBlockByNumber": 1
+      },
+      "total": 646314,
+      "endpoints": [
+        {
+          "id": "arc_public",
+          "health": 0.9999999999999996,
+          "circuit": "half-open",
+          "circuits": {
+            "logs": "closed",
+            "call": "half-open",
+            "archive": "closed",
+            "probe": "closed"
+          },
+          "weight": 100,
+          "priority": 3,
+          "capabilities": [
+            "logs",
+            "call",
+            "archive",
+            "probe",
+            "backfill"
+          ],
+          "calls": 277175,
+          "budget": {
+            "used": 321823,
+            "limit": null,
+            "pct": 0,
+            "state": "ok"
+          },
+          "byCapability": {
+            "logs": {
+              "used": 321510,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            },
+            "call": {
+              "used": 313,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            }
+          },
+          "queue": {
+            "waiting": 0,
+            "max": 30,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "chainstack",
+          "health": 0.9999999999999996,
+          "circuit": "closed",
+          "circuits": {
+            "simulate": "closed",
+            "call": "closed",
+            "probe": "closed"
+          },
+          "weight": 1,
+          "priority": 1,
+          "capabilities": [
+            "simulate",
+            "call",
+            "probe"
+          ],
+          "calls": 87902,
+          "budget": {
+            "used": 103485,
+            "limit": 3000000,
+            "pct": 0.034495,
+            "state": "ok"
+          },
+          "byCapability": {
+            "simulate": {
+              "used": 0,
+              "limit": null,
+              "reserveMonthly": 2000000,
+              "spillover": false
+            },
+            "call": {
+              "used": 103485,
+              "limit": 1000000,
+              "reserveMonthly": null,
+              "spillover": false
+            }
+          },
+          "queue": {
+            "waiting": 0,
+            "max": 100,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "alchemy",
+          "health": 0.9999999999999996,
+          "circuit": "closed",
+          "circuits": {
+            "logs": "closed",
+            "call": "closed",
+            "archive": "closed",
+            "probe": "closed"
+          },
+          "weight": 50,
+          "priority": 2,
+          "capabilities": [
+            "logs",
+            "call",
+            "archive",
+            "probe",
+            "backfill"
+          ],
+          "calls": 281237,
+          "budget": {
+            "used": 325993,
+            "limit": null,
+            "pct": 0,
+            "state": "ok"
+          },
+          "byCapability": {
+            "logs": {
+              "used": 325638,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            },
+            "call": {
+              "used": 355,
+              "limit": null,
+              "reserveMonthly": null,
+              "spillover": false
+            }
+          },
+          "queue": {
+            "waiting": 0,
+            "max": 60,
+            "rejected": 0
+          }
+        }
+      ]
+    },
+    "spend": {
+      "counts": {
+        "chainstack:eth_getCode": 2,
+        "chainstack:eth_getBlockByNumber": 8890,
+        "alchemy:eth_call": 191,
+        "arc_public:eth_call": 158,
+        "chainstack:eth_blockNumber": 35454,
+        "alchemy:eth_getLogs": 281026,
+        "chainstack:eth_call": 43556,
+        "arc_public:eth_getLogs": 277002,
+        "alchemy:eth_blockNumber": 19,
+        "arc_public:eth_blockNumber": 15,
+        "alchemy:eth_getBlockByNumber": 1
+      },
+      "month": [
+        {
+          "provider": "arc_public",
+          "method": "eth_blockNumber",
+          "month": "2026-09",
+          "calls": 11196
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getLogs",
+          "month": "2026-09",
+          "calls": 310123
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 26784
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getCode",
+          "month": "2026-09",
+          "calls": 178
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-09",
+          "calls": 3077
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_simulateV1",
+          "month": "2026-09",
+          "calls": 402
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-09",
+          "calls": 2241
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 18907
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getCode",
+          "month": "2026-09",
+          "calls": 333
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 508
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-09",
+          "calls": 292
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_simulateV1",
+          "month": "2026-09",
+          "calls": 483
+        },
+        {
+          "provider": "arc_anvil_local",
+          "method": "eth_getBalance",
+          "month": "2026-09",
+          "calls": 76
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getCode",
+          "month": "2026-09",
+          "calls": 47
+        },
+        {
+          "provider": "alchemy",
+          "method": "eth_getLogs",
+          "month": "2026-09",
+          "calls": 143539
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getBalance",
+          "month": "2026-09",
+          "calls": 2
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_blockNumber",
+          "month": "2026-09",
+          "calls": 11438
+        },
+        {
+          "provider": "alchemy",
+          "method": "eth_call",
+          "month": "2026-09",
+          "calls": 203
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getBalance",
+          "month": "2026-09",
+          "calls": 10
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getTransactionByHash",
+          "month": "2026-09",
+          "calls": 2
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getTransactionReceipt",
+          "month": "2026-09",
+          "calls": 2
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_getLogs",
+          "month": "2026-10",
+          "calls": 321510
+        },
+        {
+          "provider": "alchemy",
+          "method": "eth_getLogs",
+          "month": "2026-10",
+          "calls": 325638
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_call",
+          "month": "2026-10",
+          "calls": 51538
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_blockNumber",
+          "month": "2026-10",
+          "calls": 41384
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getCode",
+          "month": "2026-10",
+          "calls": 18
+        },
+        {
+          "provider": "chainstack",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-10",
+          "calls": 10545
+        },
+        {
+          "provider": "alchemy",
+          "method": "eth_call",
+          "month": "2026-10",
+          "calls": 325
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_call",
+          "month": "2026-10",
+          "calls": 288
+        },
+        {
+          "provider": "alchemy",
+          "method": "eth_blockNumber",
+          "month": "2026-10",
+          "calls": 29
+        },
+        {
+          "provider": "arc_public",
+          "method": "eth_blockNumber",
+          "month": "2026-10",
+          "calls": 25
+        },
+        {
+          "provider": "alchemy",
+          "method": "eth_getBlockByNumber",
+          "month": "2026-10",
+          "calls": 1
+        }
+      ],
+      "budgets": {
+        "arc_public": {
+          "used": 321823,
+          "limit": null,
+          "pct": 0,
+          "state": "ok"
+        },
+        "chainstack": {
+          "used": 103485,
+          "limit": 3000000,
+          "pct": 0.034495,
+          "state": "ok"
+        },
+        "alchemy": {
+          "used": 325993,
+          "limit": null,
+          "pct": 0,
+          "state": "ok"
+        },
+        "etherscan": {
+          "used": 0,
+          "limit": null,
+          "pct": 0,
+          "state": "ok"
+        }
+      }
+    },
+    "indexer": {
+      "head": 24640568,
+      "streams": [
+        {
+          "stream": "poll:a:v4",
+          "nextBlock": 24640567,
+          "lag": 2
+        },
+        {
+          "stream": "poll:b:v3v2tax",
+          "nextBlock": 24640567,
+          "lag": 2
+        },
+        {
+          "stream": "poll:c:launchpads",
+          "nextBlock": 24640567,
+          "lag": 2
+        },
+        {
+          "stream": "poll:d:milestones",
+          "nextBlock": 24640567,
+          "lag": 2
+        },
+        {
+          "stream": "poll:f:aerodrome",
+          "nextBlock": 24640567,
+          "lag": 2
+        }
+      ],
+      "lastPollAt": 1791330524,
+      "backfill": [
+        {
+          "stream": "v4:pm:history",
+          "nextBlock": 24640544,
+          "remainingBlocks": 24,
+          "blocksPerSec": 76.60184035985512,
+          "backoffUntil": null
+        },
+        {
+          "stream": "uniswap_v3:backfill",
+          "nextBlock": 24640544,
+          "remainingBlocks": 24,
+          "blocksPerSec": 87.81517048149432,
+          "backoffUntil": null
+        },
+        {
+          "stream": "uniswap_v2:backfill",
+          "nextBlock": 24640544,
+          "remainingBlocks": 24,
+          "blocksPerSec": 79.59734619730604,
+          "backoffUntil": null
+        },
+        {
+          "stream": "aerodrome_cl:backfill",
+          "nextBlock": 24640544,
+          "remainingBlocks": 24,
+          "blocksPerSec": 76.58189864688167,
+          "backoffUntil": null
+        },
+        {
+          "stream": "o1:backfill",
+          "nextBlock": 24640569,
+          "remainingBlocks": 0,
+          "blocksPerSec": 107.26451146119192,
+          "backoffUntil": null
+        },
+        {
+          "stream": "minara:backfill",
+          "nextBlock": 24640569,
+          "remainingBlocks": 0,
+          "blocksPerSec": 78.99922950924692,
+          "backoffUntil": null
+        },
+        {
+          "stream": "tolly:backfill",
+          "nextBlock": 24640569,
+          "remainingBlocks": 0,
+          "blocksPerSec": 79.851565569335,
+          "backoffUntil": null
+        },
+        {
+          "stream": "foci:backfill",
+          "nextBlock": 24640569,
+          "remainingBlocks": 0,
+          "blocksPerSec": 76.05692332124387,
+          "backoffUntil": null
+        },
+        {
+          "stream": "argus:backfill",
+          "nextBlock": 24640569,
+          "remainingBlocks": 0,
+          "blocksPerSec": 93.90073281890892,
+          "backoffUntil": null
+        },
+        {
+          "stream": "window48h:b",
+          "nextBlock": 22365749,
+          "remainingBlocks": 0,
+          "blocksPerSec": 0,
+          "backoffUntil": null
+        }
+      ],
+      "tradesRows": 332274,
+      "lagBlocks": 2,
+      "caughtUp": true,
+      "lastError": null,
+      "consecutiveFailures": 0,
+      "maxTxMs": 112.9047189950943,
+      "maxBlockingMs": 119.09606599807739,
+      "maxAggregateMs": 208.0405240058899
+    },
+    "safety": {
+      "enqueued": 0,
+      "collapsed": 0,
+      "dropped": 0,
+      "running": 0,
+      "done": 0,
+      "failed": 0,
+      "simulateCalls": 0,
+      "skippedPinned": 0
+    },
+    "payerIdentity": "x402",
+    "x402": {
+      "enabled": true,
+      "network": "eip155:5042"
+    }
+  },
+  "search402": {
+    "status": 402,
+    "requestId": "46d92558",
+    "requestBody": {
+      "query": "cirBTC",
+      "limit": 5
+    },
+    "paymentRequired": {
+      "x402Version": 2,
+      "error": "Payment required",
+      "resource": {
+        "url": "http://api.arcgate.dev/trade/v1/search",
+        "description": "Token search",
+        "mimeType": ""
+      },
+      "accepts": [
+        {
+          "scheme": "exact",
+          "network": "eip155:5042",
+          "amount": "5000",
+          "asset": "0x3600000000000000000000000000000000000000",
+          "payTo": "0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e",
+          "maxTimeoutSeconds": 300,
+          "extra": {
+            "name": "USDC",
+            "version": "2"
+          }
+        }
+      ]
+    },
+    "body": {
+      "error": {
+        "code": "payment_required",
+        "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+        "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+      },
+      "next": "pay"
+    }
+  },
+  "swapTx": {
+    "status": 409,
+    "requestId": "0d66121b",
+    "requestBody": {
+      "quoteId": "q_0123456789abcdef",
+      "taker": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+      "recipient": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+      "deadlineSec": 300,
+      "permit": {
+        "message": {
+          "details": {
+            "token": "0x3600000000000000000000000000000000000000",
+            "amount": "500000",
+            "expiration": "1793000000",
+            "nonce": "0"
+          },
+          "spender": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
+          "sigDeadline": "1790000000"
+        },
+        "signature": "0xababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab"
+      }
+    },
+    "body": {
+      "error": {
+        "code": "no_pending_swap",
+        "message": "no pending permit round for this quoteId/taker/recipient - call POST /trade/v1/swap first, which is paid and returns the permit this call takes"
+      },
+      "next": "fix_request"
+    }
+  },
+  "receiptUnknown": {
+    "status": 404,
+    "requestId": "9cc5e83e",
+    "requestBody": {
+      "quoteId": "q_0123456789abcdef",
+      "txHashes": [
+        "0xabababababababababababababababababababababababababababababababab"
+      ]
+    },
+    "body": {
+      "error": {
+        "code": "swap_not_found",
+        "message": "no /trade/v1/swap answer was issued for that quoteId in the last hour"
+      },
+      "next": "stop"
+    }
+  }
+}

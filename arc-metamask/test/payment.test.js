@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { recoverTypedDataAddress } from 'viem';
 import { acceptOffer, assertAuthorization, createArcgateClient } from '../src/payment.js';
-import { account, authorization, config, encodeHeader, hash, offer, other, receiptHeader, required, wallet } from './fixtures.js';
+import { account, authorization, config, encodeHeader, hash, offer, other, receiptHeader, required, settlementHeader, testnetConfig, testnetOffer, testnetRequired, wallet } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -96,4 +96,86 @@ test('a paid call that fails keeps the API next action and free replacement quot
     ? new Response(JSON.stringify(required), { status: 402 })
     : Response.json({ error: { code: 'quote_stale', hint: 'price moved' }, next: 'requote', quote: { quoteId: 'q_abcdefabcdefabcd' } }, { status: 409, headers: { 'payment-response': receiptHeader } }) });
   await assert.rejects(api('swap', {}), error => error.status === 409 && /next=requote/.test(error.message) && error.body.quote.quoteId === 'q_abcdefabcdefabcd');
+});
+
+test('offers and authorizations are bound to the resolved row: its network, payTo and payment chain', () => {
+  assert.equal(acceptOffer(testnetOffer, testnetConfig), true);
+  assert.equal(acceptOffer(offer, config), true);
+  // An Arc mainnet offer on the testnet row, and the reverse.
+  assert.equal(acceptOffer(offer, testnetConfig), false);
+  assert.equal(acceptOffer(testnetOffer, config), false);
+  // The right network but the other row's recipient.
+  assert.equal(acceptOffer({ ...testnetOffer, payTo: config.payTo }, testnetConfig), false);
+  assert.equal(acceptOffer({ ...offer, payTo: testnetConfig.payTo }, config), false);
+  assert.equal(acceptOffer({ ...testnetOffer, payTo: other }, testnetConfig), false);
+  assert.doesNotThrow(() => assertAuthorization(authorization(testnetConfig), wallet, testnetConfig));
+  assert.equal(authorization(testnetConfig).domain.chainId, 5042002);
+  // Arc mainnet typed data on the testnet row, and the reverse.
+  assert.throws(() => assertAuthorization(authorization(config), wallet, testnetConfig), /authorization/);
+  assert.throws(() => assertAuthorization(authorization(testnetConfig), wallet, config), /authorization/);
+  // The testnet chain with the production payee.
+  const data = authorization(testnetConfig); data.message.to = config.payTo;
+  assert.throws(() => assertAuthorization(data, wallet, testnetConfig), /authorization/);
+  const wrongChain = authorization(testnetConfig); wrongChain.domain.chainId = 5042; // Permit2's chain is not the x402 chain on this row
+  assert.throws(() => assertAuthorization(wrongChain, wallet, testnetConfig), /authorization/);
+});
+
+test('on the testnet row the real x402 SDK signs on 5042002 for the testnet payee only', async () => {
+  const signed = [], requests = [];
+  const api = createArcgateClient({ wallet: { address: wallet.address, signTypedData: data => { signed.push(data); return wallet.signTypedData(data); } }, config: testnetConfig,
+    fetchFn: async (url, init) => {
+      requests.push(init);
+      if (requests.length === 1) return new Response('{}', { status: 402, headers: { 'payment-required': encodeHeader(testnetRequired) } });
+      const payload = JSON.parse(Buffer.from(new Headers(init.headers).get('payment-signature'), 'base64').toString());
+      assert.equal(payload.accepted.network, 'eip155:5042002');
+      assert.equal(payload.payload.authorization.to.toLowerCase(), testnetConfig.payTo.toLowerCase());
+      return new Response('{"resolution":"verified"}', { headers: { 'payment-response': settlementHeader(testnetConfig) } });
+    } });
+  assert.deepEqual(await api('search', { query: 'cirBTC' }), { resolution: 'verified' });
+  assert.equal(requests.length, 2);
+  assert.equal(signed.length, 1);
+  assert.equal(Number(signed[0].domain.chainId), 5042002);
+  assert.equal(signed[0].message.to.toLowerCase(), testnetConfig.payTo.toLowerCase());
+  // An offer for the other row never reaches wallet signing, on either row.
+  for (const [row, accepts] of [[testnetConfig, offer], [config, testnetOffer]]) {
+    let signedOther = false;
+    const refusing = createArcgateClient({ wallet: { address: wallet.address, signTypedData() { signedOther = true; } }, config: row,
+      fetchFn: async () => new Response(JSON.stringify({ ...required, accepts: [accepts] }), { status: 402 }),
+    });
+    await assert.rejects(refusing('search', {}), /payment network/, row.network);
+    assert.equal(signedOther, false);
+  }
+});
+
+test('a 502 X402MiddlewareError is reported with its message and a warning that the payment may have settled', async () => {
+  let requests = 0;
+  const api = createArcgateClient({ wallet, config, fetchFn: async () => ++requests === 1
+    ? new Response(JSON.stringify(required), { status: 402 })
+    : Response.json({ error: 'X402MiddlewareError: facilitator verify failed' }, { status: 502, headers: { 'x-request-id': 'abc12345' } }) });
+  await assert.rejects(api('search', {}), error => {
+    assert.equal(error.status, 502);
+    assert.match(error.message, /X402MiddlewareError: facilitator verify failed/);
+    assert.match(error.message, /may have settled/);
+    assert.match(error.message, /PAYMENT-RESPONSE|balance/);
+    assert.match(error.message, /No automatic retry/);
+    return true;
+  });
+  assert.equal(requests, 2);
+});
+
+test('a payment_response_expired settlement also warns that the payment may have settled; other failures do not', async () => {
+  const settlement = errorReason => encodeHeader({ success: false, errorReason, transaction: '', network: config.network, payer: wallet.address });
+  const answer = async (status, headers, body = {}) => {
+    let requests = 0;
+    const api = createArcgateClient({ wallet, config, fetchFn: async () => ++requests === 1
+      ? new Response(JSON.stringify(required), { status: 402 }) : Response.json(body, { status, headers }) });
+    return api('search', {}).then(() => assert.fail('expected a refusal'), error => error);
+  };
+  const expired = await answer(402, { 'payment-response': settlement('payment_response_expired') });
+  assert.equal(expired.status, 402);
+  assert.match(expired.message, /payment_response_expired/);
+  assert.match(expired.message, /may have settled/);
+  // An ordinary settlement failure and an ordinary API error leave it at their own message.
+  assert.doesNotMatch((await answer(402, { 'payment-response': settlement('insufficient_funds') })).message, /may have settled/);
+  assert.doesNotMatch((await answer(409, { 'payment-response': receiptHeader }, { error: { code: 'quote_stale' }, next: 'requote' })).message, /may have settled/);
 });

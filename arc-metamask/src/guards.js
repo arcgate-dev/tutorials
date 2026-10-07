@@ -15,8 +15,9 @@ export const routerAbi = parseAbi([
 const same = (left, right) => getAddress(left) === getAddress(right);
 const ensure = (ok, message) => { if (!ok) throw new Error(message); };
 
-export function pickToken(search, expected) {
-  ensure(search.network === 'eip155:5042' && ['verified', 'clear_leader', 'single'].includes(search.resolution), 'Search is unresolved or on another network.');
+export function pickToken(search, config) {
+  const expected = config.buyToken;
+  ensure(search.network === config.tradeNetwork && ['verified', 'clear_leader', 'single'].includes(search.resolution), 'Search is unresolved or on another network.');
   const token = search.results?.[0];
   ensure(token && same(token.address, expected) && token.verification?.status === 'verified'
     && Array.isArray(token.flags) && token.flags.length === 0, 'Search did not resolve to the expected verified token without flags.');
@@ -24,7 +25,9 @@ export function pickToken(search, expected) {
 }
 
 export function reviewQuote(quote, config) {
-  ensure(quote.network === 'eip155:5042' && quote.side === 'exactIn', 'Unexpected quote network or side.');
+  ensure(quote.network === config.tradeNetwork && quote.side === 'exactIn', 'Unexpected quote network or side.');
+  // The deployed API omits next on a 200; the local one says swap. Anything else is the API telling the caller not to swap.
+  ensure(quote.best?.executable === true && (quote.next === undefined || quote.next === 'swap'), 'The API does not say this quote can be swapped.');
   ensure(same(quote.sell.address, USDC) && quote.sell.decimals === 6
     && same(quote.buy.address, config.buyToken) && quote.buy.decimals === 8, 'Unexpected quote tokens or decimals.');
   ensure(quote.sell.amountRaw === parseUnits(config.amount, 6).toString()
@@ -48,7 +51,7 @@ export function reviewPermit(data, config, now = Math.floor(Date.now() / 1000)) 
   ensure(primaryType === 'PermitSingle' && keys.join(',') === 'PermitDetails,PermitSingle'
     && keys.every(key => JSON.stringify(types[key]) === JSON.stringify(permitTypes[key])), 'Unexpected Permit2 typed-data schema.');
   ensure(domain.name === 'Permit2' && domain.version === undefined
-    && BigInt(domain.chainId) === 5042n && same(domain.verifyingContract, PERMIT2), 'Unexpected Permit2 domain.');
+    && BigInt(domain.chainId) === BigInt(config.tradeChainId) && same(domain.verifyingContract, PERMIT2), 'Unexpected Permit2 domain.');
   const { details, spender, sigDeadline } = message;
   ensure(same(spender, config.router) && same(details.token, USDC)
     && BigInt(details.amount) === parseUnits(config.amount, 6), 'Permit2 changed the token, spender or sell amount.');
@@ -73,9 +76,12 @@ export function reviewSwap(swap, quote, wallet, config, minOut, signed = null, n
   ensure(['ok', 'pinned'].includes(swap.safety?.verdict), 'Swap safety verdict is not accepted.');
   ensure(Date.parse(swap.expiresAt) > now * 1000, 'Swap has expired.');
   if (signed) {
+    // /swap/tx on the deployed API omits next; the local one says send.
+    ensure(swap.next === undefined || swap.next === 'send', 'The API does not say to send the final swap.');
     ensure(swap.signatures?.length === 0, 'Final swap still asks for a signature; do not send placeholder calldata.');
     reviewPermit(signed.typedData, config, now);
   } else {
+    ensure(swap.next === 'sign_permit', 'The API does not ask for a Permit2 signature.');
     ensure(swap.signatures?.length === 1 && swap.signatures[0].kind === 'permit2', 'Expected a fresh Permit2 signature. This route or allowance does not demonstrate the tutorial.');
     reviewPermit(swap.signatures[0].typedData, config, now);
   }

@@ -4,6 +4,7 @@ import { getReceipt } from '../src/receipt.js';
 import { main } from '../src/main.js';
 import { config, hash, tradeReceipt } from './fixtures.js';
 
+process.env.PATH = ''; // Never let a test find the real `mm` on this machine.
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
 test('receipt is a plain free call and preserves pass, pending and fail answers', async () => {
