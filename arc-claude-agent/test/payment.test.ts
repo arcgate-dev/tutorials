@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { connectArcgate } from '../src/mcp.ts';
 import { acceptOffer, createBudget, selectOffer } from '../src/payment.ts';
 import { connect } from './connect.ts';
 import { fakeMcp } from './fake-mcp.ts';
@@ -190,4 +191,25 @@ test('selectOffer is the first accepted offer, and none when nothing is accepted
   assert.deepEqual(selectOffer([otherNetwork, overCap, mainnet, good], config), mainnet);
   assert.ok(selectOffer([otherNetwork, overCap], config) == null);
   assert.ok(selectOffer([], config) == null);
+});
+
+test('a paid tools/call that gets HTTP 502 may have settled: thrown with that warning, reservation kept, no second paid call', async (t) => {
+  const config = testConfig();
+  const fake = fakeMcp();
+  // Override: the fake server receives the paid tools/call, and the gateway in front of it answers 502 to the caller.
+  const fetchFn: typeof fetch = async (input, init) => {
+    const answer = await fake.fetch(input, init);
+    const message = init?.body === undefined ? {} : JSON.parse(String(init.body));
+    return message.method === 'tools/call' && message.params?._meta?.[PAYMENT_META] !== undefined ? new Response('Bad Gateway', { status: 502 }) : answer;
+  };
+  const arcgate = await connectArcgate({ config, fetchFn, log: fake.log, paidTools: config.paidTools });
+  t.after(() => arcgate.close());
+
+  await assert.rejects(arcgate.call('watchCreate', { address: config.account.address, condition: REQUEST_SCREEN }), (error: Error) => {
+    assert.match(error.message, /may have settled/);
+    return true;
+  });
+
+  assert.equal(arcgate.budget.reserved, 10_000n, 'the reservation is not released');
+  assert.equal(fake.paidCalls().length, 1, 'the paid call is not sent again');
 });
