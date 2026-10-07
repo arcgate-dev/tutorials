@@ -105,7 +105,11 @@ export function fakeMcp({ inbox = 'messages' }: { inbox?: Inbox } = {}) {
       const inboundUrl = captured('inbound-create.paid').structuredContent.url;
       if (method !== 'POST' || url !== inboundUrl) return reply({ error: { code: 'not_found' } }, 404);
       if (headers['inbound-secret'] !== INBOUND_SECRET) return reply({ error: { code: 'unauthorized' } }, 401);
-      return reply({ accepted: true }, 202);
+      // What arcgate answers a stored inbound post (apps/notifier/src/admission.ts:58, sent through res.status(...).json(...) by
+      // notifier/src/inbound.ts): 201 and {stored: true, idempotencyKey}. The key is the one on the captured page's inbound message.
+      const { messages } = captured('box-message-list').structuredContent;
+      const stored = messages.find((m: Json) => m.kind === 'inbound') ?? messages[0];
+      return reply({ stored: true, idempotencyKey: stored.idempotencyKey }, 201);
     }
     const message = JSON.parse(String(init?.body));
     const id = message.id;

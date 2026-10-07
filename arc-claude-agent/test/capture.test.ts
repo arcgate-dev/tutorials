@@ -29,11 +29,15 @@ async function scratchDir(t: TestContext) {
 /** The fake's fetch, with every response body kept as received, so a test can say what was recorded byte for byte. */
 function recording(fake: ReturnType<typeof fakeMcp>) {
   const bodies: string[] = [];
+  const answers: { url: string; method: string; status: number; body: string }[] = [];
   return {
     bodies,
+    answers,
     async fetchFn(input: string | URL | Request, init?: RequestInit) {
       const response = await fake.fetch(input, init);
-      bodies.push(await response.clone().text());
+      const body = await response.clone().text();
+      bodies.push(body);
+      answers.push({ url: String(input instanceof Request ? input.url : input), method: init?.method ?? 'GET', status: response.status, body });
       return response;
     },
   };
@@ -83,8 +87,9 @@ test('the capture pays the three tools in order, posts to the inbound address as
   const config = testConfig();
   const fake = fakeMcp();
   const dir = await scratchDir(t);
+  const seen = recording(fake);
 
-  await captureFixtures({ config, fetchFn: fake.fetch, dir, log: fake.log });
+  await captureFixtures({ config, fetchFn: seen.fetchFn, dir, log: fake.log });
 
   // Each paid tool is an unpaid probe, then the paid call; each owner call is signed.
   const label = (call: { tool?: string; paid?: boolean }) => (call.paid ? `${call.tool}:paid` : call.tool);
@@ -117,6 +122,13 @@ test('the capture pays the three tools in order, posts to the inbound address as
   assert.ok(post > 0, 'a post to the inbound address');
   assert.equal(requests[post].url, captured('inbound-create.paid').structuredContent.url);
   assert.equal(requests[post].headers!['inbound-secret'], fake.secret);
+  // arcgate answers a stored inbound post 201 {stored: true, idempotencyKey} (notifier admission.ts:58): the post was answered so.
+  const answered = seen.answers.filter((a) => a.method === 'POST' && !a.url.endsWith('/mcp'));
+  assert.equal(answered.length, 1, 'one post to the inbound address');
+  assert.equal(answered[0].status, 201, 'the post was answered 201');
+  assert.deepEqual(Object.keys(JSON.parse(answered[0].body)).sort(), ['idempotencyKey', 'stored']);
+  assert.equal(JSON.parse(answered[0].body).stored, true);
+  assert.ok(captured('box-message-list').structuredContent.messages.some((m: { idempotencyKey: string }) => m.idempotencyKey === JSON.parse(answered[0].body).idempotencyKey), 'the key is one from the captured page');
   assert.match(requests[post].body!, /ignore|instruction|disregard|delete|forward/i, 'an instruction-like note');
   const after = (tool: string) => requests.findIndex((r, i) => i > post && r.tool === tool);
   assert.ok(requests.findLastIndex((r) => r.tool === 'inboundCreate') < post, 'after inboundCreate');
