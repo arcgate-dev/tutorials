@@ -113,9 +113,35 @@ const messagesIn = trace => ofOp(trace, 'boxMessageList').flatMap(entry => entry
 
 // box -------------------------------------------------------------------------------------------
 
-test('box: boxStatus first; a missing box is created by one paid boxCreate and the status is read again', async () => {
+test('box: an existing box (the captured run) is read with a signed boxStatus and nothing is paid', async () => {
   const { w, out } = await stepwise();
   const t = out.box.trace;
+  assert.deepEqual(ops(t), ['boxStatus'], 'the captured run found its box, so the box step made one request');
+  assert.equal(t[0].status, 200);
+  assert.ok(signed(t[0]), 'the status read is signed by the wallet');
+  assert.equal(paid(t).length, 0, 'no payment is signed');
+  assert.equal(t[0].response.address.toLowerCase(), w.fixture.address.toLowerCase());
+  assert.match(out.box.logs.join('\n'), /exist/i);
+});
+
+// The captured run holds no 404 box_not_found, so the create branch runs on edited copies of captured answers:
+// the status answered 404 (the body is the openapi box_not_found example), the start run's captured topup 402 and
+// charged 200 with the path edited to the box path, and the captured status 200.
+test('box: a missing box (404 box_not_found) is created by one paid boxCreate and the status is read again', async () => {
+  const w = world();
+  assert.equal(w.price.boxCreate, w.price.boxTopUp, 'the create branch replays the captured topup payment, which needs equal prices');
+  const start = runExchanges(w.fixture);
+  const status = clone(start.find(e => operationOfExchange(e) === 'boxStatus' && e.status === 200));
+  const at = start.findIndex(e => operationOfExchange(e) === 'boxTopUp' && e.status === 402);
+  assert.ok(at >= 0 && ok(start[at + 1].status), 'the start run holds a topup 402 and its charged answer');
+  const [unpaid, charged] = clone(start.slice(at, at + 2)).map(e => ({ ...e, path: e.path.replace(/\/topup$/, '') }));
+  assert.equal(operationOfExchange(unpaid), 'boxCreate');
+  assert.equal(operationOfExchange(charged), 'boxCreate');
+  const missing = { ...clone(status), status: 404, body: { error: { code: 'box_not_found', message: 'this address has no box' }, next: 'fix_request' } };
+
+  const run = await runStep('box', [missing, unpaid, charged, status]);
+  assert.equal(run.error, null, run.error?.message);
+  const t = run.trace;
   assert.deepEqual(ops(t), ['boxStatus', 'boxCreate', 'boxCreate', 'boxStatus']);
   assert.equal(t[0].status, 404);
   assert.equal(t[0].response.error.code, 'box_not_found');
@@ -127,18 +153,6 @@ test('box: boxStatus first; a missing box is created by one paid boxCreate and t
   assert.ok(signed(t[0]) && signed(t[3]), 'the status reads are signed by the wallet');
   assert.ok(!signed(t[1]) && !signed(t[2]), 'a paid create is authenticated by its payment');
   assert.equal(t[3].response.address.toLowerCase(), w.fixture.address.toLowerCase());
-});
-
-test('box: an existing box is reported, with no payment signed', async () => {
-  const { out } = await stepwise();
-  const existing = out.box.exchanges.at(-1);
-  assert.equal(operationOfExchange(existing), 'boxStatus');
-  assert.equal(existing.status, 200);
-  const run = await runStep('box', [existing]);
-  assert.equal(run.error, null);
-  assert.deepEqual(ops(run.trace), ['boxStatus']);
-  assert.equal(paid(run.trace).length, 0);
-  assert.match(run.logs.join('\n'), /exist/i);
 });
 
 // inbound ---------------------------------------------------------------------------------------
@@ -206,30 +220,37 @@ test('inbound: anything but 401 for the old secret fails the step', async () => 
 
 // watch -----------------------------------------------------------------------------------------
 
-test('watch: a token watch and a screen are created (paid) and listed, then one paid search names the watched token', async () => {
+test('watch: a token watch, a screen and an agent screen are created (paid) and listed, then one paid search names the watched token', async () => {
   const { w, out } = await stepwise();
   const t = out.watch.trace;
-  assert.deepEqual(ops(t), ['watchCreate', 'watchCreate', 'watchCreate', 'watchCreate', 'watchList', 'tradeSearch', 'tradeSearch']);
-  assert.deepEqual(t.map(e => e.status === 402 ? 402 : ok(e.status) ? 'ok' : e.status), [402, 'ok', 402, 'ok', 'ok', 402, 'ok']);
-  assert.deepEqual(paid(t).map(e => e.operation), ['watchCreate', 'watchCreate', 'tradeSearch']);
+  assert.deepEqual(ops(t), ['watchCreate', 'watchCreate', 'watchCreate', 'watchCreate', 'watchCreate', 'watchCreate', 'watchList', 'tradeSearch', 'tradeSearch']);
+  assert.deepEqual(t.map(e => e.status === 402 ? 402 : ok(e.status) ? 'ok' : e.status), [402, 'ok', 402, 'ok', 402, 'ok', 'ok', 402, 'ok']);
+  assert.deepEqual(paid(t).map(e => e.operation), ['watchCreate', 'watchCreate', 'watchCreate', 'tradeSearch']);
   for (const entry of paid(t)) assert.equal(acceptedOf(entry).accepted.amount, w.price[entry.operation]);
   assert.ok(t.every(e => e.operation === 'watchList' ? signed(e) : !signed(e)));
 
+  // The conditions are the issue's spec, written out here. The agent directory's chain is the one boxStatus
+  // reports as registeredAgents.chainId, not the payment network.
+  const { chainId } = out.box.trace.findLast(e => e.operation === 'boxStatus').response.registeredAgents;
+  assert.equal(typeof chainId, 'number');
+  const expected = [
+    { kind: 'token', token: w.config.watchToken, where: [{ field: 'volume_24h', op: 'gt', value: 100000 }] },
+    { kind: 'screen', where: [{ field: 'volume_24h', op: 'gt', value: 100000 }, { field: 'safety_verdict', op: 'eq', value: 'ok' }] },
+    { kind: 'agents', chainId, on: ['registered'] },
+  ];
   const creates = paid(t).filter(e => e.operation === 'watchCreate');
-  const [one, two] = creates.map(e => JSON.parse(e.body).condition);
-  const kinds = [one.kind, two.kind];
-  assert.equal(kinds.filter(kind => kind === 'screen').length, 1, 'one screen');
-  const token = [one, two].find(condition => condition.kind !== 'screen');
-  assert.match(token.token, /^0x[0-9a-fA-F]{40}$/, 'one watch on a named token');
-  const screen = [one, two].find(condition => condition.kind === 'screen');
-  assert.ok(Array.isArray(screen.where) && screen.where.length >= 1);
+  assert.deepEqual(creates.map(e => JSON.parse(e.body).condition), expected, 'the token watch, the screen and the agent screen, in that order');
 
-  const listed = t.find(e => e.operation === 'watchList').response.watches.map(watch => watch.id);
-  for (const create of creates) assert.ok(listed.includes(create.response.id), 'the list shows each watch just created');
+  const listed = t.find(e => e.operation === 'watchList').response.watches;
+  creates.forEach((create, i) => {
+    const shown = listed.find(watch => watch.id === create.response.id);
+    assert.ok(shown, 'the list shows each watch just created');
+    assert.deepEqual(shown.condition, expected[i], 'the list shows the condition that was sent');
+  });
 
   const search = paid(t).at(-1);
-  const query = JSON.parse(search.body).query;
-  assert.ok([token.token.toLowerCase(), 'cirbtc'].includes(String(query).toLowerCase()), `the search names the watched token, not "${query}"`);
+  assert.equal(search.operation, 'tradeSearch');
+  assert.equal(String(JSON.parse(search.body).query).toLowerCase(), w.config.watchToken, 'the search names the watched token');
   assert.ok(ops(t).lastIndexOf('watchCreate') < ops(t).indexOf('tradeSearch'), 'the search follows the watches, so the index change reaches them');
 });
 
@@ -327,6 +348,31 @@ test('messages: waits for a watch hit, lists every page by cursor, fetches one m
   assert.match(out.messages.logs.join('\n'), /instruction/i);
 });
 
+test('messages: a watch hit\'s content parses to {watchId, condition, changeId, token, symbol, observed}', () => {
+  const { fixture } = world();
+  const run = runExchanges(fixture);
+  const create = run.find(e => operationOfExchange(e) === 'watchCreate' && ok(e.status) && e.requestBody?.condition?.kind === 'token');
+  assert.ok(create, 'the run created a token watch');
+  const condition = create.requestBody.condition;
+  const messages = run.filter(e => operationOfExchange(e) === 'boxMessageList').flatMap(e => e.body.messages);
+  // by watchId, not "any watch.*": the box may also hold a watch hit of someone else's screen
+  const hit = messages.find(message => message.type === 'watch.token' && message.source?.watchId === create.body.id);
+  assert.ok(hit, `the box holds a watch.token message of the run's token watch ${create.body.id}`);
+  assert.equal(hit.payload.untrusted, true);
+  assert.equal(hit.payload.contentType, 'application/json');
+
+  const content = JSON.parse(hit.payload.content);
+  assert.deepEqual(Object.keys(content).sort(), ['changeId', 'condition', 'observed', 'symbol', 'token', 'watchId'], 'previous and newest appear only with a changes clause');
+  assert.equal(content.watchId, create.body.id);
+  assert.deepEqual(content.condition, condition);
+  assert.equal(content.token, condition.token);
+  assert.ok(Number.isInteger(content.changeId) && content.changeId > 0);
+  assert.ok(content.symbol === null || typeof content.symbol === 'string');
+  assert.deepEqual(Object.keys(content.observed), condition.where.map(clause => clause.field), 'observed is keyed by clause field');
+  assert.equal(typeof content.observed.volume_24h, 'number');
+  assert.ok(content.observed.volume_24h > 100000, 'the clause is volume_24h > 100000');
+});
+
 test('messages: with only one inbound message it is fetched and kept', async () => {
   const { out } = await stepwise();
   const queue = clone(out.messages.exchanges);
@@ -372,7 +418,7 @@ test('topup: 409 allowance_full is reported as not charged and the step passes',
   const w = world();
   const exchanges = w.fixture.exchanges;
   const at = exchanges.findIndex(e => e.status === 409 && e.body?.error?.code === 'allowance_full');
-  assert.ok(at >= 0, 'the capture must hold a boxTopUp answered 409 allowance_full: capture = start, then topup run twice more under the same recorder, each as its own command run with its own paid client and per-run cap; the first is charged and grants the messages used during the run, the second is the 409');
+  assert.ok(at >= 0, 'the capture must hold a boxTopUp answered 409 allowance_full: capture = start, then topup run twice more under the same recorder, each as its own command run with its own paid client and per-run cap; the start run topup is charged, and at least one extra topup is answered 409 allowance_full');
   let from = at;
   while (from > 0 && exchanges[from - 1].path === exchanges[at].path && exchanges[from - 1].status === 402) from--;
   const run = await runStep('topup', clone(exchanges.slice(from, at + 1)));
@@ -480,7 +526,9 @@ test('the run pays exactly the captured paid calls, each at the API terms, to on
   const t = apiTrace(replay.trace), payments = paid(t);
   const count = {};
   for (const entry of payments) count[entry.operation] = (count[entry.operation] ?? 0) + 1;
-  assert.deepEqual(count, { boxCreate: 1, inboundCreate: 1, watchCreate: 2, tradeSearch: 1, webhookCreate: 1, boxTopUp: 1 });
+  const firstStatus = runExchanges(w.fixture).find(e => operationOfExchange(e) === 'boxStatus');
+  assert.deepEqual(count, { ...firstStatus.status === 404 && { boxCreate: 1 }, inboundCreate: 1, watchCreate: 3, tradeSearch: 1, webhookCreate: 1, boxTopUp: 1 });
+  assert.equal(firstStatus.status, 200, 'the capture is the box-exists run: its first boxStatus found the box');
 
   const payTo = new Set();
   let total = 0n;

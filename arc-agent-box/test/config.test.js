@@ -53,6 +53,14 @@ test('the default caps are positive, per run at least per call, and cover the wh
   assert.ok(total <= config.maxTotal, `a full run pays ${total}, over the per-run cap ${config.maxTotal}`);
 });
 
+test('the per-run cap covers a run on a fresh box', () => {
+  // boxCreate + inboundCreate + 3 watchCreate + tradeSearch + webhookCreate + boxTopUp, at the captured prices
+  const price = prices(loadFixture());
+  const run = ['boxCreate', 'inboundCreate', 'watchCreate', 'watchCreate', 'watchCreate', 'tradeSearch', 'webhookCreate', 'boxTopUp'];
+  const total = run.reduce((sum, operation) => sum + BigInt(price[operation]), 0n);
+  assert.ok(total <= loadConfig({}).maxTotal, `a run on a fresh box pays ${total}, over the per-run cap ${loadConfig({}).maxTotal}`);
+});
+
 function operationId(exchange) {
   return operationOf(exchange.method, exchange.path);
 }

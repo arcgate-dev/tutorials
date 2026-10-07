@@ -16,10 +16,11 @@ import { privateKeyToAccount } from 'viem/accounts';
 // x-request-id and content-type (lowercase names). `body` is the parsed JSON response body.
 //
 // Capture contract: the capture is `start`, then `topup` run twice more under the same recorder, each as
-// its own command run with its own paid client and per-run cap. The first extra topup is charged and
-// grants the messages used during the run; the second is answered 409 allowance_full. So the fixture
-// ends with a trailing block of boxTopUp exchanges (and the free reads each command run makes first),
-// after the start run's final signed GETs. runExchanges() returns the start run without that block.
+// its own command run with its own paid client and per-run cap. The start run's topup is charged (a nearly
+// full box can grant 0 days), and at least one extra topup is answered 409 allowance_full; the first extra
+// topup may be either. So the fixture ends with a trailing block of boxTopUp exchanges (and the free reads
+// each command run makes first), after the start run's final signed GETs. runExchanges() returns the start
+// run without that block.
 
 export const SPEC = {
   domain: { name: 'arcgate', version: '1' },
@@ -82,7 +83,8 @@ export function loadFixture() {
 export const isFree = exchange => exchange.method === 'GET' && (exchange.path === '/health' || exchange.path === '/openapi.json');
 
 // The exchanges of the start run: the fixture with its trailing block of boxTopUp exchanges (the two
-// extra topup command runs, and the free reads they begin with) cut off. start ends with signed GETs,
+// extra topup command runs, charged or answered 409, and the free reads they begin with) cut off. The start
+// run's own topup is inside it, before its cleanup and final reads. start ends with signed GETs,
 // so the boundary is clean.
 export function runExchanges(fixture) {
   const end = fixture.exchanges.findLastIndex(exchange => !isFree(exchange) && operationOf(exchange.method, exchange.path) !== 'boxTopUp');

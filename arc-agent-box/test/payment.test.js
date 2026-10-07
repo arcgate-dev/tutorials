@@ -11,14 +11,14 @@ import { PAID, SPEC, acceptedOf, clone, createReplay, health, loadFixture, makeW
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
 // Everything below starts from the captured run: the API's own terms (/health, /openapi.json) and the
-// 402 and settlement it answered boxCreate with. Tests change copies of those, never invent values.
+// 402 and settlement it answered the start run's boxTopUp with. Tests change copies of those, never invent values.
 let memo;
 function world() {
   memo ??= (() => {
     const fixture = loadFixture();
     const config = loadConfig({ API_URL: fixture.apiUrl });
-    const at = fixture.exchanges.findIndex(e => e.status === 402 && operationOf(e.method, e.path) === 'boxCreate');
-    assert.ok(at >= 0, 'the capture holds a 402 for boxCreate');
+    const at = fixture.exchanges.findIndex(e => e.status === 402 && operationOf(e.method, e.path) === 'boxTopUp');
+    assert.ok(at >= 0, 'the capture holds a 402 for boxTopUp');
     const unpaid = fixture.exchanges[at], paid = fixture.exchanges[at + 1];
     assert.ok(paid.status < 300 && paid.headers['payment-response'], 'the 402 is followed by the paid answer');
     const required = decodePaymentRequiredHeader(unpaid.headers['payment-required']);
@@ -53,7 +53,7 @@ async function setup(w, fetchFn, { config = w.config } = {}) {
   return { call, account, wallet: spy, signed: () => signed, records, terms };
 }
 
-const boxCreate = w => ['boxCreate', 'POST', w.unpaid.path, undefined];
+const topUp = w => ['boxTopUp', 'POST', w.unpaid.path, undefined];
 const noPayment = requests => requests.every(request => request.headers.get('payment-signature') === null);
 
 // a paid call -----------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ test('a paid call signs the offer the API made, once, and retries the identical 
   const w = world();
   const { fetchFn, requests } = scripted(respond(w.unpaid), respond(w.paid));
   const { call, account, wallet, records, signed } = await setup(w, fetchFn);
-  assert.deepEqual(await call(...boxCreate(w)), w.paid.body);
+  assert.deepEqual(await call(...topUp(w)), w.paid.body);
 
   assert.equal(requests.length, 2);
   assert.equal(signed(), 1);
@@ -105,7 +105,7 @@ test('a POST with a body retries the same body', async () => {
   const body = { query: 'x', limit: 5 };
   const { fetchFn, requests } = scripted(challenge(w), settled(w));
   const { call } = await setup(w, fetchFn);
-  await call('boxCreate', 'POST', w.unpaid.path, body);
+  await call('boxTopUp', 'POST', w.unpaid.path, body);
   assert.deepEqual(JSON.parse(requests[0].init.body), body);
   assert.equal(requests[1].init.body, requests[0].init.body);
   assert.equal(requests[1].headers.get('content-type'), requests[0].headers.get('content-type'));
@@ -147,7 +147,7 @@ test('terms that are missing, not USDC or above the per-call cap stop the run be
     await assert.rejects(load(spec => editOperation(spec, operationId, op => { op['x-payment'].asset = 'EURC'; })), `${operationId} priced in another asset`);
     await assert.rejects(load(spec => editOperation(spec, operationId, op => { op['x-payment'].baseUnits = String(w.config.maxPayment + 1n); })), `${operationId} above the cap`);
   }
-  await assert.rejects(load(() => {}, { ...w.config, maxPayment: BigInt(w.price.boxCreate) - 1n }), 'a cap below the price');
+  await assert.rejects(load(() => {}, { ...w.config, maxPayment: BigInt(w.price.boxTopUp) - 1n }), 'a cap below the price');
   await assert.rejects(load((spec, status) => { status.ok = false; }), 'an unhealthy API');
   await assert.rejects(load((spec, status) => { status.x402.enabled = false; }), 'x402 off');
   await assert.rejects(load((spec, status) => { delete status.x402; }), 'no x402 section');
@@ -155,13 +155,13 @@ test('terms that are missing, not USDC or above the per-call cap stop the run be
 
 test('an offer is paid only when its amount equals the operation price and is within the per-call cap', async () => {
   const w = world();
-  const price = BigInt(w.price.boxCreate);
+  const price = BigInt(w.price.boxTopUp);
   assert.equal(String(price), w.offer.amount, 'the captured offer is the captured price');
   const roomy = { ...w.config, maxPayment: price * 2n, maxTotal: price * 8n };
   for (const amount of [String(price - 1n), String(price + 1n), String(price * 2n), '0', '-1', '1e6', '']) {
     const { fetchFn, requests } = scripted(challenge(w, { offer: { ...w.offer, amount } }));
     const { call, signed } = await setup(w, fetchFn, { config: roomy });
-    await assert.rejects(call(...boxCreate(w)), `amount ${JSON.stringify(amount)}`);
+    await assert.rejects(call(...topUp(w)), `amount ${JSON.stringify(amount)}`);
     assert.equal(signed(), 0, `amount ${JSON.stringify(amount)} was signed`);
     assert.equal(requests.length, 1);
     assert.ok(noPayment(requests));
@@ -169,14 +169,14 @@ test('an offer is paid only when its amount equals the operation price and is wi
   // The price is the API's own terms, but a cap below it still refuses it.
   const { fetchFn, requests } = scripted(challenge(w));
   const { call, signed } = await setup(w, fetchFn, { config: { ...w.config, maxPayment: price - 1n } });
-  await assert.rejects(call(...boxCreate(w)));
+  await assert.rejects(call(...topUp(w)));
   assert.equal(signed(), 0);
   assert.ok(noPayment(requests));
 });
 
 test("an offer priced for another operation is not paid", async () => {
   const w = world();
-  assert.notEqual(w.price.watchCreate, w.price.boxCreate, 'the capture prices these operations differently');
+  assert.notEqual(w.price.watchCreate, w.price.boxTopUp, 'the capture prices these operations differently');
   const { fetchFn, requests } = scripted(challenge(w));
   const { call, signed } = await setup(w, fetchFn);
   await assert.rejects(call('watchCreate', 'POST', templateOf('watchCreate').replace('{address}', w.fixture.address.toLowerCase()), { condition: {} }));
@@ -191,14 +191,14 @@ test('the offer must be exact USDC on the network /health names', async () => {
   for (const change of [{ network: other }, { network: 'eip155:1' }, { asset: getAddress(`0x${'11'.repeat(20)}`) }, { scheme: 'upto' }]) {
     const { fetchFn, requests } = scripted(challenge(w, { offer: { ...w.offer, ...change } }));
     const { call, signed } = await setup(w, fetchFn);
-    await assert.rejects(call(...boxCreate(w)), JSON.stringify(change));
+    await assert.rejects(call(...topUp(w)), JSON.stringify(change));
     assert.equal(signed(), 0, `${JSON.stringify(change)} was signed`);
     assert.ok(noPayment(requests));
   }
   for (const accepts of [[], [{ ...w.offer, network: other }, { ...w.offer, asset: getAddress(`0x${'22'.repeat(20)}`) }]]) {
     const { fetchFn } = scripted(challenge(w, { accepts }));
     const { call, signed } = await setup(w, fetchFn);
-    await assert.rejects(call(...boxCreate(w)));
+    await assert.rejects(call(...topUp(w)));
     assert.equal(signed(), 0);
   }
 });
@@ -213,28 +213,28 @@ test('the payment network in /health is the one every offer must name', async ()
   const { account, wallet } = makeWallet(w.fixture.address);
   let signed = 0;
   const call = createArcgateClient({ wallet: { address: wallet.address, signTypedData: data => { signed++; return account.signTypedData(data); } }, config: w.config, health: h, terms, fetchFn });
-  await assert.rejects(call(...boxCreate(w)));
+  await assert.rejects(call(...topUp(w)));
   assert.equal(signed, 0);
 });
 
 // the run ---------------------------------------------------------------------------------------
 
-const topUp = w => ['boxTopUp', 'POST', templateOf('boxTopUp').replace('{address}', w.fixture.address.toLowerCase()), undefined];
-const topUpOffer = w => ({ ...w.offer, amount: w.price.boxTopUp });
+const inbound = w => ['inboundCreate', 'POST', templateOf('inboundCreate').replace('{address}', w.fixture.address.toLowerCase()), undefined];
+const inboundOffer = w => ({ ...w.offer, amount: w.price.inboundCreate });
 
 test('payTo stays the same for every payment in a run', async () => {
   const w = world();
-  const { fetchFn, requests } = scripted(challenge(w), settled(w), challenge(w, { offer: topUpOffer(w) }), settled(w));
+  const { fetchFn, requests } = scripted(challenge(w), settled(w), challenge(w, { offer: inboundOffer(w) }), settled(w));
   const same = await setup(w, fetchFn);
-  await same.call(...boxCreate(w));
   await same.call(...topUp(w));
+  await same.call(...inbound(w));
   assert.equal(same.signed(), 2, 'with an unchanged payTo the run pays twice');
   assert.equal(requests.length, 4);
 
-  const moved = scripted(challenge(w), settled(w), challenge(w, { offer: { ...topUpOffer(w), payTo: getAddress(`0x${'33'.repeat(20)}`) } }));
+  const moved = scripted(challenge(w), settled(w), challenge(w, { offer: { ...inboundOffer(w), payTo: getAddress(`0x${'33'.repeat(20)}`) } }));
   const run = await setup(w, moved.fetchFn);
-  await run.call(...boxCreate(w));
-  await assert.rejects(run.call(...topUp(w)));
+  await run.call(...topUp(w));
+  await assert.rejects(run.call(...inbound(w)));
   assert.equal(run.signed(), 1);
   assert.equal(moved.requests.length, 3);
   assert.equal(moved.requests[2].headers.get('payment-signature'), null);
@@ -242,12 +242,12 @@ test('payTo stays the same for every payment in a run', async () => {
 
 test('the per-run cap holds: a payment that would pass it is not signed', async () => {
   const w = world();
-  const total = BigInt(w.price.boxCreate) + BigInt(w.price.boxTopUp);
+  const total = BigInt(w.price.boxTopUp) + BigInt(w.price.inboundCreate);
   const run = async maxTotal => {
-    const { fetchFn, requests } = scripted(challenge(w), settled(w), challenge(w, { offer: topUpOffer(w) }), settled(w));
+    const { fetchFn, requests } = scripted(challenge(w), settled(w), challenge(w, { offer: inboundOffer(w) }), settled(w));
     const client = await setup(w, fetchFn, { config: { ...w.config, maxTotal } });
-    await client.call(...boxCreate(w));
-    const error = await client.call(...topUp(w)).then(() => null, failure => failure);
+    await client.call(...topUp(w));
+    const error = await client.call(...inbound(w)).then(() => null, failure => failure);
     return { client, requests, error };
   };
   const exact = await run(total);
@@ -263,12 +263,12 @@ test('the per-run cap holds: a payment that would pass it is not signed', async 
 
 test('a paid response that is lost is not retried and keeps its share of the run cap', async () => {
   const w = world();
-  const price = BigInt(w.price.boxCreate);
+  const price = BigInt(w.price.boxTopUp);
   const { fetchFn, requests } = scripted(challenge(w), () => { throw new Error('socket hang up'); }, challenge(w));
   const client = await setup(w, fetchFn, { config: { ...w.config, maxPayment: price * 2n, maxTotal: price * 2n - 1n } });
-  await assert.rejects(client.call(...boxCreate(w)), /settle/i);
+  await assert.rejects(client.call(...topUp(w)), /settle/i);
   assert.equal(requests.length, 2, 'the paid request is not sent again');
-  await assert.rejects(client.call(...boxCreate(w)));
+  await assert.rejects(client.call(...topUp(w)));
   assert.equal(client.signed(), 1, 'the second payment is not signed');
   assert.equal(requests.length, 3);
   assert.equal(requests[2].headers.get('payment-signature'), null);
@@ -289,7 +289,7 @@ test('a paid answer without a matching settlement is not success', async () => {
   for (const [name, answer] of Object.entries(answers)) {
     const { fetchFn } = scripted(challenge(w), answer);
     const { call, signed } = await setup(w, fetchFn);
-    await assert.rejects(call(...boxCreate(w)), /receipt|settle|payment/i, name);
+    await assert.rejects(call(...topUp(w)), /receipt|settle|payment/i, name);
     assert.equal(signed(), 1, name);
   }
 });
@@ -300,15 +300,15 @@ test('a non-402 answer to the first request signs nothing: a body comes back, an
   const w = world();
   const ok = scripted(() => Response.json({ address: w.fixture.address.toLowerCase(), granted: { messages: 1, days: 1 } }));
   const first = await setup(w, ok.fetchFn);
-  assert.deepEqual(await first.call(...boxCreate(w)), { address: w.fixture.address.toLowerCase(), granted: { messages: 1, days: 1 } });
+  assert.deepEqual(await first.call(...topUp(w)), { address: w.fixture.address.toLowerCase(), granted: { messages: 1, days: 1 } });
   assert.equal(first.signed(), 0);
   assert.equal(ok.requests.length, 1);
   assert.ok(noPayment(ok.requests));
 
-  for (const [status, code] of [[409, 'box_exists'], [404, 'box_not_found'], [429, 'rate_limited'], [500, 'internal']]) {
+  for (const [status, code] of [[409, 'allowance_full'], [404, 'box_not_found'], [429, 'rate_limited'], [500, 'internal']]) {
     const bad = scripted(() => Response.json({ error: { code, hint: 'h' } }, { status, headers: { 'x-request-id': 'req-9' } }));
     const run = await setup(w, bad.fetchFn);
-    await assert.rejects(run.call(...boxCreate(w)), error => error instanceof ArcgateError && error.status === status && error.body.error.code === code);
+    await assert.rejects(run.call(...topUp(w)), error => error instanceof ArcgateError && error.status === status && error.body.error.code === code);
     assert.equal(run.signed(), 0);
     assert.equal(bad.requests.length, 1);
   }
