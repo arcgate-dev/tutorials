@@ -63,7 +63,7 @@ receipt: boxCreate tx 0x33cefeeac0e61f343db456c945954d8d54b5f3bdca26ae3a32939ec3
 When a paid call comes back as an error, the tutorial tells you what that means for your money:
 
 - `not charged: <tool> <code>`: the server refused the call after the payment was sent, for a reason of its own such as `box_exists`. The result carries no receipt and nothing settled. The tour prints it and goes on for `box_exists`, and stops for any other code with its code and its `next`.
-- `not settled: <tool> payment_required (check the balance before running again)`: the payment did not settle cleanly. The facilitator may have broadcast the authorization before it failed, and the authorization stays valid for its `maxTimeoutSeconds`, so the tutorial cannot say that no money moved. Read your USDC balance before you run again.
+- `not settled: <tool> payment_required (check the balance before running again)`: the payment did not settle cleanly. The facilitator may have broadcast the authorization before it failed, and the authorization stays valid for its `maxTimeoutSeconds`, so the tutorial cannot say that no money moved. The line also covers a settlement that fails with `payment_response_expired`. Read your USDC balance before you run again.
 - `<tool>: no answer after the payment was sent (...); the payment may have settled. Check the transaction or your USDC balance before paying again.`: a signed paid call got an HTTP 502 or no answer at all. The tutorial throws this and the run stops. The payment stays reserved against the run's cap, and nothing is sent again.
 
 In all these cases the payment stays reserved against the run's cap. The same advice holds when a call stops with `payment may have settled; no receipt`: check the balance before you run again.
