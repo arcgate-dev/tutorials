@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createAgentClient } from '../src/agent.js';
 import { createArcgateClient } from '../src/payment.js';
 import { ALLOWED_NETWORKS, loadConfig } from '../src/config.js';
 import { ArcgateError } from '../src/http.js';
@@ -312,4 +313,80 @@ test('a non-402 answer to the first request signs nothing: a body comes back, an
     assert.equal(run.signed(), 0);
     assert.equal(bad.requests.length, 1);
   }
+});
+
+// a paid answer that may have settled -----------------------------------------------------------
+
+// Override: the x402 middleware's own 502 body, a plain string, not an Arcgate { code, message, hint } error.
+const middleware502 = () => new Response(JSON.stringify({ error: 'X402MiddlewareError: facilitator verify failed' }), { status: 502, headers: { 'x-request-id': 'abc12345' } });
+// Override: a 402 whose settlement is the captured one turned into a failed one.
+const refused = (w, errorReason) => () => new Response('{}', { status: 402, headers: { 'payment-response': encodePaymentResponseHeader({ ...w.settlement, success: false, errorReason, transaction: '' }) } });
+
+test('a paid 502 X402MiddlewareError may have settled', async () => {
+  const w = world();
+  const { fetchFn, requests } = scripted(respond(w.unpaid), middleware502);
+  const { call, signed } = await setup(w, fetchFn);
+  await assert.rejects(call(...topUp(w)), error => {
+    assert.ok(error instanceof ArcgateError);
+    assert.equal(error.status, 502);
+    assert.match(error.message, /X402MiddlewareError: facilitator verify failed/);
+    assert.doesNotMatch(error.message, /request_failed/);
+    assert.match(error.message, /may have settled/);
+    assert.match(error.message, /PAYMENT-RESPONSE|balance/);
+    assert.match(error.message, /No automatic retry/);
+    return true;
+  });
+  assert.equal(signed(), 1);
+  assert.equal(requests.length, 2, 'the paid request is not sent again');
+});
+
+test('a payment_response_expired settlement may have settled', async () => {
+  const w = world();
+  const { fetchFn, requests } = scripted(respond(w.unpaid), refused(w, 'payment_response_expired'));
+  const { call } = await setup(w, fetchFn);
+  await assert.rejects(call(...topUp(w)), error => {
+    assert.ok(error instanceof ArcgateError);
+    assert.equal(error.status, 402);
+    assert.match(error.message, /payment_response_expired/);
+    assert.match(error.message, /may have settled/);
+    return true;
+  });
+  assert.equal(requests.length, 2);
+});
+
+test('other failures do not say may have settled', async () => {
+  const w = world();
+  const fails = async (run, requests) => {
+    const error = await run().then(() => assert.fail('expected a refusal'), failure => failure);
+    assert.ok(error instanceof ArcgateError);
+    assert.doesNotMatch(error.message, /may have settled/);
+    assert.equal(requests.length, 1);
+    return error;
+  };
+  // An ordinary settlement failure on a paid call.
+  const insufficient = scripted(respond(w.unpaid), refused(w, 'insufficient_funds'));
+  const paid = await setup(w, insufficient.fetchFn);
+  const settlementError = await paid.call(...topUp(w)).then(() => assert.fail('expected a refusal'), failure => failure);
+  assert.ok(settlementError instanceof ArcgateError);
+  assert.match(settlementError.message, /insufficient_funds/);
+  assert.doesNotMatch(settlementError.message, /may have settled/);
+  assert.equal(insufficient.requests.length, 2);
+
+  // The same 502 on a free owner call.
+  const owner = scripted(middleware502);
+  const ownerClient = createAgentClient({ wallet: makeWallet().wallet, config: w.config, fetchFn: owner.fetchFn });
+  const ownerError = await fails(() => ownerClient('boxStatus'), owner.requests);
+  assert.equal(ownerError.status, 502);
+  assert.match(ownerError.message, /X402MiddlewareError: facilitator verify failed/);
+
+  // The same 502 on the free /health read.
+  const health502 = scripted(middleware502);
+  const healthError = await fails(() => loadTerms(w.config, health502.fetchFn), health502.requests);
+  assert.equal(healthError.status, 502);
+  assert.match(healthError.message, /X402MiddlewareError: facilitator verify failed/);
+
+  // The same 502 on a paid call does warn, so the checks above are not satisfied by a warning that never appears.
+  const control = scripted(respond(w.unpaid), middleware502);
+  const controlClient = await setup(w, control.fetchFn);
+  await assert.rejects(controlClient.call(...topUp(w)), /may have settled/);
 });
