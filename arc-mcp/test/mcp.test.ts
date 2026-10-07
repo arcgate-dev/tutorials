@@ -180,3 +180,19 @@ test('an error result after payment is not charged', async (t) => {
   assert.equal(lines[1], 'not charged: boxCreate box_exists');
   assert.equal(arcgate.budget.reserved, 50_000n, 'and the reservation is not released');
 });
+
+test('a settlement failure after payment is not charged', async (t) => {
+  const { fake, arcgate } = await connect(t);
+  const offer = capturedOffer();
+  // @x402/mcp answers a failed settlement with a payment-required result whose error is a plain string.
+  fake.set('tradeSearch', 'paid', captured('trade-search.payment-required'));
+
+  const out = await arcgate.call('tradeSearch', search);
+
+  assert.equal(out.charged, false);
+  assert.deepEqual(money(fake), [
+    `price: tradeSearch ${offer.amount} base units (${formatUnits(BigInt(offer.amount), 6)} USDC) on ${offer.network} to ${offer.payTo}`,
+    'not charged: tradeSearch payment_required',
+  ]);
+  assert.equal(arcgate.budget.reserved, 5_000n, 'and the reservation is not released');
+});

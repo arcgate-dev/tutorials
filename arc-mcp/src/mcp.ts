@@ -13,9 +13,13 @@ export interface ToolResult {
   isError?: boolean;
 }
 
-/** The error an arcgate error result carries in its text: { error: { code, message }, next }. */
-export function errorOf(result: ToolResult): { code: string; message: string; next: string } {
+/**
+ * The error an arcgate error result carries in its text: { error: { code, message }, next }. A plain string
+ * `error` is the x402 wrapper's payment-required result (for example when the settlement failed).
+ */
+export function errorOf(result: ToolResult): { code: string; message: string; next?: string } {
   const body = JSON.parse(result.content.find((item) => item.type === 'text')?.text ?? '{}');
+  if (typeof body.error === 'string') return { code: 'payment_required', message: body.error };
   return { code: body.error?.code, message: body.error?.message, next: body.next };
 }
 

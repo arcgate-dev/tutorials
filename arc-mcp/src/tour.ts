@@ -5,9 +5,9 @@ import { errorOf, type Arcgate, type ToolResult } from './mcp.ts';
 const USDC = '0x3600000000000000000000000000000000000000';
 const CIRBTC = '0x171a4217b86a807a64eb94757db6849fb4bdbaa0';
 
-function refusal(tool: string, result: ToolResult) {
+export function refusal(tool: string, result: ToolResult) {
   const { code, message, next } = errorOf(result);
-  return new Error(`${tool} was refused: ${code}: ${message} next ${next}`);
+  return new Error(`${tool} was refused: ${code}: ${message}${next ? ` next ${next}` : ''}`);
 }
 
 /**
