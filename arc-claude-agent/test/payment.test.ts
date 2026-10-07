@@ -1,11 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { agentSignature } from '../src/agent.ts';
 import { connectArcgate } from '../src/mcp.ts';
 import { acceptOffer, createBudget, selectOffer } from '../src/payment.ts';
 import { connect } from './connect.ts';
 import { fakeMcp } from './fake-mcp.ts';
 import { testConfig } from './test-config.ts';
-import { capturedOffer, noNetwork, PAYMENT_META, recoverPayer, REQUEST_SCREEN, RECEIPT_META, captured, withOffer } from './support.ts';
+import { capturedOffer, noNetwork, OWNER_REQUESTS, PAYMENT_META, recoverPayer, REQUEST_SCREEN, RECEIPT_META, captured, withOffer } from './support.ts';
 
 globalThis.fetch = noNetwork;
 
@@ -212,4 +213,49 @@ test('a paid tools/call that gets HTTP 502 may have settled: thrown with that wa
 
   assert.equal(arcgate.budget.reserved, 10_000n, 'the reservation is not released');
   assert.equal(fake.paidCalls().length, 1, 'the paid call is not sent again');
+});
+
+test('a tools/call that gets HTTP 502 before any payment is signed rethrows the transport error unchanged', async (t) => {
+  // Override: the gateway in front of the server answers 502 to the tools/call that `answers502` picks.
+  const connectWith502 = async (answers502: (message: any) => boolean) => {
+    const config = testConfig();
+    const fake = fakeMcp();
+    const fetchFn: typeof fetch = async (input, init) => {
+      const answer = await fake.fetch(input, init);
+      const message = init?.body === undefined ? {} : JSON.parse(String(init.body));
+      return message.method === 'tools/call' && answers502(message) ? new Response('Bad Gateway', { status: 502 }) : answer;
+    };
+    const arcgate = await connectArcgate({ config, fetchFn, log: fake.log, paidTools: config.paidTools });
+    t.after(() => arcgate.close());
+    return { config, fake, arcgate };
+  };
+
+  // (a) The first tools/call has no payment on it: nothing was signed, so the error is the original one.
+  {
+    const { config, fake, arcgate } = await connectWith502((message) => message.params?._meta?.[PAYMENT_META] === undefined);
+    await assert.rejects(arcgate.call('watchCreate', { address: config.account.address, condition: REQUEST_SCREEN }), (error: Error) => {
+      assert.match(error.message, /Bad Gateway/);
+      assert.doesNotMatch(error.message, /may have settled/);
+      return true;
+    });
+    assert.equal(arcgate.budget.reserved, 0n, 'nothing was reserved');
+    assert.equal(fake.paidCalls().length, 0, 'nothing was signed or sent');
+  }
+
+  // (b) A free call after a paid one signed nothing: the earlier payment's offer must not make this 502 look paid.
+  {
+    let failFree = false;
+    const { config, arcgate } = await connectWith502((message) => failFree && message.params?.name === 'boxStatus');
+    const address = config.account.address;
+    await arcgate.call('watchCreate', { address, condition: REQUEST_SCREEN });
+    assert.equal(arcgate.budget.reserved, 10_000n);
+
+    failFree = true;
+    await assert.rejects(arcgate.call('boxStatus', { address, agentSignature: await agentSignature(config.account, OWNER_REQUESTS.boxStatus(address)) }), (error: Error) => {
+      assert.match(error.message, /Bad Gateway/);
+      assert.doesNotMatch(error.message, /may have settled/);
+      return true;
+    });
+    assert.equal(arcgate.budget.reserved, 10_000n, 'the earlier payment stays reserved, and the free call adds nothing');
+  }
 });
