@@ -15,27 +15,28 @@ export const routerAbi = parseAbi([
 const same = (left, right) => getAddress(left) === getAddress(right);
 const ensure = (ok, message) => { if (!ok) throw new Error(message); };
 
-export function pickToken(search, expected) {
-  ensure(search.network === 'eip155:5042' && ['verified', 'clear_leader', 'single'].includes(search.resolution), 'Search is unresolved or on another network.');
+export function pickToken(search, config) {
+  ensure(search.network === config.tradeNetwork && ['verified', 'clear_leader', 'single'].includes(search.resolution), 'Search is unresolved or on another network.');
   const token = search.results?.[0];
-  ensure(token && same(token.address, expected) && token.verification?.status === 'verified'
+  ensure(token && same(token.address, config.buyToken) && token.verification?.status === 'verified'
     && Array.isArray(token.flags) && token.flags.length === 0, 'Search did not resolve to the expected verified token without flags.');
   return token;
 }
 
-export function reviewQuote(quote, config, wallet) {
-  ensure(quote.network === 'eip155:5042' && quote.side === 'exactIn', 'Unexpected quote network or side.');
+export function reviewQuote(quote, config, wallet, now = Math.floor(Date.now() / 1000)) {
+  ensure(quote.network === config.tradeNetwork && quote.side === 'exactIn', 'Unexpected quote network or side.');
   ensure(same(quote.sell.address, USDC) && quote.sell.decimals === 6
     && same(quote.buy.address, config.buyToken) && quote.buy.decimals === 8, 'Unexpected quote tokens or decimals.');
   ensure(quote.sell.amountRaw === parseUnits(config.amount, 6).toString()
     && parseUnits(quote.sell.amount, 6) === parseUnits(config.amount, 6), 'Quote changed the requested sell amount.');
   ensure(['ok', 'pinned'].includes(quote.safety?.verdict), 'Quote safety verdict is not accepted by this tutorial.');
-  ensure(quote.next !== 'stop' && quote.best.executable !== false, 'Quote says to stop or has no executable route. Review its warnings.');
+  ensure(quote.next === 'swap', 'Quote does not say to swap (it may say stop, requote or fix_request). Review its warnings.');
+  ensure(quote.best.executable !== false, 'Quote says to stop or has no executable route. Review its warnings.');
   if (quote.readiness) {
     ensure(!wallet || same(quote.readiness.taker, wallet.address), 'Quote readiness is for another wallet.');
     ensure(quote.readiness.ready === true, 'Wallet readiness failed. Review the input balance, gas and swap fee before continuing.');
   }
-  ensure(quote.slippageBps === config.slippageBps && Date.parse(quote.expiresAt) > Date.now(), 'Quote is expired or changed slippage.');
+  ensure(quote.slippageBps === config.slippageBps && Date.parse(quote.expiresAt) > now * 1000, 'Quote is expired or changed slippage.');
   const minOut = parseUnits(quote.best.minAmountOut, quote.buy.decimals);
   ensure(minOut > 0n, 'Quote has no positive minimum output.');
   return minOut;
@@ -44,7 +45,7 @@ export function reviewQuote(quote, config, wallet) {
 export function reviewSwap(swap, quote, wallet, config, minOut, now = Math.floor(Date.now() / 1000)) {
   ensure(swap.quoteId === quote.quoteId && same(swap.recipient, wallet.address), 'Swap changed quote or recipient.');
   ensure(swap.signatures?.length === 0, 'Expected approval="approve" with no Permit2 signatures.');
-  ensure(swap.next === undefined, 'Swap requires another action; do not send its transactions.');
+  ensure(swap.next === 'send', 'Swap requires another action; do not send its transactions.');
   ensure(['ok', 'pinned'].includes(swap.safety?.verdict), 'Swap safety verdict is not accepted.');
   ensure(Date.parse(swap.expiresAt) > now * 1000, 'Swap has expired.');
   const txs = swap.transactions;

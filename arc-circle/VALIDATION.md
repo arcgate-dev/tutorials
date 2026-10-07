@@ -1,5 +1,39 @@
 # Validation
 
+## Localnet run — October 6, 2026
+
+The tutorial ran end to end against the arcgate localnet on **October 6, 2026 (UTC)**, captured at `2026-10-06T22:09:38.795Z`. Every step passed, and the free receipt returned `pass`.
+
+| Item | Value |
+| --- | --- |
+| API | `http://127.0.0.1:19800` |
+| `/health` commit | `null`, so the arcgate checkout is `917dd4a`; `rulesVersion` `r2-383954828c` |
+| Payment network | `eip155:5042002` (Arc testnet), settled through Arcus |
+| Trade chain | the localnet's Arc mainnet fork, chain `5042`, at `127.0.0.1:19845` |
+| `payTo` | `0x987F719b516f528f4080EF0853E37aD5d7E773A0`, set through `ARCGATE_PAY_TO` because it is the stack's `PAY_TO`; the row default is `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266` |
+| Router | `0x0eA7461542fE051c013AB0f5860190bC847f3271` |
+| `SELL_AMOUNT` | `1` |
+| Taker | `0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD`, an `ARC-TESTNET` EOA |
+
+| Step | Result | Detail |
+| --- | --- | --- |
+| search | pass | Paid 5000 units. Settlement `0xa547ade055b454464b2debecb91ea4b06841cbafff4c04baa99fe1042dc291c1`, request ID `73147186`. |
+| quote | pass | Paid 10000 units. Settlement `0x6d35ef3778a89e4d841972b3f1bc4f44ee99bbd86a4c404c138ce75e595fc31e`, request ID `132b84e7`, quote `q_9b4fe45c89ab130a`, `next` `swap`. |
+| swap | pass | Paid 10000 units. Settlement `0x6fc5f682800a9a446d3cb373f2b5bf5f4778bdaba5b1c06490921fcaac5649f7`, request ID `709cadec`, `next` `send`. |
+| sign | pass | Circle `signTypedData` signed each x402 authorization, and each recovered to the wallet. The settlement `payer` is present in all three. |
+| send | pass | Approve `0x28c89355113d5b36a092703b1c4ecb261ddf988984f877cf61ca59686fb043d8` (block 23584079, success) and swap `0x37bb05a16dd3467609ed9ddc426cb2de3810d92535dc601a3162481fc2288058` (block 23584080, success), broadcast by impersonating the wallet address on the fork. Delivered **1193** cirBTC units against `minAmountOut` **1181**. |
+| receipt | pass | `result` `pass`, `next` `done`. In-flow request ID `887e1863`; the separate `npm run receipt` command had request ID `fa70ca95`. |
+
+Total fees were **25000 units (0.025 USDC)**, equal to the `maxTotal` budget.
+
+Circle signed every x402 payment. Circle cannot sign or broadcast for a router that exists only on the fork, so the approve and swap were sent from the wallet's address on the fork instead. This stands in for Circle's broadcast on localnet; the mainnet walkthrough below used Circle for that step.
+
+Offline tests: `npm test` in `arc-circle` passed **56 of 56** tests and in `arc-metamask` **37 of 37**, on fixtures captured in this run ([localnet-free.json](test/fixtures/localnet-free.json) and [localnet-run.json](test/fixtures/localnet-run.json)).
+
+OpenAPI check: `../arcgate/docs/openapi.json`, version 3.1.0, sha256 `c47db591d9c4d32fcf9c37f44007f03aa048f72736283cd5fc626da27ef90398`, validated with Ajv2020 and ajv-formats. Every request sent (`SearchRequest`, `QuoteRequest`, `SwapRequest`, `ReceiptRequest`) and every captured response (`HealthResponse`, `SearchResponse`, `QuoteResponse`, `SwapResponse`, `ReceiptResponse`, `PaymentRequired`, `PaymentRequiredBody`, `SettleResponse`) is valid. The only failures were the unsent `{}` probe bodies in `localnet-free.json`.
+
+No Circle keys, entity secrets or wallet IDs are recorded here or in the fixtures.
+
 ## API compatibility review — September 30, 2026
 
 Reviewed the tutorial against the live [docs OpenAPI document](https://docs.arcgate.dev/openapi.json), [API OpenAPI document](https://api.arcgate.dev/openapi.json), and Circle's current [typed-data signing](https://developers.circle.com/api-reference/wallets/developer-controlled-wallets/sign-typed-data) and [contract execution](https://developers.circle.com/api-reference/wallets/developer-controlled-wallets/create-developer-transaction-contract-execution) references.

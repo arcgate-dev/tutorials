@@ -1,0 +1,877 @@
+{
+  "capturedAt": "2026-10-06T22:09:38.795Z",
+  "source": "arc-circle trade -- --execute against the arcgate localnet at http://127.0.0.1:19800; fees settled on Arc testnet, approve and swap sent on the fork",
+  "arcgateCommit": "917dd4a",
+  "healthCommit": null,
+  "rulesVersion": "r2-383954828c",
+  "network": "eip155:5042002",
+  "taker": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD",
+  "run": {
+    "search": {
+      "request": {
+        "query": "cirBTC",
+        "limit": 5
+      },
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:19800/trade/v1/search",
+          "description": "Token search",
+          "mimeType": ""
+        },
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:5042002",
+            "amount": "5000",
+            "asset": "0x3600000000000000000000000000000000000000",
+            "payTo": "0x987F719b516f528f4080EF0853E37aD5d7E773A0",
+            "maxTimeoutSeconds": 300,
+            "extra": {
+              "name": "USDC",
+              "version": "2"
+            }
+          }
+        ]
+      },
+      "paymentResponse": {
+        "success": true,
+        "payer": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD",
+        "transaction": "0xa547ade055b454464b2debecb91ea4b06841cbafff4c04baa99fe1042dc291c1",
+        "network": "eip155:5042002"
+      },
+      "requestId": "73147186",
+      "body": {
+        "query": "cirBTC",
+        "network": "eip155:5042",
+        "block": 22784798,
+        "resolution": "verified",
+        "rulesVersion": "r2-383954828c",
+        "results": [
+          {
+            "address": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+            "symbol": "cirBTC",
+            "name": "Circle Wrapped Bitcoin",
+            "decimals": 8,
+            "match": "symbol",
+            "verification": {
+              "status": "verified",
+              "source": "circle_docs",
+              "trust": 1,
+              "sourceUrl": "https://docs.arc.io/contract-addresses",
+              "note": null,
+              "coinId": null,
+              "checkedAt": "2026-09-23T22:16:07.000Z"
+            },
+            "evidence": {
+              "firstWithTicker": true,
+              "creatorLinked": false,
+              "depth2PctUsd": "336094.678403",
+              "depthKind": "measured",
+              "depthAgeSec": 1188125,
+              "volume24hUsd": "4721268.029509",
+              "traders24h": 3042,
+              "trades24h": 26411,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": 3384.677777777778,
+              "posterior": null
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": "direct",
+              "creator": null,
+              "createdBlock": 560194,
+              "createdAt": "2026-05-18T21:28:28.000Z",
+              "website": null,
+              "twitter": null,
+              "telegram": null
+            },
+            "state": "pool_only",
+            "venues": [
+              {
+                "venue": "uniswap_v3",
+                "poolId": "0x82916bee18fcef517b26c72d7cb5f13694e1db41",
+                "pair": "USDC",
+                "feeBps": 1,
+                "hooks": null
+              },
+              {
+                "venue": "aerodrome_cl",
+                "poolId": "0xd945caee4635bcd7fb8a9fa74dc1d0c4c1472782",
+                "pair": "USDC",
+                "feeBps": null,
+                "hooks": null
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x85ff2b5048d26bbdf37e249333b59891605149a4a5476cea5c93050501e0f83d",
+                "pair": "USDC",
+                "feeBps": 15,
+                "hooks": "0x0000000000000000000000000000000000000000"
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0xc955cbfb9d03cde6f78901a81740264f895b9c00025beb9115cf2d7b86b3ee5a",
+                "pair": "USDC",
+                "feeBps": 30,
+                "hooks": "0x0000000000000000000000000000000000000000"
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x932a29f936ac1f6a682fef3eab27efd034bdb52f27ab9f184090cb47b9319ca7",
+                "pair": "USDC",
+                "feeBps": 25,
+                "hooks": "0x1df2971b2dfb0e80d7061dbe5e73688ba6552800"
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0xc019b0603eacdd1b70eba21b7352d6614daf5395f4cf048166c93d0dcd9d65af",
+                "pair": "USDC",
+                "feeBps": 24.5,
+                "hooks": "0x0000000000000000000000000000000000000000"
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x5a5d1fe991921a5818b5424bde3188d5d9cf6eadc3423539305a88b839949f8b",
+                "pair": "USDC",
+                "feeBps": 51,
+                "hooks": "0x0000000000000000000000000000000000000000"
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0xd4d25a5384c34a8d8163c4e79a86f54ad3b3198032990921162d1a12fa0ef1d7",
+                "pair": "USDC",
+                "feeBps": 90,
+                "hooks": "0x0000000000000000000000000000000000000000"
+              }
+            ],
+            "liquidityUsd": "17000020.6821",
+            "depth2PctUsd": "336094.678403",
+            "volume24hUsd": "4721268.029509",
+            "holders": null,
+            "safety": null,
+            "safetyByRoute": [],
+            "flags": []
+          },
+          {
+            "address": "0x3afc8565d2cc6826f069c2a52b0b0bf84e322df3",
+            "symbol": "CIRBTC",
+            "name": "CirBTC",
+            "decimals": 18,
+            "match": "symbol",
+            "verification": {
+              "status": "unverified"
+            },
+            "evidence": {
+              "firstWithTicker": false,
+              "creatorLinked": false,
+              "depth2PctUsd": null,
+              "depthKind": null,
+              "depthAgeSec": null,
+              "volume24hUsd": null,
+              "traders24h": null,
+              "trades24h": null,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": 431.8488888888889,
+              "posterior": 0.08032880550966794
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": "argus",
+              "creator": "0x3c39009619cd43f7b855b2de77d8a2ae35a47dea",
+              "createdBlock": 21567818,
+              "createdAt": "2026-09-18T22:18:12.000Z",
+              "website": null,
+              "twitter": "https://x.com/arc/status/2101068753798611147",
+              "telegram": null
+            },
+            "state": "pool_only",
+            "venues": [
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x78129022861d48f05b0a81d8a4cef52201c5b71828f3c9bb274aa89a22bb1b7c",
+                "pair": "USDC",
+                "feeBps": 100,
+                "hooks": "0xc0859b22226ccc2eac7aafeca34150e5b872e044"
+              }
+            ],
+            "liquidityUsd": null,
+            "depth2PctUsd": null,
+            "volume24hUsd": null,
+            "holders": null,
+            "safety": {
+              "routeId": "uniswap_v4:0x78129022861d48f05b0a81d8a4cef52201c5b71828f3c9bb274aa89a22bb1b7c",
+              "route": {
+                "venue": "uniswap_v4",
+                "poolId": "0x78129022861d48f05b0a81d8a4cef52201c5b71828f3c9bb274aa89a22bb1b7c",
+                "pair": "USDC"
+              },
+              "verdict": "taxed",
+              "canSell": true,
+              "buyTaxBps": 200,
+              "sellTaxBps": 100,
+              "buyImpactBps": 40,
+              "roundTripLossBps": 490,
+              "sellImpactBps": 20,
+              "sellDelaySec": 60,
+              "exitSellTaxBps": 100,
+              "scope": {
+                "block": 23584075,
+                "walletProfile": "fresh_eoa"
+              }
+            },
+            "safetyByRoute": [
+              {
+                "routeId": "uniswap_v4:0x78129022861d48f05b0a81d8a4cef52201c5b71828f3c9bb274aa89a22bb1b7c",
+                "route": {
+                  "venue": "uniswap_v4",
+                  "poolId": "0x78129022861d48f05b0a81d8a4cef52201c5b71828f3c9bb274aa89a22bb1b7c",
+                  "pair": "USDC"
+                },
+                "verdict": "taxed",
+                "buyTaxBps": 200,
+                "sellTaxBps": 100,
+                "checkedBlock": 23584075
+              }
+            ],
+            "flags": [
+              "buy_tax",
+              "hooked_pool",
+              "impersonates_canonical",
+              "sell_tax",
+              "shared_ticker"
+            ]
+          },
+          {
+            "address": "0x426755b862a8db8956a03eaddd16f0ea2e6ac672",
+            "symbol": "CIRBTC",
+            "name": "cirBTC ARC",
+            "decimals": 18,
+            "match": "symbol",
+            "verification": {
+              "status": "unverified"
+            },
+            "evidence": {
+              "firstWithTicker": false,
+              "creatorLinked": false,
+              "depth2PctUsd": null,
+              "depthKind": null,
+              "depthAgeSec": null,
+              "volume24hUsd": null,
+              "traders24h": null,
+              "trades24h": null,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": 431.7627777777778,
+              "posterior": 0.08032880550966794
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": "argus",
+              "creator": "0xfb7c1f2784f53cf09c56bacd130e20a2056a7083",
+              "createdBlock": 21568430,
+              "createdAt": "2026-09-18T22:23:22.000Z",
+              "website": null,
+              "twitter": "https://x.com/arc/status/2101068753798611147?s=20",
+              "telegram": null
+            },
+            "state": "pool_only",
+            "venues": [
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x439e330027d984daa5bba1920096a29fba675760bd50f70f546dd22abe04a65f",
+                "pair": "USDC",
+                "feeBps": 100,
+                "hooks": "0xa7f8070fc24e52e27c3fae0bc4d1ce2231f12044"
+              },
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0xa292795c418612ab0fd179c8aca58330efb0a2b7ed441a31fd93b2da4ef1d8b9",
+                "pair": "USDC",
+                "feeBps": 9600,
+                "hooks": "0x0000000000000000000000000000000000000000"
+              }
+            ],
+            "liquidityUsd": null,
+            "depth2PctUsd": null,
+            "volume24hUsd": null,
+            "holders": null,
+            "safety": {
+              "routeId": "uniswap_v4:0x439e330027d984daa5bba1920096a29fba675760bd50f70f546dd22abe04a65f",
+              "route": {
+                "venue": "uniswap_v4",
+                "poolId": "0x439e330027d984daa5bba1920096a29fba675760bd50f70f546dd22abe04a65f",
+                "pair": "USDC"
+              },
+              "verdict": "taxed",
+              "canSell": true,
+              "buyTaxBps": 200,
+              "sellTaxBps": 200,
+              "buyImpactBps": 40,
+              "roundTripLossBps": 586,
+              "sellImpactBps": 20,
+              "sellDelaySec": 60,
+              "exitSellTaxBps": 200,
+              "scope": {
+                "block": 23584075,
+                "walletProfile": "fresh_eoa"
+              }
+            },
+            "safetyByRoute": [
+              {
+                "routeId": "uniswap_v4:0x439e330027d984daa5bba1920096a29fba675760bd50f70f546dd22abe04a65f",
+                "route": {
+                  "venue": "uniswap_v4",
+                  "poolId": "0x439e330027d984daa5bba1920096a29fba675760bd50f70f546dd22abe04a65f",
+                  "pair": "USDC"
+                },
+                "verdict": "taxed",
+                "buyTaxBps": 200,
+                "sellTaxBps": 200,
+                "checkedBlock": 23584075
+              }
+            ],
+            "flags": [
+              "buy_tax",
+              "hooked_pool",
+              "impersonates_canonical",
+              "sell_tax",
+              "shared_ticker"
+            ]
+          },
+          {
+            "address": "0xf7a6cdc70e46444b531766621959a1da794e2b6c",
+            "symbol": "CIRBTC",
+            "name": "cirbtc",
+            "decimals": 18,
+            "match": "symbol",
+            "verification": {
+              "status": "unverified"
+            },
+            "evidence": {
+              "firstWithTicker": false,
+              "creatorLinked": false,
+              "depth2PctUsd": "0",
+              "depthKind": "measured",
+              "depthAgeSec": 716116,
+              "volume24hUsd": "199.371997",
+              "traders24h": 4,
+              "trades24h": 8,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": null,
+              "posterior": 0.05633924744816761
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": null,
+              "creator": null,
+              "createdBlock": null,
+              "createdAt": null,
+              "website": null,
+              "twitter": null,
+              "telegram": null
+            },
+            "state": null,
+            "venues": [
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x74051ff8310f6e8ab2dba9ccf6fcfba733d82933ea28b49ad9131dba5584aa7b",
+                "pair": "USDC",
+                "feeBps": null,
+                "hooks": "0xf2177335ec9def8ad7e12fbaa631781962f120cc"
+              }
+            ],
+            "liquidityUsd": null,
+            "depth2PctUsd": "0",
+            "volume24hUsd": "199.371997",
+            "holders": null,
+            "safety": {
+              "routeId": "uniswap_v4:0x74051ff8310f6e8ab2dba9ccf6fcfba733d82933ea28b49ad9131dba5584aa7b",
+              "route": {
+                "venue": "uniswap_v4",
+                "poolId": "0x74051ff8310f6e8ab2dba9ccf6fcfba733d82933ea28b49ad9131dba5584aa7b",
+                "pair": "USDC"
+              },
+              "verdict": "taxed",
+              "canSell": true,
+              "buyTaxBps": 200,
+              "sellTaxBps": 200,
+              "buyImpactBps": 39,
+              "roundTripLossBps": 396,
+              "sellImpactBps": 20,
+              "sellDelaySec": 60,
+              "exitSellTaxBps": 200,
+              "scope": {
+                "block": 23584075,
+                "walletProfile": "fresh_eoa"
+              }
+            },
+            "safetyByRoute": [
+              {
+                "routeId": "uniswap_v4:0x74051ff8310f6e8ab2dba9ccf6fcfba733d82933ea28b49ad9131dba5584aa7b",
+                "route": {
+                  "venue": "uniswap_v4",
+                  "poolId": "0x74051ff8310f6e8ab2dba9ccf6fcfba733d82933ea28b49ad9131dba5584aa7b",
+                  "pair": "USDC"
+                },
+                "verdict": "taxed",
+                "buyTaxBps": 200,
+                "sellTaxBps": 200,
+                "checkedBlock": 23584075
+              }
+            ],
+            "flags": [
+              "buy_tax",
+              "hooked_pool",
+              "illiquid",
+              "impersonates_canonical",
+              "sell_tax",
+              "shared_ticker"
+            ]
+          },
+          {
+            "address": "0x41d0848f24beb0b616252756f525741e11dc8dee",
+            "symbol": "cirBTC",
+            "name": "cirBTC",
+            "decimals": 18,
+            "match": "symbol",
+            "verification": {
+              "status": "unverified"
+            },
+            "evidence": {
+              "firstWithTicker": false,
+              "creatorLinked": false,
+              "depth2PctUsd": null,
+              "depthKind": null,
+              "depthAgeSec": null,
+              "volume24hUsd": null,
+              "traders24h": null,
+              "trades24h": null,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": null,
+              "posterior": 0.014674749273452865
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": null,
+              "creator": null,
+              "createdBlock": null,
+              "createdAt": null,
+              "website": null,
+              "twitter": null,
+              "telegram": null
+            },
+            "state": null,
+            "venues": [
+              {
+                "venue": "uniswap_v3",
+                "poolId": "0xf6ff10ff25f5887662da3d5885b445147a38e3c1",
+                "pair": "USDC",
+                "feeBps": 100,
+                "hooks": null
+              }
+            ],
+            "liquidityUsd": null,
+            "depth2PctUsd": null,
+            "volume24hUsd": null,
+            "holders": null,
+            "safety": {
+              "routeId": "uniswap_v3:0xf6ff10ff25f5887662da3d5885b445147a38e3c1",
+              "route": {
+                "venue": "uniswap_v3",
+                "poolId": "0xf6ff10ff25f5887662da3d5885b445147a38e3c1",
+                "pair": "USDC"
+              },
+              "verdict": "ok",
+              "canSell": true,
+              "buyTaxBps": 0,
+              "sellTaxBps": 0,
+              "buyImpactBps": 33,
+              "roundTripLossBps": 199,
+              "sellImpactBps": 16,
+              "sellDelaySec": 60,
+              "exitSellTaxBps": 0,
+              "scope": {
+                "block": 23584076,
+                "walletProfile": "fresh_eoa"
+              }
+            },
+            "safetyByRoute": [
+              {
+                "routeId": "uniswap_v3:0xf6ff10ff25f5887662da3d5885b445147a38e3c1",
+                "route": {
+                  "venue": "uniswap_v3",
+                  "poolId": "0xf6ff10ff25f5887662da3d5885b445147a38e3c1",
+                  "pair": "USDC"
+                },
+                "verdict": "ok",
+                "buyTaxBps": 0,
+                "sellTaxBps": 0,
+                "checkedBlock": 23584076
+              }
+            ],
+            "flags": [
+              "impersonates_canonical",
+              "shared_ticker"
+            ]
+          }
+        ]
+      }
+    },
+    "quote": {
+      "request": {
+        "sell": "0x3600000000000000000000000000000000000000",
+        "buy": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+        "amount": "1",
+        "side": "exactIn",
+        "slippageBps": 100,
+        "taker": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD"
+      },
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:19800/trade/v1/quote",
+          "description": "Swap quote",
+          "mimeType": ""
+        },
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:5042002",
+            "amount": "10000",
+            "asset": "0x3600000000000000000000000000000000000000",
+            "payTo": "0x987F719b516f528f4080EF0853E37aD5d7E773A0",
+            "maxTimeoutSeconds": 300,
+            "extra": {
+              "name": "USDC",
+              "version": "2"
+            }
+          }
+        ]
+      },
+      "paymentResponse": {
+        "success": true,
+        "payer": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD",
+        "transaction": "0x6d35ef3778a89e4d841972b3f1bc4f44ee99bbd86a4c404c138ce75e595fc31e",
+        "network": "eip155:5042002"
+      },
+      "requestId": "132b84e7",
+      "body": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "network": "eip155:5042",
+        "block": 23584078,
+        "expiresAt": "2026-10-06T22:11:14.306Z",
+        "side": "exactIn",
+        "sell": {
+          "address": "0x3600000000000000000000000000000000000000",
+          "symbol": "USDC",
+          "decimals": 6,
+          "amount": "1",
+          "amountRaw": "1000000",
+          "verification": {
+            "status": "verified",
+            "source": "circle_docs",
+            "trust": 1
+          },
+          "state": null
+        },
+        "buy": {
+          "address": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+          "symbol": "cirBTC",
+          "decimals": 8,
+          "verification": {
+            "status": "verified",
+            "source": "circle_docs",
+            "trust": 1
+          },
+          "state": "pool_only",
+          "discovered": "index"
+        },
+        "slippageBps": 100,
+        "routes": [
+          {
+            "type": "direct",
+            "routeId": "0x3600000000000000000000000000000000000000>0x171a4217b86a807a64eb94757db6849fb4bdbaa0|uniswap_v3:0x82916bee18fcef517b26c72d7cb5f13694e1db41",
+            "provider": "native",
+            "hops": [
+              {
+                "venue": "uniswap_v3",
+                "poolId": "0x82916bee18fcef517b26c72d7cb5f13694e1db41",
+                "tokenIn": "USDC",
+                "tokenOut": "cirBTC",
+                "tokenInAddress": "0x3600000000000000000000000000000000000000",
+                "tokenOutAddress": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+                "feeBps": 1
+              }
+            ],
+            "amountOutQuoted": "0.00001193",
+            "buyTaxBps": 0,
+            "costVsMidBps": 0,
+            "gasUsdc": "0.004583",
+            "fee": {
+              "bps": 0,
+              "amount": "0",
+              "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+              "collector": null
+            },
+            "executable": true,
+            "providerQuoteAgeBlocks": 0,
+            "partialFill": false
+          }
+        ],
+        "unsupportedVenues": [
+          {
+            "venue": "unitflow",
+            "poolId": "0xc1c00a22e7a4fcf9ddf7e0ec13708711fa2fb3f5",
+            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
+            "reason": "venue not identified/supported"
+          },
+          {
+            "venue": "unitflow",
+            "poolId": "0xeeef22e30c75734126fed2364c23051b5f721b75",
+            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
+            "reason": "venue not identified/supported"
+          }
+        ],
+        "best": {
+          "provider": "native",
+          "amountOutQuoted": "0.00001193",
+          "amountOutSimulated": "0.00001193",
+          "amountOutRaw": "1193",
+          "minAmountOut": "0.00001181",
+          "gasUsdc": "0.004583",
+          "fee": {
+            "bps": 0,
+            "amount": "0",
+            "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+            "collector": null
+          },
+          "executable": true,
+          "providerQuoteAgeBlocks": 0,
+          "floorBasis": "simulated",
+          "type": "direct",
+          "legs": [
+            {
+              "routeIndex": 0,
+              "shareBps": 10000,
+              "amountIn": "1",
+              "amountOut": "0.00001193",
+              "minAmountOut": "0.00001181"
+            }
+          ]
+        },
+        "safety": {
+          "verdict": "pinned",
+          "method": "simulate_v1",
+          "routeId": "graph:0x3600000000000000000000000000000000000000:0x171a4217b86a807a64eb94757db6849fb4bdbaa0:18637683c0050ab32803b76e",
+          "canSell": true,
+          "buyTaxBps": null,
+          "sellTaxBps": null,
+          "exitSellTaxBps": null,
+          "buyImpactBps": 0,
+          "sellImpactBps": null,
+          "execCostBps": null,
+          "roundTripLossBps": null,
+          "maxBuyUsdc": null,
+          "maxSellTokens": null,
+          "sellDelaySec": null,
+          "revertReason": null,
+          "scope": {
+            "block": 23584078,
+            "walletProfile": "fresh_eoa",
+            "sellDelaySec": null,
+            "tokenAgeSec": 12184846
+          },
+          "note": "Both endpoints are pinned assets; graph delivery was measured at the quote block."
+        },
+        "warnings": [],
+        "attestation": null,
+        "readiness": {
+          "taker": "0x5edff82f0e7dc25968cba8b614bedd782ac2cedd",
+          "balance": {
+            "token": "0x3600000000000000000000000000000000000000",
+            "required": "1000000",
+            "available": "10000000",
+            "enough": true
+          },
+          "approval": {
+            "mode": "permit2",
+            "needs": "approve_and_sign_permit"
+          },
+          "approve": {
+            "needs": "approve"
+          },
+          "gas": {
+            "estimatedUsdc": "0.006903",
+            "available": "9",
+            "enough": true
+          },
+          "fees": {
+            "swapUsdc": "0.01",
+            "payer": "0x5edff82f0e7dc25968cba8b614bedd782ac2cedd",
+            "payerAvailable": null,
+            "enough": null
+          },
+          "totalCostUsdc": "0.016903",
+          "ready": true
+        },
+        "next": "swap"
+      }
+    },
+    "swap": {
+      "request": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "taker": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD",
+        "recipient": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD",
+        "approval": "approve",
+        "deadlineSec": 300
+      },
+      "paymentRequired": {
+        "x402Version": 2,
+        "error": "Payment required",
+        "resource": {
+          "url": "http://127.0.0.1:19800/trade/v1/swap",
+          "description": "Swap transactions",
+          "mimeType": ""
+        },
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:5042002",
+            "amount": "10000",
+            "asset": "0x3600000000000000000000000000000000000000",
+            "payTo": "0x987F719b516f528f4080EF0853E37aD5d7E773A0",
+            "maxTimeoutSeconds": 300,
+            "extra": {
+              "name": "USDC",
+              "version": "2"
+            }
+          }
+        ]
+      },
+      "paymentResponse": {
+        "success": true,
+        "payer": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD",
+        "transaction": "0x6fc5f682800a9a446d3cb373f2b5bf5f4778bdaba5b1c06490921fcaac5649f7",
+        "network": "eip155:5042002"
+      },
+      "requestId": "709cadec",
+      "body": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "block": 23584078,
+        "expiresAt": "2026-10-06T22:14:19.000Z",
+        "signatures": [],
+        "transactions": [
+          {
+            "to": "0x3600000000000000000000000000000000000000",
+            "data": "0x095ea7b30000000000000000000000000ea7461542fe051c013ab0f5860190bc847f327100000000000000000000000000000000000000000000000000000000000f4240",
+            "value": "0",
+            "gas": "72070",
+            "purpose": "approve"
+          },
+          {
+            "to": "0x0ea7461542fe051c013ab0f5860190bc847f3271",
+            "data": "0xfdbcb692000000000000000000000000360000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f4240000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000000049d0000000000000000000000005edff82f0e7dc25968cba8b614bedd782ac2cedd000000000000000000000000000000000000000000000000000000006ac572bb000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa000000000000000000000000000000000000000000000000000000000000f424000000000000000000000000000000000000000000000000000000000000f4240000000000000000000000000000000000000000000000000000000000000049d00000000000000000000000053bf6b0684ec7ef91e1387da3d1a1769bc5a6f7700000000000000000000000036000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008400000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e404e45aaf0000000000000000000000003600000000000000000000000000000000000000000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa000000000000000000000000000000000000000000000000000000000000000640000000000000000000000000ea7461542fe051c013ab0f5860190bc847f32717fffffffffffffffffffffffffffffffffffffffffffffffffffffffa3a3a3a4000000000000000000000000000000000000000000000000000000000000049d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0",
+            "gas": "307150",
+            "purpose": "swap"
+          }
+        ],
+        "amountOutSimulated": "1193",
+        "minAmountOut": "1181",
+        "recipient": "0x5edff82f0e7dc25968cba8b614bedd782ac2cedd",
+        "safety": {
+          "verdict": "pinned",
+          "scope": {
+            "walletProfile": "taker",
+            "block": 23584078
+          }
+        },
+        "attestation": null,
+        "warnings": [],
+        "next": "send"
+      }
+    },
+    "receipt": {
+      "request": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "txHashes": [
+          "0x28c89355113d5b36a092703b1c4ecb261ddf988984f877cf61ca59686fb043d8",
+          "0x37bb05a16dd3467609ed9ddc426cb2de3810d92535dc601a3162481fc2288058"
+        ]
+      },
+      "requestId": "887e1863",
+      "body": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "result": "pass",
+        "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+        "recipient": "0x5edff82f0e7dc25968cba8b614bedd782ac2cedd",
+        "minAmountOut": "1181",
+        "delivered": "1193",
+        "block": 23584080,
+        "transactions": [
+          {
+            "hash": "0x28c89355113d5b36a092703b1c4ecb261ddf988984f877cf61ca59686fb043d8",
+            "purpose": "approve",
+            "status": "success",
+            "block": 23584079
+          },
+          {
+            "hash": "0x37bb05a16dd3467609ed9ddc426cb2de3810d92535dc601a3162481fc2288058",
+            "purpose": "swap",
+            "status": "success",
+            "block": 23584080
+          }
+        ],
+        "reason": null,
+        "next": "done"
+      }
+    },
+    "receiptCommand": {
+      "request": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "txHashes": [
+          "0x28c89355113d5b36a092703b1c4ecb261ddf988984f877cf61ca59686fb043d8",
+          "0x37bb05a16dd3467609ed9ddc426cb2de3810d92535dc601a3162481fc2288058"
+        ]
+      },
+      "requestId": "fa70ca95",
+      "body": {
+        "quoteId": "q_9b4fe45c89ab130a",
+        "result": "pass",
+        "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+        "recipient": "0x5edff82f0e7dc25968cba8b614bedd782ac2cedd",
+        "minAmountOut": "1181",
+        "delivered": "1193",
+        "block": 23584080,
+        "transactions": [
+          {
+            "hash": "0x28c89355113d5b36a092703b1c4ecb261ddf988984f877cf61ca59686fb043d8",
+            "purpose": "approve",
+            "status": "success",
+            "block": 23584079
+          },
+          {
+            "hash": "0x37bb05a16dd3467609ed9ddc426cb2de3810d92535dc601a3162481fc2288058",
+            "purpose": "swap",
+            "status": "success",
+            "block": 23584080
+          }
+        ],
+        "reason": null,
+        "next": "done"
+      }
+    }
+  }
+}
