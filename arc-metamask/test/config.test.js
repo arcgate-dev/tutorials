@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { parseEnv } from 'node:util';
 import { getAddress } from 'viem';
 import * as cfg from '../src/config.js';
 import { inspect } from '../src/main.js';
@@ -131,4 +133,19 @@ test('inspect refuses before signing when /health and the 402 disagree, or the n
   const disabled = structuredClone(mainnet);
   disabled.health.x402.enabled = false;
   await refuse(disabled, /unavailable|disabled/i);
+});
+
+test('copying .env.example and pointing API_URL at the localnet resolves the Arc testnet row, not mainnet values', () => {
+  const example = parseEnv(readFileSync(new URL('../.env.example', import.meta.url), 'utf8'));
+  // The shipped file talks to production with no network pinned: each row's defaults live in src/config.js.
+  assert.equal(cfg.loadConfig(example).apiUrl, 'https://api.arcgate.dev');
+  for (const key of ['ARCGATE_PAY_TO', 'ARCGATE_ROUTER_ADDRESS', 'ARC_RPC_URL']) assert.equal(example[key], undefined, `${key} is an active line in .env.example`);
+  // The only edit a reader makes for the localnet is API_URL; npm run loads the file through --env-file.
+  const env = { ...example, API_URL: 'http://127.0.0.1:19800' };
+  const testnet = cfg.forNetwork(cfg.loadConfig(env), TESTNET, env);
+  assert.equal(testnet.apiUrl, 'http://127.0.0.1:19800');
+  for (const key of ['payTo', 'router', 'rpcUrl']) same(testnet[key], ROW[TESTNET][key], key);
+  // Production resolves to its own row from the same file.
+  const mainnet = cfg.forNetwork(cfg.loadConfig(example), MAINNET, example);
+  for (const key of ['payTo', 'router', 'rpcUrl']) same(mainnet[key], ROW[MAINNET][key], key);
 });
