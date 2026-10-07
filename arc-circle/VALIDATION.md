@@ -1,5 +1,11 @@
 # Validation
 
+## OpenAPI check — October 7, 2026
+
+OpenAPI check: sha256 `72fb8c6a90ff9d0641e3b46b38cba013cef5068706f54d2da1f3a57910a9da41`, validated with Ajv2020 and ajv-formats: **14 checked, 0 failed**. Per schema, the passing checks were `SearchRequest` 1, `QuoteRequest` 1, `SwapRequest` 2, `ReceiptRequest` 1, `ReceiptResponse` 2, `HealthResponse` 1, `PaymentRequired` 3 and `PaymentRequiredBody` 3, with no failures. The Ajv output for this run is not kept in the repository.
+
+This run did not record the paid `SearchResponse`, `QuoteResponse`, `SwapResponse` or `SettleResponse`, so those were **not validated** in this run. The October 6 capture-based check below covers them.
+
 ## Localnet run — October 6, 2026
 
 The tutorial ran end to end against the arcgate localnet on **October 6, 2026 (UTC)**, captured at `2026-10-06T22:09:38.795Z`. Every step passed, and the free receipt returned `pass`.
