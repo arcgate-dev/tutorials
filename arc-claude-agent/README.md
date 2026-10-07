@@ -188,7 +188,7 @@ The bot logs one line for a paid call that comes back as an error, so you can te
 - `not settled: <tool> payment_required (check the balance before running again)`: the settlement failed, and funds may have moved. This also covers a settlement that fails with `payment_response_expired`, which may have moved funds. Check your USDC balance before you run again.
 - `<tool>: no answer after the payment was sent (...); the payment may have settled. Check the transaction or your USDC balance before paying again.`: the signed call got an HTTP 502 or no answer at all. The tool returns this text as an error result, and the payment stays reserved under the cap.
 
-In each case, check the transaction or your balance before you run again. The model is told never to repeat a paid call to retry it (`SETUP_PROMPT` in `src/prompts.ts`). Sources: `src/mcp.ts` for the three lines, and `test/payment.test.ts` (a paid 502) and `test/bridge.test.ts` (`not charged`).
+For `not settled` and for no answer, check the transaction or your balance before you run again. The model is told never to repeat a paid call to retry it (`SETUP_PROMPT` in `src/prompts.ts`). Sources: `src/mcp.ts` for the three lines, and `test/payment.test.ts` (a paid 502) and `test/bridge.test.ts` (`not charged`).
 
 ## Tests and fixtures
 
