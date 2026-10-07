@@ -15,13 +15,11 @@
     "preview": "node --env-file-if-exists=.env src/main.js preview",
     "trade": "node --env-file-if-exists=.env src/main.js trade",
     "receipt": "node --env-file-if-exists=.env src/main.js receipt",
-    "test": "node --test test/*.test.js",
-    "policy": "node --env-file-if-exists=.env src/main.js policy"
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "@x402/core": "2.27.0",
     "@x402/evm": "2.27.0",
-    "viem": "2.56.9",
-    "yaml": "2.9.1"
+    "viem": "2.56.9"
   }
 }

@@ -28,7 +28,7 @@ export function assertAuthorization(data, wallet, config, now = Math.floor(Date.
   const { domain, message, types, primaryType } = data;
   const shape = Object.fromEntries(Object.entries(types).filter(([name]) => name !== 'EIP712Domain'));
   if (primaryType !== 'TransferWithAuthorization' || JSON.stringify(shape) !== JSON.stringify(authorizationTypes)
-      || BigInt(domain.chainId) !== BigInt(config.chainId) || getAddress(domain.verifyingContract) !== USDC
+      || BigInt(domain.chainId) !== BigInt(config.paymentChainId) || getAddress(domain.verifyingContract) !== USDC
       || domain.name !== 'USDC' || domain.version !== '2'
       || getAddress(message.from) !== wallet.address || getAddress(message.to) !== getAddress(config.payTo)
       || BigInt(message.value) <= 0n || BigInt(message.value) > config.maxPayment
