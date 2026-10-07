@@ -4,7 +4,10 @@
 // It answers the SDK's GET /mcp (Accept: text/event-stream) with the 405 the server sends, because the
 // server offers no event stream and the SDK stops there. It chooses a tools/call answer by tool
 // name, then by whether the call carries a payment in params._meta["x402/payment"] (a tool that
-// takes no payment, boxStatus, is chosen by whether it carries agentSignature). It records every
+// takes no payment, boxStatus, is chosen by whether it carries agentSignature). It models the one
+// thing the server's answers depend on, whether the agent has a box, by the server's own rule
+// (apps/notifier/src/agent.ts): a signed boxStatus answers box_not_found while there is no box, and a
+// paid boxCreate leaves the box present, so the next one answers box_exists. It records every
 // request on one timeline, together with the lines tests log through `log`, so a test can say what
 // was sent and when.
 import { captured, fixture, PAYMENT_META } from './support.ts';
@@ -12,6 +15,8 @@ import { captured, fixture, PAYMENT_META } from './support.ts';
 type Json = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export type Phase = 'unpaid' | 'paid';
+/** Whether the agent has a box when the fake starts. */
+export type BoxState = 'absent' | 'present';
 
 export interface RequestEvent {
   kind: 'request';
@@ -30,17 +35,19 @@ export interface LogEvent {
 export type TimelineEvent = RequestEvent | LogEvent;
 
 // Captured answers: tool -> phase -> fixture file. boxStatus has no payment: its two answers are
-// "without" and "with" agentSignature, which the fake files under 'unpaid' and 'paid'.
-const ANSWERS: Record<string, Record<Phase, string>> = {
+// "without" and "with" agentSignature, which the fake files under 'unpaid' and 'paid'. An answer that
+// depends on the box is a file per BoxState.
+type Answer = string | Record<BoxState, string>;
+const ANSWERS: Record<string, Record<Phase, Answer>> = {
   health: { unpaid: 'health', paid: 'health' },
   tradeVenues: { unpaid: 'trade-venues', paid: 'trade-venues' },
   tradeSearch: { unpaid: 'trade-search.payment-required', paid: 'trade-search.paid' },
   tradeQuote: { unpaid: 'trade-quote.payment-required', paid: 'trade-quote.paid' },
-  boxCreate: { unpaid: 'box-create.payment-required', paid: 'box-create.paid' },
-  boxStatus: { unpaid: 'box-status.signature-required', paid: 'box-status' },
+  boxCreate: { unpaid: 'box-create.payment-required', paid: { absent: 'box-create.paid', present: 'box-create.exists' } },
+  boxStatus: { unpaid: 'box-status.signature-required', paid: { absent: 'box-status.not-found', present: 'box-status' } },
 };
 
-export function fakeMcp() {
+export function fakeMcp({ box }: { box: BoxState } = { box: 'absent' }) {
   const timeline: TimelineEvent[] = [];
   const overrides = new Map<string, Json>();
 
@@ -74,11 +81,12 @@ export function fakeMcp() {
     event.paid = meta?.[PAYMENT_META] !== undefined;
     if (meta) event.meta = meta;
     const phase: Phase = paid ? 'paid' : 'unpaid';
-    const override = overrides.get(`${tool}:${phase}`);
-    if (override) return answer(override);
-    const file = ANSWERS[tool]?.[phase];
-    if (!file) throw new Error(`fake-mcp has no ${phase} answer for ${tool}`);
-    return answer(captured(file));
+    const entry = ANSWERS[tool]?.[phase];
+    if (!entry) throw new Error(`fake-mcp has no ${phase} answer for ${tool}`);
+    const file = typeof entry === 'string' ? entry : entry[box];
+    // A paid boxCreate creates the box, whatever the answer sent back.
+    if (tool === 'boxCreate' && event.paid) box = 'present';
+    return answer(overrides.get(`${tool}:${phase}`) ?? captured(file));
   }
 
   return {
