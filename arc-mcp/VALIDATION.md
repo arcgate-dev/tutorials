@@ -63,4 +63,6 @@ The signed `boxStatus` answered 200 with the box, so the tour called no `boxCrea
 
 ### Offline tests
 
-`npm test`: 34 tests pass offline (every test file sets `globalThis.fetch` to a function that throws). `npm run typecheck` passes. The tests in `arc-circle`, `arc-metamask` and `arc-agent-box` still pass.
+`npm test`: 37 tests pass offline (every test file sets `globalThis.fetch` to a function that throws). `npm run typecheck` passes. The tests in `arc-circle`, `arc-metamask` and `arc-agent-box` still pass.
+
+The spec tests are unchanged: `test/fake-mcp.ts`, `test/tour.test.ts`, `test/capture.test.ts` and `test/fixtures.test.ts` are byte-identical to commit `29f4653`, and in `test/fixtures/README.md` only the DATE and COMMIT placeholder was filled in. The cases added since live in `test/capture-guard.test.ts` and `test/mcp.test.ts`.
