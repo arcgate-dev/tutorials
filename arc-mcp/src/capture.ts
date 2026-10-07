@@ -2,8 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Config } from './config.ts';
 import { agentSignature } from './agent.ts';
-import { connectArcgate } from './mcp.ts';
-import { runTour } from './tour.ts';
+import { connectArcgate, errorOf } from './mcp.ts';
+import { refusal, runTour } from './tour.ts';
 
 // tool -> [the answer to a call without a payment or signature, the answer to one with it]. A paid
 // boxCreate that is refused is the box_exists answer; a signed boxStatus that is refused is box_not_found.
@@ -65,6 +65,8 @@ export async function captureFixtures({ config, fetchFn, dir, log }: { config: C
     if (!status.result.isError) {
       throw new Error(`${address} already has a box, so there is no box_not_found to capture; nothing was written. Use an AGENT_PRIVATE_KEY with no box.`);
     }
+    // Any other refusal would fail the tour's own boxStatus after tradeSearch and tradeQuote were paid.
+    if (errorOf(status.result).code !== 'box_not_found') throw refusal('boxStatus', status.result);
     await runTour({ config, arcgate: first, log });
   } finally {
     await first.close();
