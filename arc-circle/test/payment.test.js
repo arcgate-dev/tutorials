@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { recoverTypedDataAddress } from 'viem';
 import { acceptOffer, assertAuthorization, createArcgateClient } from '../src/payment.js';
+import { getReceipt } from '../src/receipt.js';
 import { circleCall, loadWallet, normalizeSignature, sendTransaction, signTypedData } from '../src/circle.js';
 // These tests sign with the in-memory ephemeral key, so their wallet is the payment wallet, not the captured taker.
-import { account, authorization, captured, circleSigner, config, encodeHeader, mainnetOffer, mainnetRequired, other, paymentWallet as wallet, pinnedTestnetConfig, quote, receiptHeader, required, run, search, settlement, swap, swapHash, testnetConfig, testnetOffer } from './fixtures.js';
+import { account, authorization, captured, circleSigner, config, encodeHeader, mainnetOffer, mainnetRequired, other, paymentWallet as wallet, pinnedTestnetConfig, quote, receiptHeader, required, run, search, settlement, swap, swapHash, tradeReceipt, testnetConfig, testnetOffer } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -136,6 +137,62 @@ test('empty middleware 402s retain settlement failure details and never trigger 
     assert.equal(requests, 2);
     assert.deepEqual(records.at(-1).paymentResponse, failure);
   }
+});
+
+test('a paid 502 X402MiddlewareError may have settled', async () => {
+  let requests = 0;
+  // Override: the x402 middleware's own 502 body, a plain string, not an Arcgate { code, message, hint } error.
+  const middleware = { error: 'X402MiddlewareError: facilitator verify failed' };
+  const api = createArcgateClient({ circle: circleSigner, wallet, config, fetchFn: async () => ++requests === 1
+    ? new Response(JSON.stringify(mainnetRequired()), { status: 402 })
+    : Response.json(middleware, { status: 502, headers: { 'x-request-id': 'abc12345' } }) });
+  await assert.rejects(api('search', {}), error => {
+    assert.equal(error.status, 502);
+    assert.match(error.message, /X402MiddlewareError: facilitator verify failed/);
+    assert.doesNotMatch(error.message, /request_failed/);
+    assert.match(error.message, /may have settled/);
+    assert.match(error.message, /PAYMENT-RESPONSE|balance/);
+    assert.match(error.message, /No automatic retry/);
+    return true;
+  });
+  assert.equal(requests, 2);
+});
+
+test('a payment_response_expired settlement may have settled', async () => {
+  let requests = 0;
+  // Override: the captured settlement turned into a failed one, on the mainnet row's network.
+  const expired = { ...settlement(), success: false, errorReason: 'payment_response_expired', network: config.network, transaction: '' };
+  const api = createArcgateClient({ circle: circleSigner, wallet, config, fetchFn: async () => ++requests === 1
+    ? new Response(JSON.stringify(mainnetRequired()), { status: 402 })
+    : Response.json({}, { status: 402, headers: { 'payment-response': encodeHeader(expired) } }) });
+  await assert.rejects(api('search', {}), error => {
+    assert.equal(error.status, 402);
+    assert.match(error.message, /payment_response_expired/);
+    assert.match(error.message, /may have settled/);
+    return true;
+  });
+  assert.equal(requests, 2);
+});
+
+test('other failures do not say may have settled', async () => {
+  const paid = async (status, headers, body = {}) => {
+    let requests = 0;
+    const api = createArcgateClient({ circle: circleSigner, wallet, config, fetchFn: async () => ++requests === 1
+      ? new Response(JSON.stringify(mainnetRequired()), { status: 402 }) : Response.json(body, { status, headers }) });
+    return api('search', {}).then(() => assert.fail('expected a refusal'), error => error);
+  };
+  // Override: the captured settlement turned into a failed one, on the mainnet row's network.
+  const insufficient = { ...settlement(), success: false, errorReason: 'insufficient_funds', network: config.network, transaction: '' };
+  assert.doesNotMatch((await paid(402, { 'payment-response': encodeHeader(insufficient) })).message, /may have settled/);
+  assert.doesNotMatch((await paid(409, { 'payment-response': receiptHeader() }, { error: { code: 'quote_stale' }, next: 'requote' })).message, /may have settled/);
+  // The free receipt is not a paid call: the same 502 body names its middleware error and warns of nothing.
+  const free = await getReceipt({ config, quoteId: tradeReceipt().quoteId, txHashes: [swapHash], fetchFn: async () =>
+    Response.json({ error: 'X402MiddlewareError: facilitator verify failed' }, { status: 502 }) }).then(() => assert.fail('expected a refusal'), error => error);
+  assert.equal(free.status, 502);
+  assert.match(free.message, /X402MiddlewareError: facilitator verify failed/);
+  assert.doesNotMatch(free.message, /may have settled/);
+  // The same 502 on a paid call does warn, so the three checks above are not satisfied by a warning that never appears.
+  assert.match((await paid(502, {}, { error: 'X402MiddlewareError: facilitator verify failed' })).message, /may have settled/);
 });
 
 test('wallet connection refuses SCA, inactive and wrong-chain wallets', async () => {
