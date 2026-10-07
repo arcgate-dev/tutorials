@@ -1,0 +1,1 @@
+{"result":{"content":[{"type":"text","text":"{\"error\":{\"code\":\"box_not_found\",\"message\":\"this address has no box\"},\"next\":\"fix_request\"}"}],"structuredContent":{"error":{"code":"box_not_found","message":"this address has no box"},"next":"fix_request"},"isError":true},"jsonrpc":"2.0","id":2}

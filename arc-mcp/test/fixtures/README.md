@@ -4,7 +4,7 @@ Every file here is one response body captured by `npm run capture` from the arcg
 headers `content-type: application/json` and `accept: application/json, text/event-stream`), byte for byte.
 None is written by hand. The tests answer with them through `test/fake-mcp.ts`, which rewrites only the JSON-RPC `id`.
 
-Captured on: DATE (recapture fills this in), from the localnet whose `/health` answered `ok: true` and `commit: null`, arcgate checkout commit COMMIT, settling x402 on Arc testnet (`eip155:5042002`).
+Captured on: 2026-10-07, from the localnet whose `/health` answered `ok: true` and `commit: null`, arcgate checkout commit d85271c, settling x402 on Arc testnet (`eip155:5042002`).
 
 | File | Request |
 | --- | --- |
