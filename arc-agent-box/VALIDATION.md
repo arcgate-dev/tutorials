@@ -19,8 +19,8 @@ Exchange numbers below are indexes into `exchanges` in the fixture.
 | channel | `webhookCreate` `_XsK9A9S7cox8eD0TPl7Kg` paid (ex. 18–19); `webhookList` (ex. 20–21); `webhookRotate` (ex. 22) | Pass |
 | messages | The first page (cursor 0, ex. 23) holds the `watch.token` hit; the empty page ended the listing (ex. 24); fetched and deleted the newest inbound message, seq 13 (ex. 25–26) | Pass |
 | topup | `boxTopUp` paid (ex. 27–28), charged, granted 4 messages and 0 days, allowance 1000 messages and expiry `1796549243` | Pass |
-| cleanup | `inboundList` (ex. 29); deleted the other track's inbound address `B-kc4oaEnh61HHv96lHpag` (ex. 30) and the run's `jGzJwc9Ho_38jtTnloOKug` (ex. 31); `watchList` (ex. 32); deleted the other track's screen `oGnXYai82uHjRH_M6rQtVg` (ex. 33) and the run's three watches (ex. 34–36); the webhook (ex. 37–38) | Pass |
-| final check | `boxStatus` and the full message list (ex. 39–42) | Pass |
+| cleanup | `inboundList` (ex. 29); deleted the other track's inbound address `B-kc4oaEnh61HHv96lHpag` (ex. 30) and the run's `jGzJwc9Ho_38jtTnloOKug` (ex. 31); `watchList` (ex. 32); deleted the other track's screen `oGnXYai82uHjRH_M6rQtVg` (ex. 33) and the run's three watches (ex. 34–36); the webhook (ex. 37–38); `boxStatus` shows 2 messages and no inbound addresses, watches or channels (ex. 39) | Pass |
+| final check | `boxStatus` and the full message list (ex. 40–42) hold seq 12 `inbound` and seq 14 `watch.token` | Pass |
 | topup (extra run 1) | Signed, answered 409 `allowance_full` (ex. 43–46), nothing charged | Pass, nothing charged |
 | topup (extra run 2) | Signed, answered 409 `allowance_full` (ex. 47–50), nothing charged | Pass, nothing charged |
 
