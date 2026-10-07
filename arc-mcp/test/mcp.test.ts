@@ -13,7 +13,7 @@ globalThis.fetch = noNetwork;
 const search = { query: 'cirBTC', limit: 5 };
 
 // The lines about money: the others (progress, tool output) are the tour's own business.
-const money = (fake: ReturnType<typeof fakeMcp>) => fake.lines().filter((line) => /^(price|receipt|not charged):/.test(line));
+const money = (fake: ReturnType<typeof fakeMcp>) => fake.lines().filter((line) => /^(price|receipt|not charged|not settled):/.test(line));
 
 test('paid call: price line before the paid request, receipt line after', async (t) => {
   const { config, fake, arcgate } = await connect(t);
@@ -181,7 +181,7 @@ test('an error result after payment is not charged', async (t) => {
   assert.equal(arcgate.budget.reserved, 50_000n, 'and the reservation is not released');
 });
 
-test('a settlement failure after payment is not charged', async (t) => {
+test('a settlement failure after payment is not settled, and the reservation stays', async (t) => {
   const { fake, arcgate } = await connect(t);
   const offer = capturedOffer();
   // @x402/mcp answers a failed settlement with a payment-required result whose error is a plain string.
@@ -192,7 +192,7 @@ test('a settlement failure after payment is not charged', async (t) => {
   assert.equal(out.charged, false);
   assert.deepEqual(money(fake), [
     `price: tradeSearch ${offer.amount} base units (${formatUnits(BigInt(offer.amount), 6)} USDC) on ${offer.network} to ${offer.payTo}`,
-    'not charged: tradeSearch payment_required',
+    'not settled: tradeSearch payment_required (check the balance before running again)',
   ]);
   assert.equal(arcgate.budget.reserved, 5_000n, 'and the reservation is not released');
 });

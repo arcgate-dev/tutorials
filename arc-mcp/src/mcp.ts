@@ -65,7 +65,9 @@ export async function connectArcgate({ config, fetchFn, log }: { config: Config;
       if (!out.paymentMade) return { result, charged: false as const };
       // The payment is signed and sent: whatever comes back, its reservation stays.
       if (out.isError) {
-        log(`not charged: ${tool} ${errorOf(result).code}`);
+        const { code } = errorOf(result);
+        // payment_required after a payment is a failed settlement: the facilitator may already have broadcast the authorization.
+        log(code === 'payment_required' ? `not settled: ${tool} payment_required (check the balance before running again)` : `not charged: ${tool} ${code}`);
         return { result, charged: false as const };
       }
       const receipt = out.paymentResponse;
