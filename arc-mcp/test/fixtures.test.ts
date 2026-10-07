@@ -66,26 +66,31 @@ test('box-status.not-found and box-status are the two answers to a signed boxSta
 test('no fixture holds a key, a payment payload or an agent signature', () => {
   const receiptTransactions = new Set(PAID.map((name) => fixture(name).result._meta[RECEIPT_META].transaction.toLowerCase()));
 
-  const walk = (value: unknown, name: string): void => {
-    if (Array.isArray(value)) return value.forEach((item) => walk(item, name));
+  // Pool ids are public on-chain identifiers (Uniswap v4 pool ids are 32-byte hex). The search and quote
+  // answers carry them in venues[].poolId and hops[].poolId, and a routeId embeds one, so they are allowed.
+  const walk = (value: unknown, name: string, poolIds: Set<string>): void => {
+    if (Array.isArray(value)) return value.forEach((item) => walk(item, name, poolIds));
     if (typeof value !== 'object' || value === null) return;
     for (const [key, inner] of Object.entries(value)) {
+      if (key.toLowerCase() === 'poolid' && typeof inner === 'string') poolIds.add(inner.toLowerCase());
       assert.notEqual(key, PAYMENT_META, `${name}: a request payment`);
       assert.notEqual(key.toLowerCase(), 'authorization', `${name}: an EIP-3009 authorization`);
       if (key === 'agentSignature') {
         // tools-list names the argument in a schema; a signed value has a signature of its own.
         assert.notEqual(typeof (inner as { signature?: unknown })?.signature, 'string', `${name}: an agent signature`);
       }
-      walk(inner, name);
+      walk(inner, name, poolIds);
     }
   };
 
   for (const name of FILES) {
     const raw = text(name);
-    walk(JSON.parse(raw), name);
+    const poolIds = new Set<string>();
+    walk(JSON.parse(raw), name, poolIds);
     assert.doesNotMatch(raw, /0x[0-9a-fA-F]{128,}/, `${name}: a signature-length hex string`);
     for (const [hash] of raw.matchAll(/0x[0-9a-fA-F]{64}(?![0-9a-fA-F])/g)) {
-      assert.ok(receiptTransactions.has(hash.toLowerCase()), `${name}: ${hash} is a 32-byte hex string that is not a receipt transaction`);
+      const known = receiptTransactions.has(hash.toLowerCase()) || poolIds.has(hash.toLowerCase());
+      assert.ok(known, `${name}: ${hash} is a 32-byte hex string that is neither a receipt transaction nor a poolId`);
     }
     if (name !== 'tools-list') assert.doesNotMatch(raw, /agentSignature/, `${name}: an agent signature`);
   }
