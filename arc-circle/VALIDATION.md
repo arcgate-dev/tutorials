@@ -1,6 +1,55 @@
 # Validation
 
-## OpenAPI check — October 7, 2026
+## Localnet run — October 7, 2026
+
+The tutorial ran against the arcgate localnet on **October 7, 2026 (UTC)** in two attempts. The first stopped at the approval (the send step); the second passed every step and the free receipt returned `pass`. Settlement hashes and request IDs below are copied from the run logs in `.runs/`.
+
+| Item | Value |
+| --- | --- |
+| API | `http://127.0.0.1:19800` |
+| `/health` commit | `null`, so the arcgate checkout is `5addf63f`; the service does not confirm it. `rulesVersion` `r2-383954828c` |
+| Payment network | `eip155:5042002` (Arc testnet), settled through Arcus |
+| `payTo` | `0x987F719b516f528f4080EF0853E37aD5d7E773A0` |
+| Taker | `0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD`, an `ARC-TESTNET` EOA |
+| `SELL_AMOUNT` | `1` |
+
+Sources: `inspect-5addf63f.log`, `connect-5addf63f.log`, `connect-after-5addf63f.log`, `trade-5addf63f.log`, `trade-5addf63f-2.log`, `receipt-5addf63f.log`, and the run logs `a0ed2095-1d48-4571-b33e-4355bc471514.jsonl` and `25c9841f-82d0-4a58-9f5b-d90ea1a4d377.jsonl`.
+
+### Attempt 1 — stopped at the approval
+
+Run log `a0ed2095-1d48-4571-b33e-4355bc471514.jsonl`, 22:54 UTC. Quote `q_546d1eae82bbbbe3`.
+
+| Step | Result | Detail |
+| --- | --- | --- |
+| search | pass | Paid 5000 units. Settlement `0x9123685d39cc71b89c37ad99af869cf7ceecf473ec03b2b675881c673f14997c`, request ID `d77e34a4`. |
+| quote | pass | Paid 10000 units. Settlement `0x5e8d30ee2cb63b68f82508d0523b83f580bfd55a2f23967f87d399df5abf950a`, request ID `9db0902f`, `next` `swap`. |
+| swap | pass | Paid 10000 units. Settlement `0x527bb7165c27c58b1f7bc17fad4596fc01e54aca71862f53870de69fd0ebd0d6`, request ID `3f863813`. |
+| send | stopped | The approve `0x28c89355113d5b36a092703b1c4ecb261ddf988984f877cf61ca59686fb043d8` timed out waiting for confirmation on the fork. It was mined later, in block 23584613. No swap transaction was sent. |
+
+Before attempt 2 the lead made a single `anvil_mine` call with `["0x1"]` at 23:02 UTC on `127.0.0.1:19845` (the fork).
+
+This approve hash is byte-identical to the one in the October 6 run on purpose: an impersonated nonce-0 transaction with the same calldata and fees and a zero signature always hashes the same.
+
+### Attempt 2 — passed
+
+Run logs `trade-5addf63f-2.log` and `25c9841f-82d0-4a58-9f5b-d90ea1a4d377.jsonl`. Quote `q_56544dc2c3d4fa85`. The quote's `approve.needs` was `none`, because attempt 1's approve had been mined, so only the swap was sent.
+
+| Step | Result | Detail |
+| --- | --- | --- |
+| search | pass | Paid 5000 units. Settlement `0x59deac54e3c991f3c1bda4698d2d0451eac0b5aff7a76914ba47d61dcdc42c9e`, request ID `3f63a656`. |
+| quote | pass | Paid 10000 units. Settlement `0x5d3d78d71545199f52880ebb569fc217f0a71b2164192a62da277d7e8b5f8dca`, request ID `3ae43599`, `next` `swap`. |
+| swap | pass | Paid 10000 units. Settlement `0x09c881778b13892ca68b20800ab823910abe53455a0e2c4458f776dd72cfe2dd`, request ID `343bebd6`. |
+| sign | pass | Each x402 authorization reached the `signed` state and then `settled`. |
+| send | pass | Swap `0x78b003494031bf803f9df58becb2622e61b6d137262e5f4ddcfb218d9c572ac7` in block 23584729, success. Delivered **1192** cirBTC units against `minAmountOut` **1180**. |
+| receipt | pass | `result` `pass`, `next` `done`. The separate `npm run receipt` command (`receipt-5addf63f.log`) returned the same result. |
+
+Fees were **25000 units (0.025 USDC)** per attempt and **50000 units (0.05 USDC)** in total. The Circle wallet's USDC balance went from `10.051048` to `10.001048` (`connect-5addf63f.log`, `connect-after-5addf63f.log`), with `10.026048` between the attempts (`trade-5addf63f-2.log`).
+
+Offline tests: `npm test` in `arc-circle` passed **59** tests.
+
+No Circle keys, entity secrets or wallet IDs are recorded here.
+
+### OpenAPI check
 
 OpenAPI check: sha256 `72fb8c6a90ff9d0641e3b46b38cba013cef5068706f54d2da1f3a57910a9da41`, validated with Ajv2020 and ajv-formats: **14 checked, 0 failed**. Per schema, the passing checks were `SearchRequest` 1, `QuoteRequest` 1, `SwapRequest` 2, `ReceiptRequest` 1, `ReceiptResponse` 2, `HealthResponse` 1, `PaymentRequired` 3 and `PaymentRequiredBody` 3, with no failures. The Ajv output for this run is not kept in the repository.
 
