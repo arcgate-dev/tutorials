@@ -88,13 +88,15 @@ test('the capture pays the three tools in order, posts to the inbound address as
 
   // Each paid tool is an unpaid probe, then the paid call; each owner call is signed.
   const label = (call: { tool?: string; paid?: boolean }) => (call.paid ? `${call.tool}:paid` : call.tool);
+  // The shared box may hold more than the capture's own message: every seq the page returned is deleted, so the second page is empty.
+  const listed: number[] = captured('box-message-list').structuredContent.messages.map((m: { seq: number }) => m.seq);
   assert.deepEqual(fake.toolCalls().map(label), [
     'boxStatus',
     'boxCreate', 'boxCreate:paid',
     'watchCreate', 'watchCreate:paid',
     'watchList',
     'inboundCreate', 'inboundCreate:paid',
-    'boxMessageList', 'boxMessageDelete', 'boxMessageList',
+    'boxMessageList', ...listed.map(() => 'boxMessageDelete'), 'boxMessageList',
   ]);
   assert.deepEqual(fake.paidCalls().map((call) => call.tool), ['boxCreate', 'watchCreate', 'inboundCreate']);
   for (const call of fake.toolCalls().filter((c) => c.tool === 'boxStatus' || c.tool === 'watchList' || c.tool?.startsWith('boxMessage'))) {
@@ -120,8 +122,7 @@ test('the capture pays the three tools in order, posts to the inbound address as
   assert.ok(requests.findLastIndex((r) => r.tool === 'inboundCreate') < post, 'after inboundCreate');
   assert.ok(after('boxMessageList') > post, 'the read is after the post');
 
-  const listed: number[] = captured('box-message-list').structuredContent.messages.map((m: { seq: number }) => m.seq);
-  assert.ok(listed.includes(fake.callsOf('boxMessageDelete')[0].args!.seq), 'it deletes a seq the list returned');
+  assert.deepEqual(fake.callsOf('boxMessageDelete').map((call) => call.args!.seq), listed, 'it deletes each seq the list returned, and no other');
 });
 
 test('the capture writes nothing and pays nothing when the payer has no box, or boxStatus is refused', async (t) => {
