@@ -1,0 +1,24 @@
+{
+  "name": "arc-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Use the Arcgate MCP server with x402 payment",
+  "engines": { "node": ">=22.18.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/main.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.1",
+    "@x402/core": "2.27.0",
+    "@x402/evm": "2.27.0",
+    "@x402/mcp": "2.27.0",
+    "viem": "2.56.9"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  }
+}
