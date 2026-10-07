@@ -10,7 +10,7 @@ Everything needed by the application is in this folder. Dependencies are public 
 
 - Node.js **22.18 or newer**, npm, Git, and Claude Code. The optional chain-list filter uses `jq`.
 - `@metamask/agent-wallet@7.0.0` and the MetaMask Agent Wallet skill.
-- A **dedicated** MetaMask **server wallet** in **Beast Mode**, funded with only a few USDC on Arc mainnet. Bring-your-own-key (`byok`) uses a different custody and policy model and isn't covered here.
+- A **dedicated** MetaMask **server wallet** in **Beast Mode**, funded with only a few USDC: on Arc mainnet for production, or on Arc testnet (at least 0.025 USDC) for the localnet preview. Bring-your-own-key (`byok`) uses a different custody and policy model and isn't covered here.
 
 This walkthrough spends real funds. The application limits each API payment to **0.01 USDC**, each command to **0.025 USDC in API fees**, and each trade to **at most 1 USDC**. The configured order is **0.50 USDC**. Gas costs extra, in USDC. About 2 USDC gives headroom for the example, though gas varies.
 
@@ -50,7 +50,7 @@ API_URL=https://api.arcgate.dev
 SELL_AMOUNT=0.50
 ```
 
-No wallet secret belongs in this file. The API names its payment network in `/health` and in the 402, and that network picks the row of chains, RPC, fee recipient and router this run uses. Each row's defaults are pinned in [src/config.js](src/config.js), so a server response cannot silently replace them: a network outside the table, or a 402 that offers a different one than `/health`, stops the run before anything is signed. To use the arcgate localnet, change only `API_URL=http://127.0.0.1:19800`; the localnet pays x402 on Arc testnet, so set `ARCGATE_PAY_TO` to your stack's `PAY_TO`. `ARC_RPC_URL`, `ARCGATE_PAY_TO` and `ARCGATE_ROUTER_ADDRESS` are optional overrides, commented out in `.env.example`. The RPC is used for readbacks and receipts; it does **not** change where `mm` broadcasts, and `mm` broadcasts to the real chain, which a localnet fork never sees. That is why `trade` runs only where the API pays on Arc mainnet and `preview` is the localnet command.
+No wallet secret belongs in this file. The API names its payment network in `/health` and in the 402, and that network picks the row of chains, RPC, fee recipient and router this run uses. Each row's defaults are pinned in [src/config.js](src/config.js), so a server response cannot silently replace them: a network outside the table, or a 402 that offers a different one than `/health`, stops the run before anything is signed. To use the arcgate localnet, set `API_URL=http://127.0.0.1:19800` and `ARCGATE_PAY_TO` to your stack's `PAY_TO`; the localnet takes x402 payments on Arc testnet (`eip155:5042002`). `ARC_RPC_URL`, `ARCGATE_PAY_TO` and `ARCGATE_ROUTER_ADDRESS` are optional overrides, commented out in `.env.example`, but `ARCGATE_PAY_TO` must be set on the localnet. The RPC is used for readbacks and receipts; it does **not** change where `mm` broadcasts, and `mm` broadcasts to the real chain, which a localnet fork never sees. That is why `trade` runs only where the API pays on Arc mainnet and `preview` is the localnet command.
 
 You can inspect the public API before connecting a wallet:
 
@@ -77,7 +77,7 @@ mm wallet address --json
 
 Do not reinitialize an existing wallet to follow a tutorial. Check it first. This walkthrough requires `walletMode: "server-wallet"` and, for every command, the server's trading mode to be `beast` (step 3).
 
-Send USDC to the printed address on **Arc mainnet (5042)**, then:
+Send USDC to the printed address: **Arc mainnet (5042)** USDC for production, or **Arc testnet (5042002)** USDC (at least 0.025) for the localnet preview. Then:
 
 ```sh
 npm run connect
@@ -93,8 +93,14 @@ mm chains list --json | jq '.data.chains[] | select(.key == "arc" or .key == "ar
 
 | CLI key | Chain ID | Role here |
 | --- | --- | --- |
-| `arc` | `5042` | API payments, Permit2 signature, approval and swap |
-| `arc-testnet` | `5042002` | Availability check only; testnet funds cannot pay this API |
+| `arc` | `5042` | API payments against https://api.arcgate.dev; Permit2 signature, approval and swap on both rows |
+| `arc-testnet` | `5042002` | x402 API fees against the arcgate localnet (preview only) |
+
+Each network row in [src/config.js](src/config.js) sets its own payment chain, RPC, fee recipient and router:
+
+- `eip155:5042` (production) pays on chain 5042 through https://rpc.mainnet.arc.io, to the default fee recipient `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e`, through router `0x6cf4f7785d479b9ec1c3abe2fb569525380baede`.
+- `eip155:5042002` (localnet, preview only) pays on chain 5042002 and reads its balance through https://rpc.testnet.arc.io. It trades against the mainnet fork at http://127.0.0.1:19845 through router `0x0eA7461542fE051c013AB0f5860190bC847f3271`. Its default fee recipient is `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`. Set `ARCGATE_PAY_TO` to the payTo your stack's 402 shows; if it differs, the run stops before signing.
+
 
 `mm` uses numeric IDs in `--chain-id`. Arc is gated server-side by **NetworkRegistry**: local chain constants do not establish service support. Stop if the expected entries are absent. `relaySupported: false` is a relay capability flag, not proof that ordinary wallet signing or broadcasting is unavailable. Chain listing also does not prove policy acceptance.
 
@@ -120,7 +126,7 @@ mm wallet trading-mode get --json
 
 In Guard Mode every command stops at its first step with an error naming this switch, before any network request, signature or transaction. What you give up in Beast Mode is MetaMask's own limit and allowlists. This application checks the same things for its own transactions before it signs anything:
 
-- each API payment is capped at 0.01 USDC and each run at 0.025 USDC, paid only to the pinned fee recipient on chain 5042;
+- each API payment is capped at 0.01 USDC and each run at 0.025 USDC, paid only to the fee recipient of the network row on that row's payment chain (5042, or 5042002 on the localnet);
 - the order is capped at 1 USDC and pinned to the cirBTC contract;
 - every transaction is decoded with a bundled ABI, and its destination (the pinned ArcgateRouter or USDC), input amount, output token, recipient (your wallet), output floor and deadline must match the quote;
 - the Permit2 permit must name ArcgateRouter, the exact sell amount and short deadlines;
@@ -140,7 +146,7 @@ The request is `POST https://api.arcgate.dev/trade/v1/search` with:
 {"query":"cirBTC","limit":5}
 ```
 
-[src/payment.js](src/payment.js) reads the 402 offer, checks the chain, USDC contract, recipient, amount and expiry, and asks the x402 SDK to create an **EIP-3009 `TransferWithAuthorization`**. Its signer calls:
+[src/payment.js](src/payment.js) reads the 402 offer, checks the chain, USDC contract, recipient, amount and expiry, and asks the x402 SDK to create an **EIP-3009 `TransferWithAuthorization`**. Its signer calls (`--chain-id` is the network row's payment chain: `5042` in production, `5042002` on the localnet):
 
 ```sh
 mm wallet sign-typed-data --chain-id 5042 --payload '<complete EIP-712 JSON>' --wait --wallet-timeout 60 --json
@@ -268,7 +274,8 @@ In Claude Code, give the agent the concrete scope: follow this tutorial, buy 0.5
 | `Policy evaluator ... degraded: unavailable` | MetaMask could not complete a server-side policy check. This is not a pending MFA request. Guard Mode's outflow and token-recipient checks need a MetaMask-side simulation that is unavailable for this Arc router call. The wallet must be in Beast Mode (step 3). See [VALIDATION.md](VALIDATION.md). |
 | `AWAITING_MFA` | MetaMask is waiting for the wallet owner to approve this request through the email or Mobile prompt in its notice. For a signing/transaction job, use `mm wallet requests watch <polling-id>`. For policy changes, approve the notice and reread `policy get`; policy MFA IDs are not wallet-job IDs. |
 | Timeout while waiting | The existing MetaMask request may still complete. Inspect that request before retrying. Do not submit a duplicate or automatically change wallet mode. |
-| `HTTP 402` right after a payment was signed | The payment facilitator refused the payment; nothing settled. It has intermittently answered `invalid_exact_evm_signature` for valid signatures. Rerun the command. |
+| `HTTP 402` right after a payment was signed | The payment facilitator refused the payment. When PAYMENT-RESPONSE has `success: false`, the error shows `payment settlement failed: <errorReason>`. With an empty `{}` body and no PAYMENT-RESPONSE, it shows `HTTP 402 (request_failed)`. Unlike the 502 row below, this error does not warn that the payment may have settled. Check the payment amount, authorization and USDC balance before starting a new paid run, and keep the `requestId` from the error. An earlier facilitator answer, `invalid_exact_evm_signature`, is recorded in [VALIDATION.md](VALIDATION.md) as history. No automatic retry. |
+| `HTTP 502 (X402MiddlewareError: ...)`, or `payment settlement failed: payment_response_expired` | The payment may have settled. The error ends with `; the payment may have settled; check the PAYMENT-RESPONSE transaction or your USDC balance before paying again`. Check that before paying again. No automatic retry. |
 | Payment requirements differ | Run `npm run inspect`; check the public configuration before changing pinned addresses or limits. |
 | `/receipt` is `pending` or unavailable | The swap already mined if the local delivery check passed. Wait at least 5 seconds and run the printed `npm run receipt -- <quoteId> <hashes>`; it is free. Do not rerun the trade. |
 | `swap/tx` answers `409 no_pending_swap` | The free round needs the same `quoteId`, `taker` and `recipient` as a paid `/swap` call, and succeeds only once. Start a new quote. |
@@ -285,6 +292,6 @@ In Claude Code, give the agent the concrete scope: follow this tutorial, buy 0.5
 npm test
 ```
 
-Tests use generated local signing keys and injected CLI, HTTP and RPC answers. Every API response they use is a clone of a capture in `test/fixtures/` (the arcgate localnet and the production API), with the clock pinned to the capture's moment, except the final `/swap/tx` and `/receipt` answers, which stay hand-built until the Beast Mode trade is captured (#8). They need no credentials, `mm` installation, funded wallet or deployed service. One test refuses every wallet command in Guard Mode. See [VALIDATION.md](VALIDATION.md) for live results and limitations.
+There are 67 offline tests, and all of them pass. Tests use generated local signing keys and injected CLI, HTTP and RPC answers. Every API response they use is a clone of a capture in `test/fixtures/` (the arcgate localnet and the production API), with the clock pinned to the capture's moment, except the final `/swap/tx` and `/receipt` answers, which are derived from the captured first swap until #11 captures the mainnet trade. They need no credentials, `mm` installation, funded wallet or deployed service. One test refuses every wallet command in Guard Mode. See [VALIDATION.md](VALIDATION.md) for live results and limitations.
 
 For the API contract, see the [API reference](https://docs.arcgate.dev) and [OpenAPI document](https://api.arcgate.dev/openapi.json). The [Circle tutorial](../arc-circle/README.md) demonstrates the separate `approval: "approve"` path.
