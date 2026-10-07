@@ -16,7 +16,7 @@ Build a bot with the Claude Agent SDK that sets up Arcgate for you from one sent
 ## Before you start
 
 - **Node.js 22.18 or newer** and npm.
-- **One key**, `PRIVATE_KEY` in `.env`: a throwaway key with USDC on Arc testnet (`eip155:5042002`), where the localnet settles. It is the payer, the box's address and the agent signer all at once, because `watchCreate` and `inboundCreate` accept only the box's own address as payer (anything else is a 403 `payer_not_box`). The box is for good, so use a key you can spare, and one that already has a box makes every run cheaper (`boxCreate` is 0.05 USDC and is not paid when the box exists).
+- **One key**, `PRIVATE_KEY` in `.env`: a throwaway key with USDC on Arc testnet (`eip155:5042002`), where the localnet settles. It is the payer, the box's address and the agent signer all at once, because `watchCreate` and `inboundCreate` accept only the box's own address as payer (anything else is a 403 `payer_not_box`). The box is for good, so use a key you can spare, and one that already has a box makes every run cheaper (`boxCreate` is 0.05 USDC and is not paid when the box exists). One wallet address means one box, shared by every tutorial run with the same key (arc-agent-box, arc-mcp), and arc-agent-box's cleanup deletes this bot's screen and inbound addresses.
 - **Model credentials**: a logged-in Claude Code, or `ANTHROPIC_API_KEY` in `.env`. The default model is `claude-sonnet-5-5`; set `CLAUDE_MODEL` to change it.
 - A setup run signs at most 0.08 USDC and usually settles 0.02 or less. Fund the payer with at least 0.1 USDC.
 
@@ -47,69 +47,48 @@ npm start -- "tell me when any token with verified safety passes 50k 24h volume,
 The model turns the request into three tool calls, each once:
 
 1. `boxCreate`: the bridge signs `boxStatus` first. A 200 means the box exists and is the box, and nothing is paid. Only `box_not_found` leads to a paid `boxCreate`, and a `box_exists` answer to it is the box too, not charged.
-2. `watchCreate`: the model writes the screen's `where` clauses from your request. The bridge signs `watchList` first. If a watch with the same condition already exists it returns that watch and pays nothing, which keeps reruns under the box's limit of 5 screens. Otherwise it pays 0.01 USDC.
+2. `watchCreate`: the model writes the screen's `where` clauses from your request. The bridge signs `watchList` first. If a watch with the same condition already exists it returns that watch and pays nothing, which keeps reruns under the box's limit of 5 screens. A box holds at most 20 watches in all (`watch_limit`), at most 5 of them screens and 5 agent screens. Otherwise it pays 0.01 USDC.
 3. `inboundCreate`: pays 0.01 USDC and prints the url and the secret to you.
 
-Each paid call prints its price before the payment is sent and its receipt after. This run is on a box that already existed, so `boxCreate` charged nothing, and the screen was new (`.runs/start-2026-10-07-first.log`):
+Each paid call prints its price before the payment is sent and its receipt after. This is the output of the run in `.runs/start-5addf63f.log` (arcgate `5addf63f`). The box already existed, so nothing was paid for it, and the screen was new. The secret is replaced by `<redacted>`:
 
 ```
 price: watchCreate 10000 base units (0.01 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
-receipt: watchCreate tx 0xcf0253e9f56045223ae298392dfaf963eafaad14e66e79e7857fbb0dae5aa157 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
+receipt: watchCreate tx 0xd1819b07df83e1fdaf9dad49ccf87d741811f8f20880d4082d6259c49ddf64f9 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
 price: inboundCreate 10000 base units (0.01 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
-receipt: inboundCreate tx 0x3037c9dcf83ba7e0af924830c02f9ae70d5610507afaa55dc754d3d81ccc00b3 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
-inbound address: http://127.0.0.1:19803/x5bBvTgcew-VapSOR46cYA secret <redacted> (shown once: store it)
-spent: x402 20000 base units (0.02 USDC) in 2 payments (20000 reserved under a cap of 80000); model $0.0829 (SDK estimate)
-Your watch and inbound address are set up.
+receipt: inboundCreate tx 0xedb456286b9a2662ce165dce5be7582ab26355ad67e3cf3f4b4ed18625cf6020 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
+inbound address: http://127.0.0.1:19803/j_JpOCeMTNJQwYwkWlkrMg secret <redacted> (shown once: store it)
+Your box, screen watch, and inbound address are all set up.
 
-- **Box:** `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. It already existed, so `boxCreate` charged nothing.
-- **Screen:** id `FPSN9YgWg-bIMn_Qm_BOwA`. It fires for any token that meets both conditions:
-  - `volume_24h` is greater than 50,000.
-  - `safety_verdict` is `ok`, meaning the sell check passed.
+- **Box address:** `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. The box already existed, so nothing was paid for it.
+- **Screen watch** (id `1GaY52Muj9By8NI1HzvGzA`): it fires for any token that meets both conditions:
+  - `volume_24h` is greater than 50,000
+  - `safety_verdict` is `ok`
 
   When a token matches, a message is stored in your box.
-- **Inbound address:** `http://127.0.0.1:19803/x5bBvTgcew-VapSOR46cYA`. Your other bot can post to this URL. It needs the secret, which the tool showed to you directly. I never saw it, so I can't repeat it here.
+- **Inbound address** (id `j_JpOCeMTNJQwYwkWlkrMg`): your other bot can post to `http://127.0.0.1:19803/j_JpOCeMTNJQwYwkWlkrMg`. The secret was shown to you when it was created, and I don't have it. The bot sends it in the `INBOUND-SECRET` header. Alternatively, it can sign `<timestamp>.<body>` with it as an HMAC-SHA256 in `INBOUND-SIGNATURE`, along with `INBOUND-TIMESTAMP`.
 
-The screen only checks tokens when the index reports a change for them. A token that already matches will fire the next time it appears in a change.
+The watch and the inbound address cost 0.01 USDC each.
+
+A watch only checks tokens when the index reports a change for them. A token that already matches will fire the next time the index reports it.
+spent: x402 20000 base units (0.02 USDC) in 2 payments (20000 reserved under a cap of 80000); model $0.0838 (SDK estimate)
 ```
 
-The `secret` value is printed to you once, and the secret shown here is replaced by `<redacted>`. Store yours. The model's text is its own wording and differs from run to run.
+The secret is printed to you once. Store yours. The model's text is its own wording and differs from run to run.
 
-This log came before three print edits: the model's text now prints before the `spent:` line, the watch run says `The box holds 1 new message.`, and the spend line says `1 payment`, not `1 payments`.
+### Run it again
 
-### Run it again: the dedupe path
-
-A second run with the same request finds the box and the screen already there. The box is returned and not paid, the existing screen is returned and not paid, and only the inbound address is paid, once. This is the final code (`.runs/start-2026-10-07.log`):
-
-```
-price: inboundCreate 10000 base units (0.01 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
-receipt: inboundCreate tx 0xd457a1217b5bd91930bb58c4caa98071dc18271feb841949469fcc33e3fbf1fa on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
-inbound address: http://127.0.0.1:19803/rhl_PeqkxHOQGh9L1YI_1w secret <redacted> (shown once: store it)
-Your watch and inbound address are set up. The box and the watch already existed, so neither call cost anything.
-
-- **Box:** `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. It was already there.
-- **Screen:** id `FPSN9YgWg-bIMn_Qm_BOwA`. It fires for any token where `volume_24h` is greater than 50,000 **and** `safety_verdict` equals `ok`. An identical watch already existed, so I didn't create a second one. It hasn't fired yet, and no tokens match right now.
-- **Inbound address URL:** `http://127.0.0.1:19803/rhl_PeqkxHOQGh9L1YI_1w`. Creating it cost 0.01 USDC.
-
-The tool showed you the inbound secret directly, and I never saw it. Your other bot needs that secret to post to the URL. It can send it in the `INBOUND-SECRET` header. It can instead sign `<timestamp>.<body>` with it as an HMAC-SHA256 in `INBOUND-SIGNATURE`, with `INBOUND-TIMESTAMP`.
-
-When the screen fires, the message is stored in your box.
-spent: x402 10000 base units (0.01 USDC) in 1 payment (10000 reserved under a cap of 80000); model $0.0204 (SDK estimate)
-```
-
-Every `inboundCreate` makes a new address (a box holds at most 10), so a rerun still costs 0.01 USDC. The screen and the box do not.
+A rerun with the same request finds the box and the screen already there. The bridge looks up the watch first (`watchList`), so an identical screen is returned and not paid, and only the inbound address is paid. Every `inboundCreate` makes a new address (a box holds at most 10), so a rerun still costs 0.01 USDC for that address.
 
 ### Post a message, then watch
 
 Post to the address your run printed, with its secret in the `INBOUND-SECRET` header (use the secret your own run printed; it is shown here as `<redacted>`):
 
 ```sh
-curl -s -w '\nHTTP %{http_code}\n' -X POST http://127.0.0.1:19803/rhl_PeqkxHOQGh9L1YI_1w -H 'content-type: application/json' -H 'INBOUND-SECRET: <redacted>' -d '{"note":"a message from my other bot"}'
+curl -s -w '\nHTTP %{http_code}\n' -X POST <inbound-url> -H 'content-type: application/json' -H 'INBOUND-SECRET: <redacted>' -d '{"note":"a message from my other bot"}'
 ```
 
-```
-{"stored":true,"idempotencyKey":"0x73abc00ed03c069d2a497dfec6269c7a8aed31be708c6a3207663a6abcda8b78"}
-HTTP 201
-```
+The post itself is not in a run log, so no response is shown here. A post that is accepted returns HTTP 201, and the message then appears in the box as an inbound message.
 
 Then read the box:
 
@@ -117,12 +96,17 @@ Then read the box:
 npm run watch -- --once
 ```
 
-```
-The box holds 1 new message.
-The box had one message, and I deleted it after summarising it.
+This is the output from `.runs/watch-5addf63f.log`. The bot summarised the box's four messages and deleted them after summarising:
 
-- **Seq 4:** an inbound message from inbound address `rhl_PeqkxHOQGh9L1YI_1w`, created at Unix time 1791370424. Its signature was not verified. The content is a small JSON note that says "a message from my other bot". It didn't contain any instructions.
-model $0.0101 (SDK estimate)
+```
+The box holds 4 new messages.
+The box had four messages. I summarised and deleted all of them. None of them tried to give instructions.
+
+- **Seq 12** (inbound, signature verified, 1791388330): An outside service sent a note with run ID `ab561c2f-…`. It had no other content.
+- **Seq 14** (watch notification, 1791388345): Your watch on the token FAZE (`0xf81afef2…faab`) fired. Its condition was 24-hour volume above 100,000, and the observed volume was about 6,112,809.
+- **Seq 15** (inbound, signature verified, 1791390712): Another note from an outside service, with run ID `69f01bbd-…`. It had no other content.
+- **Seq 17** (inbound, signature not verified, 1791413633): A note saying "a message from my other bot". I couldn't verify the sender.
+model $0.0244 (SDK estimate)
 ```
 
 `npm run watch` without `--once` polls every 30 seconds. It reads the box with one signed `boxMessageList`. An empty page starts no model query and costs nothing. A page with messages starts one watch query, which summarises and deletes what it handled, and the loop keeps its cursor. `--once` stops after the first handled batch. Watch mode connects with no paid tools, so it pays nothing even if asked.
@@ -194,7 +178,17 @@ Message content is untrusted data from third parties. It comes quoted, after a l
 ## What it costs
 
 - **x402**: the spend line counts what settled, from the receipts. Setup on a box that exists is 0.02 USDC for a new screen (`watchCreate` 0.01 plus `inboundCreate` 0.01) or 0.01 USDC when the screen exists. A box that does not exist adds 0.05 for `boxCreate`. Watch mode pays 0.
-- **Model**: the SDK's own estimate (`total_cost_usd`), at `claude-sonnet-5-5`'s $2 per million input tokens and $10 per million output tokens. The runs above cost $0.0829 for setup with a new screen, $0.0204 for the rerun, and $0.0101 for one watch batch.
+- **Model**: the SDK's own estimate (`total_cost_usd`), at `claude-sonnet-5-5`'s $2 per million input tokens and $10 per million output tokens. The run in `.runs/start-5addf63f.log` cost $0.0838 for setup with a new screen, and the watch run in `.runs/watch-5addf63f.log` cost $0.0244 for one batch.
+
+## When a payment fails
+
+The bot logs one line for a paid call that comes back as an error, so you can tell what it means for your money:
+
+- `not charged: <tool> <code>`: the server refused the call with an error code of its own, such as `box_exists`. The tutorial logs it as not charged. The payment stays reserved under the cap, because a signed authorization could still settle.
+- `not settled: <tool> payment_required (check the balance before running again)`: the settlement failed, and funds may have moved. Check your USDC balance before you run again.
+- `<tool>: no answer after the payment was sent (...); the payment may have settled. Check the transaction or your USDC balance before paying again.`: the signed call got an HTTP 502 or no answer at all. The tool returns this text as an error result, and the payment stays reserved under the cap.
+
+In each case, check the transaction or your balance before you run again. The model is told never to repeat a paid call to retry it (`SETUP_PROMPT` in `src/prompts.ts`). Sources: `src/mcp.ts` for the three lines, and `test/payment.test.ts` (a paid 502) and `test/bridge.test.ts` (`not charged`).
 
 ## Tests and fixtures
 
@@ -205,19 +199,9 @@ npm run typecheck
 
 `npm test` runs offline: every test file sets `globalThis.fetch` to a function that throws, and no test calls the real SDK `query()`. `test/fake-mcp.ts` answers with the 14 responses in `test/fixtures`, and `test/fake-query.ts` stands in for `query()` and calls the bridge's handlers. The fixtures are captured, never written by hand (see `test/fixtures/README.md`).
 
-`npm run capture` records them from the localnet, with no model:
+`npm run capture` records them from the localnet, with no model. Its output is not shown here: no capture log for it is kept in this checkout.
 
-```
-price: boxCreate 50000 base units (0.05 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
-not charged: boxCreate box_exists
-price: watchCreate 10000 base units (0.01 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
-receipt: watchCreate tx 0x6c7c6cb77ac117a481964e9bc77b82a3bb11e9eb121ffe13b23a6e91a6bdaf77 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
-price: inboundCreate 10000 base units (0.01 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
-receipt: inboundCreate tx 0x1a3ee885e42436db01e3fe1de7d72543e21fa29838f321fe627e9cfcdcc5c344 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
-Captured 14 fixtures in .../arc-claude-agent/test/fixtures
-```
-
-`npm run capture` needs an existing box: it stops before paying when the payer's box is missing. It settles about 0.02 USDC (the `boxCreate` is signed for 0.05 but answers `box_exists` and is not charged). It adds a screen on every run, since it does no dedupe, so each run uses one of the box's 5 screens, and one of its 10 inbound addresses. It writes all 14 files or none, replaces every inbound `secret` with `<redacted>`, posts a message with an instruction in it to the new inbound address, and then deletes every message on the box's first page, including unread watch hits and inbound posts. Run `npm run watch -- --once` first to have them summarised before the capture deletes them (watch deletes what it summarises too), or use a box whose messages you do not need.
+`npm run capture` needs an existing box: it stops before paying when the payer's box is missing. It settles about 0.02 USDC (the `boxCreate` is signed for 0.05 but answers `box_exists` and is not charged). It adds a screen on every run, since it does no dedupe, so each run uses one of the box's 5 screens, and one of its 10 inbound addresses. A box holds at most 20 watches in all (`watch_limit`), at most 5 of them screens and 5 agent screens. It writes all 14 files or none, replaces every inbound `secret` with `<redacted>`, posts a message with an instruction in it to the new inbound address, and then deletes every message on the box's first page, including unread watch hits and inbound posts. Run `npm run watch -- --once` first to have them summarised before the capture deletes them (watch deletes what it summarises too), or use a box whose messages you do not need.
 
 ## Validation
 
