@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { recoverTypedDataAddress } from 'viem';
 import { acceptOffer, assertAuthorization, createArcgateClient } from '../src/payment.js';
-import { account, authorization, config, encodeHeader, hash, offer, other, receiptHeader, required, settlementHeader, testnetConfig, testnetOffer, testnetRequired, wallet } from './fixtures.js';
+import { account, authorization, config, encodeHeader, hash, offer, other, quote, quoteId, receiptHeader, required, search, settlementHeader, testnetConfig, testnetOffer, testnetRequired, wallet } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -36,9 +36,9 @@ test('real x402 SDK retries identical request once with a valid MetaMask-signed 
     const typed = authorization();
     typed.message = payload.payload.authorization;
     assert.equal(await recoverTypedDataAddress({ ...typed, signature: payload.payload.signature }), account.address);
-    return new Response('{"resolution":"verified"}', { headers: { 'payment-response': receiptHeader } });
+    return new Response(JSON.stringify(search()), { headers: { 'payment-response': receiptHeader } });
   } });
-  assert.deepEqual(await api('search', { query: 'cirBTC' }), { resolution: 'verified' });
+  assert.deepEqual(await api('search', { query: 'cirBTC' }), search());
   assert.equal(requests.length, 2);
   assert.equal(requests[0].url, requests[1].url);
   assert.equal(requests[0].init.body, requests[1].init.body);
@@ -77,7 +77,7 @@ test('a successful HTTP response without a settlement receipt is not payment suc
 
 
 test('free /swap/tx and /receipt never sign a payment, even when answered with 402', async () => {
-  for (const [operation, body] of [['swap/tx', { quoteId: 'q_1234567890abcdef', permit: {} }], ['receipt', { quoteId: 'q_1234567890abcdef', txHashes: [hash] }]]) {
+  for (const [operation, body] of [['swap/tx', { quoteId, permit: {} }], ['receipt', { quoteId, txHashes: [hash] }]]) {
     let signed = false, calls = 0;
     const api = createArcgateClient({ wallet: { address: wallet.address, signTypedData() { signed = true; } }, config, fetchFn: async (url, init) => {
       calls++;
@@ -94,8 +94,8 @@ test('a paid call that fails keeps the API next action and free replacement quot
   let requests = 0;
   const api = createArcgateClient({ wallet, config, fetchFn: async () => ++requests === 1
     ? new Response(JSON.stringify(required), { status: 402 })
-    : Response.json({ error: { code: 'quote_stale', hint: 'price moved' }, next: 'requote', quote: { quoteId: 'q_abcdefabcdefabcd' } }, { status: 409, headers: { 'payment-response': receiptHeader } }) });
-  await assert.rejects(api('swap', {}), error => error.status === 409 && /next=requote/.test(error.message) && error.body.quote.quoteId === 'q_abcdefabcdefabcd');
+    : Response.json({ error: { code: 'quote_stale', hint: 'price moved' }, next: 'requote', quote: quote() }, { status: 409, headers: { 'payment-response': receiptHeader } }) });
+  await assert.rejects(api('swap', {}), error => error.status === 409 && /next=requote/.test(error.message) && error.body.quote.quoteId === quoteId);
 });
 
 test('offers and authorizations are bound to the resolved row: its network, payTo and payment chain', () => {
@@ -129,9 +129,9 @@ test('on the testnet row the real x402 SDK signs on 5042002 for the testnet paye
       const payload = JSON.parse(Buffer.from(new Headers(init.headers).get('payment-signature'), 'base64').toString());
       assert.equal(payload.accepted.network, 'eip155:5042002');
       assert.equal(payload.payload.authorization.to.toLowerCase(), testnetConfig.payTo.toLowerCase());
-      return new Response('{"resolution":"verified"}', { headers: { 'payment-response': settlementHeader(testnetConfig) } });
+      return new Response(JSON.stringify(search()), { headers: { 'payment-response': settlementHeader(testnetConfig) } });
     } });
-  assert.deepEqual(await api('search', { query: 'cirBTC' }), { resolution: 'verified' });
+  assert.deepEqual(await api('search', { query: 'cirBTC' }), search());
   assert.equal(requests.length, 2);
   assert.equal(signed.length, 1);
   assert.equal(Number(signed[0].domain.chainId), 5042002);

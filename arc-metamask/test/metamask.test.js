@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWallet, loadWallet, parseMmOutput, parseMmResult } from '../src/metamask.js';
-import { account, authorization, config, hash, other, permit, testnetConfig, wallet } from './fixtures.js';
+import { account, authorization, config, hash, other, permit, pinTime, testnetConfig, wallet } from './fixtures.js';
 import { fakeMm, guardRefusal } from './support.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
@@ -118,7 +118,8 @@ test('decode requires known approval; unknown executeGraph uses the independentl
   await assert.rejects(mm.decode([{ purpose: 'approve', data: '0x095ea7b3' }], []), /recognize approve/);
 });
 
-test('typed data is signed only on the row\'s payment or trade chain, and that domain chainId goes to --chain-id', async () => {
+test('typed data is signed only on the row\'s payment or trade chain, and that domain chainId goes to --chain-id', async t => {
+  pinTime(t); // the captured Permit2 deadline is only valid at the moment of the capture
   // Production row: x402 and Permit2 are both on Arc mainnet.
   // Testnet row: x402 is on Arc testnet (5042002), Permit2 is on Arc mainnet (5042).
   for (const [row, signed, refused] of [[config, [[authorization(config), '5042'], [permit(config), '5042']], [5042002, 1, 11155111, 0]],
