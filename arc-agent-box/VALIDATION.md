@@ -1,6 +1,60 @@
 # Validation
 
-## Localnet run — 2026-10-06 (UTC)
+## Localnet run — 2026-10-07 (UTC)
+
+`CAPTURE_API_COMMIT=12b0368f npm run capture` ran on October 7, 2026 against an arcgate localnet:
+
+- API: `http://127.0.0.1:19800`. `/health` reports `commit: null` on localnet, so the arcgate commit recorded is the fixture's `apiCommit`, `12b0368f`.
+- Payments: x402 on Arc testnet `eip155:5042002` through the facilitator `https://facilitator.arcusnetwork.co`, in USDC `0x3600000000000000000000000000000000000000`, paid to `0x987F719b516f528f4080EF0853E37aD5d7E773A0`, the `payTo` in the fixture's 402s.
+- Agent (box) address: `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0` only. It is an existing shared box, so there was no `boxCreate`. Its state before the run: created at `1791365243`, 999 messages left, expiry `1796549243`, 0 messages, 1 inbound address (`B-kc4oaEnh61HHv96lHpag`), 1 watch (another track's screen `oGnXYai82uHjRH_M6rQtVg`: `volume_24h gt 50000` AND `safety_verdict eq ok`) and 0 webhooks.
+- The capture is three command runs under one recording fetch: `start` (all seven steps and the final check), then `topup`, then `topup`. It wrote `test/fixtures/localnet.json` (`capturedAt` `2026-10-07T15:52:38Z`) and one run log, `.runs/dff999a1-cf8b-4f79-9546-3b659b7ed60a.jsonl`. `WATCH_TOKEN` was unset, so the token watch used the default, FAZE `0xf81afef268aca40717e0adcae7c41514327cfaab`.
+
+Exchange numbers below are indexes into `exchanges` in the fixture.
+
+| Step | What it did | Result |
+| --- | --- | --- |
+| box | `boxStatus` answered 200 (ex. 2); nothing was created or paid | Pass |
+| inbound | `inboundCreate` paid (ex. 3–4), id `jGzJwc9Ho_38jtTnloOKug`; post with INBOUND-SIGNATURE 201 stored (ex. 5); `inboundRotate` (ex. 6); post signed with the old secret 401 `inbound_unauthorized` (ex. 7); post with the new secret 201 stored (ex. 8) | Pass |
+| watch | Token watch `dvxnlleAXUxG4_oP5ZLgmw`, `{kind:'token', token: FAZE, where:[volume_24h gt 100000]}`, paid (ex. 9–10); screen `F8erlRYeh-WMOo5n5jq97Q`, `volume_24h gt 100000` AND `safety_verdict eq ok`, paid (ex. 11–12); agent screen `0nmkWVwaNxE2B6OkZfruLw`, `{kind:'agents', chainId:5042, on:['registered']}`, paid (ex. 13–14); `watchList` (ex. 15) lists all three with the conditions sent, plus the other track's screen; one paid `tradeSearch` (ex. 16–17) | Pass |
+| channel | `webhookCreate` `_XsK9A9S7cox8eD0TPl7Kg` paid (ex. 18–19); `webhookList` (ex. 20–21); `webhookRotate` (ex. 22) | Pass |
+| messages | The first page (cursor 0, ex. 23) holds the `watch.token` hit; the empty page ended the listing (ex. 24); fetched and deleted the newest inbound message, seq 13 (ex. 25–26) | Pass |
+| topup | `boxTopUp` paid (ex. 27–28), charged, granted 4 messages and 0 days, allowance 1000 messages and expiry `1796549243` | Pass |
+| cleanup | `inboundList` (ex. 29); deleted the other track's inbound address `B-kc4oaEnh61HHv96lHpag` (ex. 30) and the run's `jGzJwc9Ho_38jtTnloOKug` (ex. 31); `watchList` (ex. 32); deleted the other track's screen `oGnXYai82uHjRH_M6rQtVg` (ex. 33) and the run's three watches (ex. 34–36); the webhook (ex. 37–38) | Pass |
+| final check | `boxStatus` and the full message list (ex. 39–42) | Pass |
+| topup (extra run 1) | Signed, answered 409 `allowance_full` (ex. 43–46), nothing charged | Pass, nothing charged |
+| topup (extra run 2) | Signed, answered 409 `allowance_full` (ex. 47–50), nothing charged | Pass, nothing charged |
+
+Cleanup deleted another track's screen and inbound address from this shared box, because `cleanup` removes everything the box holds, not only what the run created.
+
+### Watch hit
+
+The box holds a watch hit at seq 14: type `watch.token`, `source.watchId` `dvxnlleAXUxG4_oP5ZLgmw`, `changeId` 61, symbol FAZE, `observed.volume_24h` 6112809.322525. Its content keys are exactly `watchId`, `condition`, `changeId`, `token`, `symbol` and `observed`; there is no `previous`, since the token watch has no `changes` clause. The screen and the agent screen did not fire. On localnet no agent registers during a run.
+
+### Settlements
+
+Every paid call settled on Arc testnet `eip155:5042002` with the agent address as payer.
+
+| Run | Operation | Amount (USDC) | Transaction |
+| --- | --- | --- | --- |
+| start | inboundCreate | 0.01 | `0x528a451e24507778abfa35df676b27b8383a9cf670ed3d7660cee310965c978b` |
+| start | watchCreate (token watch) | 0.01 | `0x7b57d5037e9bfcad5d15c00d8e8e07531b3e0f2ef1645ab2f2cb3d2765bac99b` |
+| start | watchCreate (screen) | 0.01 | `0x1ee462dd6105f4a9c98405101325e380d0af396013af8898faf9b8aab95a4a14` |
+| start | watchCreate (agent screen) | 0.01 | `0x69cdc7a4321f29db4c1cbfd72d010f03046d7fa833428bee9beb37214e62822b` |
+| start | tradeSearch | 0.005 | `0xd3189633d4e2f8643af5384d1b75da51c4d8ef3602536b6fc3cd84468aa77dc2` |
+| start | webhookCreate | 0.01 | `0x65e1baabe69b1bf7a0a1e78693188c3df3a336916a898dddc98c7c02b5dae972` |
+| start | boxTopUp | 0.05 | `0x28d82576679aa0714dff86b35887c4e72a7e64e509bd7c78b1bc231da3eb377d` |
+| topup (extra run 1) | boxTopUp | 0 | none: 409 `allowance_full`, not settled |
+| topup (extra run 2) | boxTopUp | 0 | none: 409 `allowance_full`, not settled |
+
+`start` cost 0.105 USDC and the whole capture 0.105 USDC: both extra topups were signed but answered 409 and never settled. The payer balance went from 1.045 to 0.94 USDC.
+
+### Offline tests
+
+After the capture, `npm test` passed 75 of 75 tests offline on `test/fixtures/localnet.json`.
+
+## Earlier runs (arcgate 917dd4a, retired watch shape)
+
+### Localnet run — 2026-10-06 (UTC)
 
 `CAPTURE_API_COMMIT=917dd4a npm run capture` ran on October 6, 2026 against an arcgate localnet:
 
@@ -24,11 +78,11 @@ Exchange numbers below are indexes into `exchanges` in the fixture.
 | topup (extra run 1) | Paid, granted 3 messages and 0 days, allowance 1000 messages left (ex. 41–44) | Pass, charged |
 | topup (extra run 2) | Signed, answered 409 `allowance_full` with no PAYMENT-RESPONSE (ex. 45–48) | Pass, nothing charged |
 
-### How the watch hit was produced
+#### How the watch hit was produced
 
 `WATCH_TOKEN` was unset, so the token watch used the default, FAZE. The plan named cirBTC, but cirBTC is a pinned asset: a search never checks it, so it never writes a change that could fire a watch. With the localnet indexer off, the only writer of changes is search enrichment, so the watch step searches the watched token once after creating the watches. That search wrote change 35 for FAZE, and the token watch fired: message seq 3, `watch.token`, `observed` 6112809.322525, `previous` null (ex. 24). The screen did not fire; its threshold was not lowered, because the token watch already gave the hit the acceptance asks for.
 
-### Settlements
+#### Settlements
 
 Every paid call settled on Arc testnet `eip155:5042002` with the agent address as payer.
 
@@ -46,11 +100,11 @@ Every paid call settled on Arc testnet `eip155:5042002` with the agent address a
 
 `start` cost 0.145 USDC and the whole capture 0.195 USDC.
 
-### Offline tests
+#### Offline tests
 
 After the capture, `npm test` passed 73 of 73 tests offline on `test/fixtures/localnet.json`, with the test files unchanged. Every test file makes `globalThis.fetch` throw. The fixture holds four `secret` fields, all `<redacted>`, and no PAYMENT-SIGNATURE or AGENT-* header.
 
-## Rerun on the same key
+### Rerun on the same key
 
 `npm start` ran a second time on `0x4189Bc425BD880b163f386e5D5270FCcb2C0A478` (`.runs/dbafd6bd-6bd1-4dd5-bf0c-ace7941bee78.jsonl`, 22:44:18–22:44:45 UTC). The box already existed, so no `boxCreate` was signed. The run log has no error line. It settled:
 
@@ -65,7 +119,7 @@ After the capture, `npm test` passed 73 of 73 tests offline on `test/fixtures/lo
 
 That is 0.095 USDC. The topup was charged, not refused: the run had used messages, so a top-up again had room to grant some. The messages step reads the box from the start, so the watch hit still held from the capture (seq 3) ended its wait at once; a rerun needs no new hit.
 
-## Earlier attempt (another key)
+### Earlier attempt (another key)
 
 Before the capture, the tutorial ran with an earlier throwaway key, `0x9A42C1C8760bBBc411ac897eea4Dc5E8cA9F73b9`, and the plan's cirBTC watch:
 
@@ -75,7 +129,7 @@ Before the capture, the tutorial ran with an earlier throwaway key, `0x9A42C1C87
 
 That key spent 0.145 USDC in all. Its box remains, since a box can't be deleted.
 
-## Acceptance-wording corrections
+### Acceptance-wording corrections
 
 The localnet run showed four places where the acceptance wording didn't match the API, and the tests follow the API:
 

@@ -6,18 +6,25 @@ Create an agent box on Arcgate to hold messages from watches and inbound posts, 
 
 - **Box**: A message store for an agent on a single address. A box cannot be deleted; it holds an allowance of messages that expires after a time.
 - **Inbound address**: An endpoint on the notifier origin where outside services post messages to the box. Each address has a secret for authentication.
-- **Watch**: A rule that fires when the index observes a token meeting a condition (volume_24h, safety_verdict) or when a multi-field screen matches.
-- **Channel**: A webhook or Telegram chat to which arcgate pushes the box's messages its filter takes (watch.token, watch.screen, watch, inbound, notice; every type by default); the box stays the record.
-- **Message**: An event stored in the box: an inbound post, a watch hit, a screen match, or a notice from arcgate.
-- **Screen**: A watch whose condition is a list of field/op/value clauses rather than one token (e.g., volume_24h > 100k AND safety_verdict = ok).
+- **Token watch**: A watch {kind:'token', token, where:[{field, op, value}]} that fires when the named token meets its clauses. It is a screen of one token: same clauses, AND only, one to eight.
+- **Screen**: A watch {kind:'screen', where:[{field, op, value}]} that fires when any token meets all clauses. Same clauses as a token watch, AND only, one to eight.
+- **Agent screen**: A watch {kind:'agents', chainId, on?, where?} that fires when an agent registers in the chain's agent directory (if 'registered' is in on) or changes (if 'updated' is in on), optionally narrowed by where clauses.
+- **Agent watch**: A watch {kind:'agent', chainId, agentId, on?} that watches one named agent for changes: updated, owner_changed, wallet_changed, uri_changed, feedback, fetch_failed, fetch_ok.
+- **Channel**: A webhook or Telegram chat to which arcgate pushes the box's messages its filter takes (watch.token, watch.screen, watch.agent, inbound, notice; every type by default); the box stays the record. The filter's 'watch' kind is shorthand for the three watch types.
+- **Message**: An event stored in the box: an inbound post, a watch hit, or a notice from arcgate. A watch hit is a watch.token, watch.screen, or watch.agent message.
 - **Allowance**: The box's limit on how many messages it can store and how long it can keep them. Top-up adds more.
 
 A box persists; once created it is not deleted. Creating it a second time answers 409 box_exists. Use a dedicated key for this box: once an address has a box, it has one for good, so use a key you need for nothing else.
 
 ## Before you start
 
+**Warnings:**
+- Every tutorial that uses the same key shares one box, and `npm run cleanup` (and the cleanup at the end of `npm start`) deletes every inbound address, watch and webhook in that box, including ones another tutorial created; messages stay.
+- A key that already has a box skips the 0.05 USDC box payment, so the start command costs about 0.105 USDC instead of 0.155 on a box that exists.
+
+**Setup:**
 - **Node.js 22.9 or newer** and npm.
-- **A fresh private key** kept in `.env` (never shared, never on a command line). The key must hold about 3 USDC on **Arc testnet** (chain `eip155:5042002`). Both payments and gas use USDC. The wallet USDC must be at least 0.15 USDC (the per-run cap) before the first payment.
+- **A fresh private key** kept in `.env` (never shared, never on a command line). The key must hold about 3 USDC on **Arc testnet** (chain `eip155:5042002`). Both payments and gas use USDC. The wallet USDC must be at least 0.16 USDC (the per-run cap) before the first payment.
 - **ARC_RPC_URL** must be an RPC for Arc testnet (the network where x402 payments settle). The chainId is checked against the 402's network.
 
 The localnet API (http://127.0.0.1:19800) takes x402 payments on Arc testnet (eip155:5042002), so your key pays in testnet USDC. Arcgate production does not serve `/agent/v1` yet; use localnet for now.
@@ -49,16 +56,16 @@ Each `npm run` command is a step or a group of steps. Every command starts a new
 | --- | --- | --- |
 | `npm run box` | Creates or checks the box | 0.050 USDC (if created) |
 | `npm run inbound` | Creates an inbound address and tests its secret rotation | 0.010 USDC |
-| `npm run watch` | Creates token and screen watches and searches to fire them | 0.025 USDC |
+| `npm run watch` | Creates three watches (token watch, screen and agent screen) and searches the token to fire them | 0.035 USDC |
 | `npm run channel` | Creates a webhook channel and waits for the ownership challenge | 0.010 USDC |
 | `npm run messages` | Waits for a watch hit, lists every page, fetches the newest inbound message and deletes it only when another inbound message stays | Free |
 | `npm run topup` | Tops up the box's message allowance | 0.050 USDC (if charged) |
 | `npm run cleanup` | Deletes the inbound address, watches and channels | Free |
-| `npm run start` | Runs all seven steps, then verifies the box | ~0.145 USDC total |
-| `npm run capture` | npm start, then two topup command runs (the first charged, the second 409 allowance_full), recorded to test/fixtures/localnet.json with secrets redacted | ~0.195 USDC total |
+| `npm run start` | Runs all seven steps, then verifies the box | About 0.155 USDC on a fresh box; 0.105 USDC when the box exists |
+| `npm run capture` | npm start, whose topup is charged, then two extra topup runs of which at least one is 409 allowance_full and the first may be charged or 409; recorded to test/fixtures/localnet.json with secrets redacted | whatever the recorded run settled: the start run plus any charged extra topup (0.105 USDC in the recorded run) |
 | `npm test` | Replays test/fixtures/localnet.json offline | Free |
 
-Prices are read once per run from `GET /openapi.json` (x-payment.baseUnits) at runtime and enforced within your per-call cap (0.05 USDC) and per-run cap (0.15 USDC). An offer that differs is refused. API errors are not charged. A 409 (box_exists, allowance_full) or 403 payer_not_box is answered without settlement, so nothing is charged (paymentResponse is null in the log).
+Prices are read once per run from `GET /openapi.json` (x-payment.baseUnits) at runtime and enforced within your per-call cap (0.05 USDC) and per-run cap (0.16 USDC). An offer that differs is refused. API errors are not charged. A 409 (box_exists, allowance_full) or 403 payer_not_box is answered without settlement, so nothing is charged (paymentResponse is null in the log). Each `npm run watch` or `npm start` adds three watches with no dedupe: run `npm run cleanup` between attempts.
 
 ## How each call is authenticated
 
@@ -99,11 +106,36 @@ npm run box
 
 The box is a message store for an agent. The step reads `boxStatus` first (free, signed). If the box exists (200), nothing is created and no payment is signed. If it does not exist (404 box_not_found), `boxCreate` is paid.
 
-An existing box is reported with no payment signed. Each command prints 'Run log: .runs/<uuid>.jsonl' and appends one JSON line per signed payment, settled payment and API error (src/main.js, file mode 0600). The run log shows the expected 404 as an error line.
+An existing box is reported with no payment signed. Each command prints 'Run log: .runs/<uuid>.jsonl' and appends one JSON line per signed payment, settled payment and API error (src/main.js, file mode 0600). On a key with no box, the run log shows the expected 404 as an error line.
 
-Example boxCreate response (paid):
+Example boxStatus (existing box, not paid):
 
-<!-- exchange 4 -->
+<!-- exchange 2 -->
+```json
+{
+  "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+  "createdAt": 1791365243,
+  "allowance": {
+    "messagesLeft": 999,
+    "expiresAt": 1796549243,
+    "expired": false
+  },
+  "counts": {
+    "messages": 0,
+    "inboundAddresses": 1,
+    "watches": 1,
+    "channels": 0
+  },
+  "unstoredWatchHits": 0,
+  "registeredAgents": {
+    "chainId": 5042,
+    "agents": []
+  }
+}
+```
+
+Example boxCreate response, from the 2026-10-06 capture (arcgate 917dd4a, a fresh key; exchange 4 of that fixture, no longer in localnet.json):
+
 ```json
 {
   "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
@@ -114,32 +146,6 @@ Example boxCreate response (paid):
   "allowance": {
     "messagesLeft": 500,
     "expiresAt": 1793918600
-  }
-}
-```
-
-Example boxStatus after creation (not paid):
-
-<!-- exchange 5 -->
-```json
-{
-  "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-  "createdAt": 1791326605,
-  "allowance": {
-    "messagesLeft": 500,
-    "expiresAt": 1793918605,
-    "expired": false
-  },
-  "counts": {
-    "messages": 0,
-    "inboundAddresses": 0,
-    "watches": 0,
-    "channels": 0
-  },
-  "unstoredWatchHits": 0,
-  "registeredAgents": {
-    "chainId": 5042,
-    "agents": []
   }
 }
 ```
@@ -165,31 +171,31 @@ An identical body is answered 200 duplicate (idempotent).
 
 The URL is on the notifier origin (like `http://127.0.0.1:19803/<id>`, one path segment).
 
-Example inbound address response (paid, exchange 7):
+Example inbound address response (paid, exchange 4):
 
-<!-- exchange 7 -->
+<!-- exchange 4 -->
 ```json
 {
-  "id": "wvzarH5ZijOgl4vgSHPfYA",
-  "url": "http://127.0.0.1:19803/wvzarH5ZijOgl4vgSHPfYA",
+  "id": "jGzJwc9Ho_38jtTnloOKug",
+  "url": "http://127.0.0.1:19803/jGzJwc9Ho_38jtTnloOKug",
   "secret": "<redacted>",
-  "createdAt": 1791326605
+  "createdAt": 1791388325
 }
 ```
 
-The secret is shown once and kept in memory only. POST to the URL with `INBOUND-SECRET: <secret>` or with `INBOUND-SIGNATURE` and `INBOUND-TIMESTAMP`. Example signature post (exchange 8, unpaid):
+The secret is shown once and kept in memory only. POST to the URL with `INBOUND-SECRET: <secret>` or with `INBOUND-SIGNATURE` and `INBOUND-TIMESTAMP`. Example signature post (exchange 5, unpaid):
 
-<!-- exchange 8 -->
+<!-- exchange 5 -->
 ```json
 {
   "stored": true,
-  "idempotencyKey": "0x8f3bf71f9d741dfaef5bdadbdf87886422e33926d2bfbc7a145a65444e9bd984"
+  "idempotencyKey": "0xddb848e2dc335c12908245546090a6f32f5b4f9711d554579fe1763cd9f77f7b"
 }
 ```
 
-After rotation (exchange 9), the old secret is refused (exchange 10):
+After rotation (exchange 6), the old secret is refused (exchange 7):
 
-<!-- exchange 10 -->
+<!-- exchange 7 -->
 ```json
 {
   "error": {
@@ -200,13 +206,13 @@ After rotation (exchange 9), the old secret is refused (exchange 10):
 }
 ```
 
-And the new secret is accepted (exchange 11):
+And the new secret is accepted (exchange 8):
 
-<!-- exchange 11 -->
+<!-- exchange 8 -->
 ```json
 {
   "stored": true,
-  "idempotencyKey": "0x363665ed5a1fa1ef2b522a466dc76b63d43989e91f26b2118848cf7eb0bf29f7"
+  "idempotencyKey": "0xc5dcdb22b6b6f4fb7902d1a4966adc51a3752ff8ad52050d2e8d9505e58fc05d"
 }
 ```
 
@@ -216,27 +222,158 @@ And the new secret is accepted (exchange 11):
 npm run watch
 ```
 
-A watch fires when the index changes something about a token. The step creates two watches: one on FAZE (the default, or your `WATCH_TOKEN`) monitoring 24-hour volume, and one screen that fires when volume is above 100k USD and the safety verdict is ok. Then it searches for the FAZE token to trigger the index to check it.
+The step creates three watches and searches the token to trigger the index. The first is a token watch: a screen of one named token, watching 24-hour volume on FAZE (the default `WATCH_TOKEN`). The second is a screen: a multi-field watch over every token in the index, watching volume and safety verdict. The third is an agent screen: a watch over Arc mainnet's agent directory that fires when an agent registers.
 
-cirBTC is pinned and is never checked; FAZE is the default because it is checkable. With the indexer off (health indexer:null), a watch fires only when a search's checks change the index. A token is checked once per safety TTL; a rerun may see no new hit. Set WATCH_TOKEN to another token on a rerun.
+With the indexer off (health indexer:null), a watch fires only when a search checks a token. A token is checked once per safety TTL; a rerun may see no new hit. Set WATCH_TOKEN to another token on a rerun. Watches fire on an edge with a cooldown (agent.watch.cooldown_seconds 3600).
 
-Watches fire on an edge with a cooldown (agent.watch.cooldown_seconds 3600). The screen in the recorded run did not fire; its threshold was not lowered to test the fire path.
+The agent screen watches Arc mainnet's agent directory; `chainId: 5042` is the directory's chain, shown as `boxStatus.registeredAgents.chainId` in the first example. On localnet no agent registers during a run, so the agent screen is created and listed only and never fires. The old `{kind:'volume_24h', direction}` watch shape is now refused with 400 invalid_request 'No matching discriminator' (see Troubleshooting).
 
-Example watch response (paid, exchange 13):
+Example token watch response (paid):
 
-<!-- exchange 13 -->
+<!-- exchange 10 -->
 ```json
 {
-  "id": "_a5hBBSFy7MU2k_jnHHuig",
+  "id": "dvxnlleAXUxG4_oP5ZLgmw",
   "condition": {
-    "kind": "volume_24h",
+    "kind": "token",
     "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
-    "direction": "above",
-    "value": 100000
+    "where": [
+      {
+        "field": "volume_24h",
+        "op": "gt",
+        "value": 100000
+      }
+    ]
   },
-  "createdAt": 1791326609
+  "createdAt": 1791388330
 }
 ```
+
+Example screen watch response (paid):
+
+<!-- exchange 12 -->
+```json
+{
+  "id": "F8erlRYeh-WMOo5n5jq97Q",
+  "condition": {
+    "kind": "screen",
+    "where": [
+      {
+        "field": "volume_24h",
+        "op": "gt",
+        "value": 100000
+      },
+      {
+        "field": "safety_verdict",
+        "op": "eq",
+        "value": "ok"
+      }
+    ]
+  },
+  "createdAt": 1791388335
+}
+```
+
+Example agent screen response (paid):
+
+<!-- exchange 14 -->
+```json
+{
+  "id": "0nmkWVwaNxE2B6OkZfruLw",
+  "condition": {
+    "kind": "agents",
+    "chainId": 5042,
+    "on": [
+      "registered"
+    ]
+  },
+  "createdAt": 1791388339
+}
+```
+
+Example watchList (after all three watches are created):
+
+<!-- exchange 15 -->
+```json
+{
+  "watches": [
+    {
+      "id": "oGnXYai82uHjRH_M6rQtVg",
+      "condition": {
+        "kind": "screen",
+        "where": [
+          {
+            "field": "volume_24h",
+            "op": "gt",
+            "value": 50000
+          },
+          {
+            "field": "safety_verdict",
+            "op": "eq",
+            "value": "ok"
+          }
+        ]
+      },
+      "createdAt": 1791386194,
+      "lastFiredAt": null,
+      "matchingTokens": 0
+    },
+    {
+      "id": "dvxnlleAXUxG4_oP5ZLgmw",
+      "condition": {
+        "kind": "token",
+        "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+        "where": [
+          {
+            "field": "volume_24h",
+            "op": "gt",
+            "value": 100000
+          }
+        ]
+      },
+      "createdAt": 1791388335,
+      "lastFiredAt": null,
+      "matchingTokens": null
+    },
+    {
+      "id": "F8erlRYeh-WMOo5n5jq97Q",
+      "condition": {
+        "kind": "screen",
+        "where": [
+          {
+            "field": "volume_24h",
+            "op": "gt",
+            "value": 100000
+          },
+          {
+            "field": "safety_verdict",
+            "op": "eq",
+            "value": "ok"
+          }
+        ]
+      },
+      "createdAt": 1791388339,
+      "lastFiredAt": null,
+      "matchingTokens": 0
+    },
+    {
+      "id": "0nmkWVwaNxE2B6OkZfruLw",
+      "condition": {
+        "kind": "agents",
+        "chainId": 5042,
+        "on": [
+          "registered"
+        ]
+      },
+      "createdAt": 1791388344,
+      "lastFiredAt": null,
+      "matchingTokens": null
+    }
+  ]
+}
+```
+
+The list's first watch is another tutorial's screen on the same shared box, which cleanup later deleted (exchange 33).
 
 ## 4. Create a webhook channel
 
@@ -248,32 +385,32 @@ A webhook channel sends inbound and watch messages to a URL. The step creates a 
 
 Arcgate POSTs a challenge to the URL once the payment settles. The receiver must echo the challenge; nothing is delivered until this ownership check passes. When Arcgate later delivers a message, it POSTs to the URL with `ARCGATE-SIGNATURE` and `ARCGATE-TIMESTAMP` headers.
 
-Example webhook response (paid, exchange 20):
+Example webhook response (paid, exchange 19):
 
-<!-- exchange 20 -->
+<!-- exchange 19 -->
 ```json
 {
-  "id": "_menTTt2BgZu1t3HGrvmsg",
+  "id": "_XsK9A9S7cox8eD0TPl7Kg",
   "url": "https://192.0.2.10/arc-agent-box",
   "secret": "<redacted>",
   "filter": [
     "inbound",
     "watch"
   ],
-  "createdAt": 1791326614
+  "createdAt": 1791388349
 }
 ```
 
 The step polls webhookList until verifiedAt is set (null before the URL answers the challenge, then a timestamp). The filter in the listing is checked against the one sent.
 
-Example before verification (exchange 21):
+Example before verification (exchange 20):
 
-<!-- exchange 21 -->
+<!-- exchange 20 -->
 ```json
 {
   "webhooks": [
     {
-      "id": "_menTTt2BgZu1t3HGrvmsg",
+      "id": "_XsK9A9S7cox8eD0TPl7Kg",
       "url": "https://192.0.2.10/arc-agent-box",
       "filter": [
         "inbound",
@@ -283,36 +420,36 @@ Example before verification (exchange 21):
       "verifiedAt": null,
       "failures": 0,
       "lastError": null,
-      "createdAt": 1791326618
+      "createdAt": 1791388354
     }
   ]
 }
 ```
 
-After verification (exchange 22):
+After verification (exchange 21):
 
-<!-- exchange 22 -->
+<!-- exchange 21 -->
 ```json
 {
   "webhooks": [
     {
-      "id": "_menTTt2BgZu1t3HGrvmsg",
+      "id": "_XsK9A9S7cox8eD0TPl7Kg",
       "url": "https://192.0.2.10/arc-agent-box",
       "filter": [
         "inbound",
         "watch"
       ],
       "enabled": true,
-      "verifiedAt": 1791326619,
+      "verifiedAt": 1791388354,
       "failures": 0,
       "lastError": null,
-      "createdAt": 1791326618
+      "createdAt": 1791388354
     }
   ]
 }
 ```
 
-The step then calls webhookRotate (exchange 23) to rotate the channel's secret.
+The step then calls webhookRotate (exchange 22) to rotate the channel's secret.
 
 ## 5. Wait for messages
 
@@ -322,117 +459,117 @@ npm run messages
 
 This step waits up to 180 seconds for a watch to fire. It then lists all messages from the box by cursor until an empty page, fetches the newest inbound message, and deletes it if the box holds two or more inbound messages. If there is only one inbound message, it is kept.
 
-The step reads the box from the start, so on a rerun a watch hit still held from an earlier run ends the wait at once. A new hit is not required.
+The step reads the box from the start, so on a rerun a watch hit still held from an earlier run ends the wait at once. A new hit is not required. On a box shared with another tutorial, that tutorial's watch hit can end the 180-second wait.
 
-When a watch fires, arcgate stores a `watch.token` (or `watch.screen`) message to the box with the watch ID, condition, and observed value. When the inbound address receives a post, the notifier writes an `inbound` message with the source address ID.
+When a watch fires, arcgate stores a message to the box. A `watch.token` or `watch.screen` hit's content is `{watchId, condition, changeId, token, symbol, observed}`, where `observed` is keyed by each clause's field (e.g., `{"volume_24h": 6112809.322525}`). The `previous` field appears only if the watch has a `changes` clause and the value changed, and `newest` (for lookalikes clauses) appears only then too. An `inbound` message contains the source address ID. A `watch.agent` hit's content is `{watchId, condition, changeId, chainId, agentId, change, agent}`, where `change` is what happened: `registered` or `updated` for an agent screen, or one of an agent watch's kinds (updated, owner_changed, wallet_changed, uri_changed, feedback, fetch_failed, fetch_ok). An agent screen fires only when an agent is registered or updated. The `previous` and `current` fields hold the old and new values only for owner_changed or wallet_changed.
 
 A delete frees space but refunds no allowance.
 
 Messages are paged by cursor until an empty page arrives (messages empty, nextCursor unchanged).
 
-Example messages list (exchange 24, trimmed):
+Example messages list (exchange 23, trimmed: idempotencyKey and box removed from each message):
 
-<!-- exchange 24 -->
+<!-- exchange 23 -->
 ```json
 {
   "messages": [
     {
       "kind": "inbound",
       "type": "inbound",
-      "seq": 1,
-      "createdAt": 1791326609,
-      "expiresAt": 1793918609,
+      "seq": 12,
+      "createdAt": 1791388330,
+      "expiresAt": 1793980330,
       "payload": {
         "untrusted": true,
         "contentType": "application/json",
         "encoding": "utf8",
-        "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"signature\",\"sentAt\":1791326609749,\"note\":\"a message from an outside service\"}"
+        "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"signature\",\"sentAt\":1791388330266,\"note\":\"a message from an outside service\"}"
       },
       "source": {
-        "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+        "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
         "signatureVerified": true
       }
     },
     {
       "kind": "inbound",
       "type": "inbound",
-      "seq": 2,
-      "createdAt": 1791326609,
-      "expiresAt": 1793918609,
+      "seq": 13,
+      "createdAt": 1791388330,
+      "expiresAt": 1793980330,
       "payload": {
         "untrusted": true,
         "contentType": "application/json",
         "encoding": "utf8",
-        "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"secret\",\"sentAt\":1791326609770,\"note\":\"a message from an outside service\"}"
+        "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"secret\",\"sentAt\":1791388330285,\"note\":\"a message from an outside service\"}"
       },
       "source": {
-        "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+        "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
         "signatureVerified": false
       }
     },
     {
       "kind": "watch",
       "type": "watch.token",
-      "seq": 3,
-      "createdAt": 1791326613,
-      "expiresAt": 1793918613,
+      "seq": 14,
+      "createdAt": 1791388345,
+      "expiresAt": 1793980345,
       "payload": {
         "untrusted": true,
         "contentType": "application/json",
         "encoding": "utf8",
-        "content": "{\"watchId\":\"_a5hBBSFy7MU2k_jnHHuig\",\"condition\":{\"kind\":\"volume_24h\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"direction\":\"above\",\"value\":100000},\"changeId\":35,\"observed\":6112809.322525,\"previous\":null}"
+        "content": "{\"watchId\":\"dvxnlleAXUxG4_oP5ZLgmw\",\"condition\":{\"kind\":\"token\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"where\":[{\"field\":\"volume_24h\",\"op\":\"gt\",\"value\":100000}]},\"changeId\":61,\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"symbol\":\"FAZE\",\"observed\":{\"volume_24h\":6112809.322525}}"
       },
       "source": {
-        "watchId": "_a5hBBSFy7MU2k_jnHHuig"
+        "watchId": "dvxnlleAXUxG4_oP5ZLgmw"
       }
     }
   ],
-  "nextCursor": 3
+  "nextCursor": 14
 }
 ```
 
-Example empty page (after cursor 3):
+Example empty page (exchange 24):
+
+<!-- exchange 24 -->
+```json
+{
+  "messages": [],
+  "nextCursor": 14
+}
+```
+
+The step fetches the newest inbound message (seq 13):
 
 <!-- exchange 25 -->
 ```json
 {
-  "messages": [],
-  "nextCursor": 3
-}
-```
-
-The step fetches the newest inbound message (seq 2, exchange 26):
-
-<!-- exchange 26 -->
-```json
-{
   "kind": "inbound",
   "type": "inbound",
-  "seq": 2,
-  "createdAt": 1791326609,
-  "expiresAt": 1793918609,
-  "idempotencyKey": "0x363665ed5a1fa1ef2b522a466dc76b63d43989e91f26b2118848cf7eb0bf29f7",
-  "box": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
+  "idempotencyKey": "0xc5dcdb22b6b6f4fb7902d1a4966adc51a3752ff8ad52050d2e8d9505e58fc05d",
+  "box": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+  "seq": 13,
+  "createdAt": 1791388330,
+  "expiresAt": 1793980330,
   "payload": {
     "untrusted": true,
     "contentType": "application/json",
     "encoding": "utf8",
-    "content": "{\"run\":\"907ca447-2e67-4ec9-9115-e66bd9b0d4ad\",\"via\":\"secret\",\"sentAt\":1791326609770,\"note\":\"a message from an outside service\"}"
+    "content": "{\"run\":\"ab561c2f-7aa0-4d70-a810-604c62e4269d\",\"via\":\"secret\",\"sentAt\":1791388330285,\"note\":\"a message from an outside service\"}"
   },
   "source": {
-    "inboundAddressId": "wvzarH5ZijOgl4vgSHPfYA",
+    "inboundAddressId": "jGzJwc9Ho_38jtTnloOKug",
     "signatureVerified": false
   }
 }
 ```
 
-And deletes it (exchange 27) because the box has two inbound messages; seq 1 stays:
+And deletes it because the box has two inbound messages; seq 12 stays:
 
-<!-- exchange 27 -->
+<!-- exchange 26 -->
 ```json
 {
   "deleted": true,
-  "seq": 2
+  "seq": 13
 }
 ```
 
@@ -444,45 +581,28 @@ A delete frees space but refunds no allowance. Message content is untrusted data
 npm run topup
 ```
 
-When the allowance runs low, pay to grant more messages. The response shows `granted` (what this payment added) and `allowance` (the total after the grant). `granted` is whatever still fits under the caps of 1000 total messages and 60 days.
+When the allowance runs low, pay to grant more messages. The response shows `granted` (what this payment added) and `allowance` (the total after the grant). `granted` is whatever still fits under the caps of 1000 total messages and 60 days. A top-up on a nearly full box still costs the full 0.05 USDC and can add as little as 0 days.
 
-Example success response (exchange 29):
+Example success response (charged, when the box held some used messages):
 
-<!-- exchange 29 -->
+<!-- exchange 28 -->
 ```json
 {
-  "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
+  "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
   "granted": {
-    "messages": 500,
-    "days": 30
-  },
-  "allowance": {
-    "messagesLeft": 997,
-    "expiresAt": 1796510605
-  }
-}
-```
-
-Example second topup, when the box is nearly full (exchange 44):
-
-<!-- exchange 44 -->
-```json
-{
-  "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-  "granted": {
-    "messages": 3,
+    "messages": 4,
     "days": 0
   },
   "allowance": {
     "messagesLeft": 1000,
-    "expiresAt": 1796510605
+    "expiresAt": 1796549243
   }
 }
 ```
 
-Example 409 allowance_full response (no payment charged, exchange 48):
+Example 409 allowance_full response (no payment charged):
 
-<!-- exchange 48 -->
+<!-- exchange 46 -->
 ```json
 {
   "error": {
@@ -501,35 +621,41 @@ The step catches the 409 and reports it as not charged; the run continues.
 npm run cleanup
 ```
 
-Delete the inbound address, watches, and webhook channels. This step is free: deletion is an owner operation.
+Delete the inbound addresses, watches and webhook channels. This step is free: deletion is an owner operation.
 
-The step lists and deletes every inbound address, watch and webhook, then reads boxStatus. Messages stay.
+Cleanup empties the whole box shared by every tutorial using the same key, not only this run's items. The step lists and deletes every inbound address, watch and webhook, then reads boxStatus. Messages stay.
 
-Example inbound address listing before deletion (exchange 30):
+Example inbound address listing before deletion (may include addresses from other tutorials):
 
-<!-- exchange 30 -->
+<!-- exchange 29 -->
 ```json
 {
   "addresses": [
     {
-      "id": "wvzarH5ZijOgl4vgSHPfYA",
-      "url": "http://127.0.0.1:19803/wvzarH5ZijOgl4vgSHPfYA",
-      "createdAt": 1791326609
+      "id": "B-kc4oaEnh61HHv96lHpag",
+      "url": "http://127.0.0.1:19803/B-kc4oaEnh61HHv96lHpag",
+      "createdAt": 1791386196
+    },
+    {
+      "id": "jGzJwc9Ho_38jtTnloOKug",
+      "url": "http://127.0.0.1:19803/jGzJwc9Ho_38jtTnloOKug",
+      "createdAt": 1791388330
     }
   ]
 }
 ```
 
-Example final boxStatus after deletion (exchange 37):
+Example final boxStatus after deletion:
 
-<!-- exchange 37 -->
+<!-- exchange 39 -->
+
 ```json
 {
-  "address": "0x4189bc425bd880b163f386e5d5270fccb2c0a478",
-  "createdAt": 1791326605,
+  "address": "0x06e594c677cd28643b82477b7b5328ac6817b2a0",
+  "createdAt": 1791365243,
   "allowance": {
-    "messagesLeft": 997,
-    "expiresAt": 1796510605,
+    "messagesLeft": 1000,
+    "expiresAt": 1796549243,
     "expired": false
   },
   "counts": {
@@ -568,6 +694,8 @@ Telegram channels work the same way as webhooks: they are created with a cost, h
 - **signature_* or nonce_reused** (401): An owner call's signature was invalid or stale. Sign again with a fresh nonce and expiry.
 - **rate_limited** (429): The address hit a rate limit. Retry after a delay.
 - **allowance_exhausted** (402): An inbound post arrived but the box's allowance is out. No message was stored. Top up to add more.
+- **watch_limit** (409): A box collected watches across multiple attempts without cleanup (no dedupe). Run `npm run cleanup` between attempts.
+- **No matching discriminator** (400 invalid_request): A watch condition in a retired shape (e.g., the old `{kind:'volume_24h', direction}` instead of `{kind:'token', where:[{field:'volume_24h', op:'gt', value}]}`). Update to the current tutorial: the watch conditions are built in src/config.js (tokenWatch, SCREEN_WATCH, AGENTS_WATCH).
 - **No watch hit on localnet**: Set WATCH_TOKEN to a different token. cirBTC is pinned and never checked; FAZE is checkable but only once per safety TTL. On a rerun, set WATCH_TOKEN to try another token.
 - **Unreadable response after signing**: A payment was signed but the response body could not be parsed as JSON. This is what happens if a 402 has an empty body: http.js readApiResponse throws, '<operation>: unreadable response (HTTP 402, requestId=…). Outcome may be uncertain; do not automatically retry.' Check the run log for a settled entry and the USDC balance before starting another paid run.
 
@@ -577,7 +705,7 @@ Run the offline test suite:
 npm test
 ```
 
-The tests replay test/fixtures/localnet.json offline, exercising the payment signature flow, owner call signatures, inbound secret rotation, per-run spending caps, and error handling. The fixture was captured by `npm run capture` on a localnet run (arcgate 917dd4a, Arc testnet), with secrets redacted.
+The tests replay test/fixtures/localnet.json offline, exercising the payment signature flow, owner call signatures, inbound secret rotation, per-run spending caps, and error handling. The fixture was captured by `npm run capture` on a localnet run (arcgate 12b0368f, Arc testnet), with secrets redacted. The capture contract is: `npm run start` (all seven steps, whose topup is charged, a nearly full box can grant 0 days), then two extra `npm run topup` runs, of which at least one is 409 allowance_full and the first may be charged or 409. In the recorded run both extra topups were 409, so the capture settled 0.105 USDC.
 
 To record a new capture from a running localnet:
 
@@ -585,6 +713,6 @@ To record a new capture from a running localnet:
 CAPTURE_API_COMMIT=<arcgate HEAD> npm run capture
 ```
 
-This runs the start command under a recording fetch, then captures two extra topup attempts (one charged, one refused as allowance_full), and writes test/fixtures/localnet.json with redacted secrets.
+This runs the start command (whose topup is charged) under a recording fetch, then captures two extra topup runs, and writes test/fixtures/localnet.json with redacted secrets.
 
 For more information, see [Arcgate docs](https://docs.arcgate.dev) and the test evidence in [VALIDATION.md](VALIDATION.md).
