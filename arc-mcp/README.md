@@ -1,6 +1,6 @@
 # Use Arcgate as a paid MCP server
 
-Connect an MCP client to Arcgate's MCP server at `/mcp`, list its 32 tools, call the free ones, and pay for three paid ones (`tradeSearch`, `tradeQuote`, `boxCreate`) with x402 on Arc. Then point a host (Claude Code, Claude Desktop or Codex) at the same server and see what a host that cannot pay gets.
+Connect an MCP client to Arcgate's `/mcp` endpoint, list its 32 tools, call the free ones, and pay for three paid ones (`tradeSearch`, `tradeQuote`, `boxCreate`) with x402 on Arc. The whole tutorial runs against an arcgate localnet until production serves `/mcp`. Then point a host (Claude Code, Claude Desktop or Codex) at the same server and see what a host that cannot pay gets.
 
 ## Vocabulary
 
@@ -31,7 +31,7 @@ AGENT_PRIVATE_KEY=0x...
 API_URL=http://127.0.0.1:19800
 ```
 
-`API_URL` defaults to `https://api.arcgate.dev`. It is an origin: https, or http for `localhost` and `127.0.0.1`, with no credentials or path. The tutorial adds `/mcp`. Production does not yet serve `/agent/v1`, so the box steps run against an arcgate localnet (`pnpm localnet` in the arcgate checkout), which settles x402 on Arc testnet.
+`API_URL` defaults to `https://api.arcgate.dev`. It is an origin: https, or http for `localhost` and `127.0.0.1`, with no credentials or path. The tutorial adds `/mcp`. Production does not serve `/mcp` yet (checked 2026-10-07, POST /mcp answers 404), so the whole tutorial, and any host, runs against an arcgate localnet until production serves `/mcp`. Use `http://127.0.0.1:19800/mcp` today. `mcp.json` and the Claude Desktop step name the production URL for when it ships.
 
 ## Run it
 
@@ -57,7 +57,7 @@ price: boxCreate 50000 base units (0.05 USDC) on eip155:5042002 to 0x987F719b516
 receipt: boxCreate tx 0x33cefeeac0e61f343db456c945954d8d54b5f3bdca26ae3a32939ec367d7d488 on eip155:5042002 payer 0x06E594c677Cd28643B82477B7B5328Ac6817b2A0
 ```
 
-`tradeSearch` is 5000 base units, `tradeQuote` 10000 and `boxCreate` 50000 (6 decimals, so 0.005, 0.01 and 0.05 USDC). Production does not list the box tools yet; the localnet lists all 32.
+`tradeSearch` is 5000 base units, `tradeQuote` 10000 and `boxCreate` 50000 (6 decimals, so 0.005, 0.01 and 0.05 USDC). The localnet lists 32 tools.
 
 When a paid call comes back as an error, the tutorial tells you what that means for your money:
 
@@ -70,12 +70,12 @@ In both cases the payment stays reserved against the run's cap. The same advice 
 
 A box is an agent's inbound address and message store, and it is for good: a second `boxCreate` for the same address answers `box_exists`. So the tour does not pay for `boxCreate` first. It asks `boxStatus`, which is free and takes no payment, but must be signed by the box's own address (`src/agent.ts`).
 
-`boxStatus` takes `{ address, agentSignature: { signature, nonce, expiry } }`. The signature is an EIP-712 `AgentRequest` over `GET /agent/v1/<lowercased address>/box/status`, with an empty body, signed by `AGENT_PRIVATE_KEY`, not the payer's key. The nonce is random and the server accepts each once. The server also limits the expiry (300 seconds ahead in arcgate's test configuration; `src/agent.ts` signs 60 seconds ahead). What comes back, all captured from the localnet in `test/fixtures`:
+`boxStatus` takes `{ address, agentSignature: { signature, nonce, expiry } }`. The signature is an EIP-712 `AgentRequest` over `GET /agent/v1/<lowercased address>/box/status`, with an empty body, signed by `AGENT_PRIVATE_KEY`, not the payer's key. The nonce is random and the server accepts each once. The server also limits the expiry (no further than 300 seconds ahead, per arcgate's OpenAPI document, or the answer is 401 `signature_expired`; `src/agent.ts` signs 60 seconds ahead). What comes back, all captured from the localnet in `test/fixtures`:
 
 - Without a signature: a 401 `signature_required` result (`box-status.signature-required.json`), `next` is `fix_request`.
 - Signed, for an address with no box: a 404 `box_not_found` result (`box-status.not-found.json`). The tour then pays `boxCreate` once and signs `boxStatus` again, with a fresh nonce.
 - Signed, for an address with a box: the box, with its address, `createdAt`, `allowance` and `counts` (`box-status.json`). That box is the box: the tour calls and pays no `boxCreate`.
-- A paid `boxCreate` for an address that already has a box: a `box_exists` result, `next` is `stop`, and no receipt (`box-create.exists.json`). The box the server names is the agent's own, so the tour treats it as the box and goes on. Nothing settles.
+- A paid `boxCreate` for an address that already has a box: a `box_exists` result, `next` is `stop`, and no receipt (`box-create.exists.json`). `box_exists` answers for the address the tour sent, which is the agent's own, so that box is the box and the tour goes on. Nothing settles.
 
 Any other `boxStatus` refusal, such as `signature_expired` or `nonce_reused`, stops the tour before `boxCreate` is paid.
 
@@ -96,21 +96,25 @@ Any other `boxStatus` refusal, such as `signature_expired` or `nonce_reused`, st
 { "mcpServers": { "arcgate": { "type": "http", "url": "https://api.arcgate.dev/mcp" } } }
 ```
 
+That is the URL for when production serves `/mcp`. Today, put `http://127.0.0.1:19800/mcp` in its place.
+
 **Claude Code**:
 
 ```sh
-claude mcp add --transport http arcgate https://api.arcgate.dev/mcp
+claude mcp add --transport http arcgate http://127.0.0.1:19800/mcp
 ```
 
-For the arcgate localnet, use `http://127.0.0.1:19800/mcp` as the URL. `--scope project` writes the same shape to `.mcp.json` in the project instead of your local settings.
+`--scope project` writes the same shape to `.mcp.json` in the project instead of your local settings. Once production serves `/mcp`, use `https://api.arcgate.dev/mcp`.
 
 **Codex**:
 
 ```sh
-codex mcp add arcgate --url https://api.arcgate.dev/mcp
+codex mcp add arcgate --url http://127.0.0.1:19800/mcp
 ```
 
-**Claude Desktop**: add Arcgate as a custom connector with the URL `https://api.arcgate.dev/mcp`. Anthropic's help page walks through it: [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+Once production serves `/mcp`, use `https://api.arcgate.dev/mcp`.
+
+**Claude Desktop**: this applies once production serves `/mcp` over https. Add Arcgate as a custom connector with the URL `https://api.arcgate.dev/mcp`. Anthropic's help page walks through it: [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 
 The free tools work at once. A host that cannot pay gets the price instead of a result. To check it against the localnet without spending anything, put the localnet URL in a scratch file and run Claude Code with only the free tool and `tradeSearch` allowed (prompt first, because `--allowedTools` takes a list):
 

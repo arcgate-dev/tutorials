@@ -1,5 +1,9 @@
 # Validation
 
+## Production check, 2026-10-07 (UTC)
+
+POST https://api.arcgate.dev/mcp answers HTTP 404 text/html; /health is ok at commit 603c5f1. Production does not serve /mcp.
+
 ## Localnet run, 2026-10-07 (UTC)
 
 `npm run capture`, then `npm start`, ran on October 7, 2026 against an arcgate localnet:
