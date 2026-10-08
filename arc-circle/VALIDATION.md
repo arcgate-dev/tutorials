@@ -1,6 +1,15 @@
 # Validation
 
-Box steps: pending live run after arcgate accepts chainId-scoped AgentRequest.
+## Box mainnet run, 2026-10-08 (UTC), api.arcgate.dev at 2c12f10d
+
+`box`, `inbound`, `messages` and `cleanup` ran against https://api.arcgate.dev (Arc mainnet, `eip155:5042`) through the Circle `ARC` EOA `0x6D2f707D75431A6f37C106b2c5085D5e42F7842d`. Every step passed.
+
+- `box`: signed `boxStatus` answered `404 box_not_found`; `boxCreate` paid 0.05 USDC (`0x21585fa9d6ab05ef9e055a5e1b3a568730c38b6c55bc077a31c566c3b37ceba9`); the signed read-back answered 200 with 500 messages and 30 days. A second run found the box and paid nothing.
+- `inbound`: `inboundCreate` paid 0.01 USDC (`0x6f49c991d1f8c6739513477b43e01a12bd5b3c289e5f862343e7f8f49958cb94`); the signed post to the inbound URL answered `201`, stored.
+- `messages`: listed 1 inbound message, fetched it (`signatureVerified` true) and deleted it.
+- `cleanup`: deleted 1 inbound address; the box then showed 0 messages and 0 inbound addresses.
+
+Both settlements were checked on chain: status 1, a USDC transfer from the wallet to `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e`, for exactly 0.05 and 0.01 USDC. Total spent: 0.06 USDC.
 
 ## Mainnet run, 2026-10-08 (UTC), api.arcgate.dev at 6e04f6a
 
