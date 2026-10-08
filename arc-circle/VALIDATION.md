@@ -1,6 +1,31 @@
 # Validation
 
-Mainnet run pending: needs the owner's Circle LIVE credentials.
+## Mainnet run, 2026-10-08 (UTC), api.arcgate.dev at 6e04f6a
+
+`inspect`, `connect`, `search`, `quote`, `preview` and `trade -- --execute` ran against https://api.arcgate.dev (Arc mainnet, `eip155:5042`) through a Circle developer-controlled `ARC` EOA, `0x6D2f707D75431A6f37C106b2c5085D5e42F7842d`, with a `LIVE_API_KEY:` key. `connect` read `usdcBalance` `24.417394`. Every step passed.
+
+Each paid step's settlement was checked on chain: status 1, a USDC transfer from the payer to `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e`, for exactly the quoted price (search 5000 units, quote and swap 10000 units). Nine payments, 0.07 USDC in total.
+
+| Step | Payment | Settlement tx |
+| --- | --- | --- |
+| search | search | `0xc89b9f94c690365c06d4e15cb4c9c12c53e54f7fb616c33aa7bcab1a38f4cdff` |
+| quote | search | `0x8cb703d8f1a2617c6f394f863984869c4eb8220d33841d7ee3e618e9d6d32823` |
+| quote | quote | `0xcbbc592c7bf20f1f36166fedad05a48826f2c6fee60e5f111b7364e801121d0a` |
+| preview | search | `0x115c012ae1f57cbcbc9a13dd9942f7b8a354021c250ee52309cc2b87ca5b32d0` |
+| preview | quote | `0x5aa7589d032fff51b52be1d5548c33b08d1b813cdc9a9b4a3889cb0f47752f40` |
+| preview | swap | `0x611151f6d802c3e887ce649b3656667f00188bb534a9415e2b07d357107d07c6` |
+| trade | search | `0x4aaeb3d4a2eb816b73b149a9f1bb634e4d614e35be3818f2c1190094f07858e7` |
+| trade | quote | `0x4b5d6977167205f06a85b23d727f3111f65d057d773b461012a611390f9bd679` |
+| trade | swap | `0x793d9478396d377356113b12d44c38f49fa2d94ab7bc9126720d04dc29fc9f76` |
+
+The trade, quote `q_2c7fc22c2998df9a`, sold 1 USDC through Circle:
+
+- Approve `0xc7dc8a42eb3891fdb3b56fec5a5121c3096fad85875817a7096e86d06667d4ec` (block 24923741, success).
+- Swap `0x243755e798ba3b58ecf346bdab1c8c417fa9d0c88f8d49a7ca79c7e153b0528f` (block 24923746, success).
+- Delivered **1227** cirBTC units against a minimum of **1214**.
+- `/receipt`: `result` `pass`, `next` `done`.
+
+Preview stopped before sending anything. The older sections below record earlier runs, including localnet ones.
 
 ## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
 
