@@ -1,5 +1,7 @@
 # Validation
 
+Box steps: pending live run after arcgate accepts chainId-scoped AgentRequest.
+
 ## Mainnet run, 2026-10-08 (UTC), api.arcgate.dev at 6e04f6a
 
 `inspect`, `connect`, `search`, `quote`, `preview` and `trade -- --execute` ran against https://api.arcgate.dev (Arc mainnet, `eip155:5042`) through a Circle developer-controlled `ARC` EOA, `0x6D2f707D75431A6f37C106b2c5085D5e42F7842d`, with a `LIVE_API_KEY:` key. `connect` read `usdcBalance` `24.417394`. Every step passed.

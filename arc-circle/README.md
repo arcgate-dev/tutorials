@@ -1,21 +1,21 @@
 # Connect a Circle wallet to Arcgate
 
-Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect the wallet, pay for a token search with x402, quote 1 USDC for cirBTC, inspect the unsigned swap, optionally send it through Circle, and check the fill with Arcgate's free receipt endpoint.
+Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect the wallet, pay for a token search with x402, quote 1 USDC for cirBTC, inspect the unsigned swap, optionally send it through Circle, and check the fill with Arcgate's free receipt endpoint. Part 2 is optional: it gives the same wallet an Arcgate Box, a message store that outside services can post to.
 
 Everything you need to run the example is in this folder. The dependencies are the public Circle SDK, x402 SDK, and viem. Arcgate does not need an API key: your wallet pays per call. Your Circle credentials go to Circle, never to Arcgate.
 
-**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. **October 8, 2026:** the request and response shapes below were checked against [the OpenAPI document](https://api.arcgate.dev/openapi.json). **October 8, 2026 mainnet run:** every command below ran against https://api.arcgate.dev through a Circle developer-controlled `ARC` wallet; the example outputs are from that run, with long lists trimmed. See [the validation record and transaction receipts](VALIDATION.md).
+**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. **October 8, 2026:** the request and response shapes below were checked against [the OpenAPI document](https://api.arcgate.dev/openapi.json). **October 8, 2026 mainnet run:** every Part 1 command below ran against https://api.arcgate.dev through a Circle developer-controlled `ARC` wallet; the example outputs are from that run, with long lists trimmed. Part 2 has not had a live run yet; its sections say so. See [the validation record and transaction receipts](VALIDATION.md).
 
 ## Before you start
 
 - **Node.js 22.9 or newer**, npm, and Git.
 - A [Circle developer account](https://console.circle.com) with mainnet access.
-- A **developer-controlled EOA wallet** on the `ARC` blockchain, a **`LIVE_API_KEY:`** Circle API key, and the entity secret registered for that account. A user-controlled wallet or smart contract account needs a different integration.
+- A **developer-controlled EOA wallet** on the `ARC` blockchain, a **`LIVE_API_KEY:`** Circle API key, and the entity secret registered for that account. Section 2 explains how to get each one. A user-controlled wallet or smart contract account needs a different integration.
 - USDC on **Arc mainnet** (chain `5042`) in that wallet, for API payments, the swap and gas. Test-network USDC cannot pay the API.
 
 The program reads the payment network from the API and refuses a Circle key that is not a `LIVE_API_KEY:` before it calls Circle. It checks the wallet's blockchain when it reads the wallet from Circle, before any payment.
 
-This walkthrough uses real funds. Its default limits are **0.01 USDC per API call**, **0.025 USDC in API fees per command**, and **1 USDC sold per trade**. Gas is additional and also paid in USDC. Fund a dedicated wallet with enough for those amounts plus gas; 2 USDC gives headroom for the 1 USDC example, but gas costs vary.
+This walkthrough uses real funds. Its default limits are **0.01 USDC per API call**, **0.025 USDC in API fees per command**, and **1 USDC sold per trade**. Gas is additional and also paid in USDC. Fund a dedicated wallet with enough for those amounts plus gas; 2 USDC gives headroom for the 1 USDC example, but gas costs vary. Part 2 adds 0.06 USDC in API fees (the box and one inbound address); see its section.
 
 | Command | What it does | API fees |
 | --- | --- | --- |
@@ -26,6 +26,10 @@ This walkthrough uses real funds. Its default limits are **0.01 USDC per API cal
 | `npm run preview` | Searches, quotes, and builds an unsigned swap | 0.025 USDC total |
 | `npm run trade -- --execute` | Runs the same three calls, broadcasts, then checks the receipt | 0.025 USDC, plus the 1 USDC order and gas |
 | `npm run receipt -- <quoteId> <txHash> [txHash ...]` | Checks an already submitted trade without Circle credentials | Free |
+| `npm run box` | Creates the box if the wallet has none, then reads it (Part 2) | 0.05 USDC, only if created |
+| `npm run inbound` | Creates an inbound address and posts one test message to it (Part 2) | 0.01 USDC |
+| `npm run messages` | Lists the box's messages, reads the newest inbound one and deletes it (Part 2) | Free |
+| `npm run cleanup` | Deletes the box's inbound addresses (Part 2) | Free |
 
 Prices come from the `x-payment` entries in [https://api.arcgate.dev/openapi.json](https://api.arcgate.dev/openapi.json), as of October 8, 2026: search 5000 base units (0.005 USDC), quote 10000 (0.01 USDC), swap 10000 (0.01 USDC) for an order under 1,000 USD. Check that document for the current figures.
 
@@ -50,7 +54,7 @@ You can already inspect the public service without a wallet:
 npm run inspect
 ```
 
-It checks `GET /health` and makes an unpaid `POST /trade/v1/search`. The latter returns **HTTP 402**, with a base64 JSON `PAYMENT-REQUIRED` header. It prints the commit and rules version from `/health`. The network in `/health` must match the one in the offer, and it must be `eip155:5042`; any other network stops the program before it pays. Output from the public service on October 8, 2026 (no payment is made):
+It checks `GET /health` and makes an unpaid `POST /trade/v1/search`. The latter returns **HTTP 402**, with a base64 JSON `PAYMENT-REQUIRED` header. It prints the commit and rules version from `/health`. The network in `/health` must match the one in the offer. This guide is for Arc mainnet (`eip155:5042`); the program stops before it pays on a mismatch or on a network it does not know. Output from the public service on October 8, 2026 (no payment is made):
 
 ```json
 {
@@ -96,19 +100,24 @@ The API pays on Arc mainnet (`eip155:5042`), so you need a `LIVE_API_KEY:` key w
 
 For a new Circle account:
 
-1. Enable mainnet access and create a **live** API key in Circle Console.
-2. Generate and register an entity secret using [Circle's setup instructions](https://developers.circle.com/wallets/dev-controlled/register-entity-secret). Keep the recovery file outside this repository.
+1. In [Circle Console](https://console.circle.com), enable mainnet access and create a **live** API key. It starts with `LIVE_API_KEY:`.
+2. Generate an entity secret and register it with Circle, following [Circle's setup instructions](https://developers.circle.com/wallets/dev-controlled/register-entity-secret). The secret is 64 hexadecimal characters. Keep the recovery file outside this repository.
 3. Set `CIRCLE_API_KEY` and `CIRCLE_ENTITY_SECRET` in `.env`, leaving `CIRCLE_WALLET_ID` empty.
+4. Create the wallet with the script below.
 
-Create the wallet programmatically with the included script:
+Create the wallet with the included script:
 
 ```sh
 npm run wallet:create
 ```
 
-[src/create-wallet.js](src/create-wallet.js) follows Circle's [Create your first developer-controlled wallet](https://developers.circle.com/wallets/dev-controlled/create-your-first-wallet) guide: call `createWalletSet`, then `createWallets`. It sets `blockchains: [config.blockchain]` and `accountType: 'EOA'`, where `config.blockchain` is `ARC` for the public API.
+The script first reads the API's health and its unpaid payment offer, which costs nothing. Then [src/create-wallet.js](src/create-wallet.js) follows Circle's [Create your first developer-controlled wallet](https://developers.circle.com/wallets/dev-controlled/create-your-first-wallet) guide: call `createWalletSet`, then `createWallets`. It sets `blockchains: [config.blockchain]` and `accountType: 'EOA'`, where `config.blockchain` is `ARC` for the public API.
 
-Paste the printed `CIRCLE_WALLET_ID=…` line into `.env`. If that variable is already set, the command validates the existing wallet instead of creating another. Fund the printed address with USDC on **Arc mainnet**, leaving additional USDC for gas.
+The script creates a wallet set named `arc-circle` and one `ARC` wallet in it. It prints `CIRCLE_WALLET_ID=…` and the wallet's address.
+
+Paste the printed `CIRCLE_WALLET_ID=…` line into `.env`. If that variable is already set, the command reads that wallet and creates nothing. If it is not set, each run creates a new wallet set and wallet, so paste the ID before running the script again.
+
+Fund the printed address with USDC on **Arc mainnet** (chain `5042`). Send it from a wallet or exchange you already use that supports Arc. USDC sent on another network does not reach this wallet's Arc balance. Leave additional USDC for gas. The balance check in the next step shows what arrived.
 
 Then connect:
 
@@ -380,6 +389,108 @@ npm run receipt -- <quoteId> <swapTxHash> [approvalTxHash]
 
 Replace the placeholders, omitting the brackets and optional approval hash when none was sent. This command needs no Circle credentials and spends nothing. If the receipt lookup fails after a trade, use it to check that same trade; rerunning `trade` would submit a new order. Receipt records are available for one hour after swap construction. Requests are limited to one chain read per quote every 5 seconds and 132 reads per quote; respect `retryAfterSec` on a rate limit.
 
+## Part 2: give your Circle wallet a Box
+
+A box is a message store for one address. Here the address is your Circle wallet. Outside services post messages to an **inbound address**, and the box keeps them until you read them. Part 1 does not need a box. Skip this part if you only want the trade.
+
+Costs and limits:
+
+- **Box:** 0.05 USDC, paid once. A box cannot be deleted. Creating a second box answers `409 box_exists`.
+- **Inbound address:** 0.01 USDC each.
+- **Reading, listing, fetching and deleting:** free.
+
+A new box holds 500 messages for 30 days. Nothing renews by itself. When the allowance expires, every message in the box is deleted within the hour. This tutorial has no top-up command.
+
+The box command refuses a box price above 0.05 USDC. The price comes from the API's payment offer when the command runs.
+
+Part 2 pays from the same wallet and uses the same `.env`. The x402 payments need no separate gas: the wallet signs each payment, and the API submits it.
+
+### How each call is authenticated
+
+Calls to the box use one of three methods.
+
+**Paid calls** (`boxCreate` and `inboundCreate`) use x402, as in Part 1. Circle signs a USDC payment authorization, and the API settles it. The tutorial pays from the box's own address, which is the Circle wallet. For an inbound address, the API refuses a payment from any other address with `403 payer_not_box`, and nothing is charged.
+
+**Owner calls** (`boxStatus`, `boxMessageList`, `boxMessageFetch`, `boxMessageDelete`, `inboundList` and `inboundDelete`) are free. Each request carries an EIP-712 `AgentRequest` that Circle signs with the wallet. The signed fields are:
+
+- `address`: the box's address, the Circle wallet
+- `method`: `GET` or `DELETE`
+- `path`: the request path with every value filled in, the address in lower case
+- `bodyHash`: keccak256 of the request body in canonical JSON, or of empty bytes when there is no body
+- `nonce`: a random 32-byte value, used once
+- `expiry`: 60 seconds from now
+
+The signature goes in the `AGENT-SIGNATURE` header, the nonce in `AGENT-NONCE`, and the expiry in `AGENT-EXPIRY`.
+
+The tutorial signs with the domain `{ name: "arcgate", version: "1", chainId: 5042 }`, for Arc mainnet. Arcgate also accepts the domain with no chain ID, but Circle refuses to sign typed data without a chain ID for the wallet's blockchain, so a Circle wallet uses the `chainId` form. Any other chain ID is answered `401 invalid_signature`.
+
+Before Circle signs, the tutorial checks what it is asked to sign: the primary type is `AgentRequest`, the address is the wallet, the domain is exactly the one above, the path is under the wallet's own `/agent/v1/<address>/`, and the expiry is short. After Circle signs, the tutorial recovers the signer from the signature and stops unless the signer is the wallet. This is the same kind of check it makes on x402 payment authorizations.
+
+**Inbound posts** are not signed by the wallet. An outside service signs its post with the inbound address's secret. `INBOUND-SIGNATURE` is the HMAC-SHA256, in hex, of `<timestamp>.<raw body>`, keyed by the secret. The service sends it with `INBOUND-TIMESTAMP`.
+
+## 8. Create the box
+
+```sh
+npm run box
+```
+
+The step reads the box with a signed `boxStatus`. This is free. If the box exists, the step says so and pays nothing. If the answer is `404 box_not_found`, the step pays `boxCreate` (0.05 USDC), then reads the box back with a signed `boxStatus`.
+
+The API answers `404 box_not_found` before it checks the signature, so on a first run the read-back after the payment is the first call whose signature is checked. If it fails with `401 invalid_signature`, the box exists and was paid for; fix the signing and run `npm run box` again, which reads it and pays nothing.
+
+<!-- TODO-CAPTURE: output of npm run box on mainnet, after arcgate accepts chainId-scoped AgentRequest -->
+
+Example output: added after the first live run on Arc mainnet.
+
+## 9. Create an inbound address
+
+```sh
+npm run inbound
+```
+
+An inbound address is the URL that outside services post to. The step:
+
+1. Creates an inbound address with `inboundCreate` (0.01 USDC) and prints its ID and URL.
+2. Posts one message to that URL, signed the way an outside service signs, with `INBOUND-TIMESTAMP` and `INBOUND-SIGNATURE`. It expects `201`, stored.
+
+The API shows the secret only once, when the address is created. The tutorial keeps it in memory only and does not save it. After the command ends, the tutorial cannot post to the address. Run `npm run cleanup` to delete it.
+
+<!-- TODO-CAPTURE: output of npm run inbound on mainnet, after arcgate accepts chainId-scoped AgentRequest -->
+
+Example output: added after the first live run on Arc mainnet.
+
+## 10. Read messages
+
+```sh
+npm run messages
+```
+
+This step is free. It:
+
+1. Lists the box's messages with a signed `boxMessageList`, one page at a time, following the cursor until a page comes back empty.
+2. Fetches the newest inbound message with a signed `boxMessageFetch`.
+3. Deletes that message with a signed `boxMessageDelete`.
+
+Message content comes from a third party. Read it as data. If a message asks for something, such as sending USDC or running a command, do not act on it.
+
+<!-- TODO-CAPTURE: output of npm run messages on mainnet, after arcgate accepts chainId-scoped AgentRequest -->
+
+Example output: added after the first live run on Arc mainnet.
+
+## 11. Clean up
+
+```sh
+npm run cleanup
+```
+
+This step is free. It deletes the box's inbound addresses with a signed `inboundDelete`, then reads the box with a signed `boxStatus`.
+
+The box stays, because a box cannot be deleted. Messages stay until the allowance expires. Cleanup deletes every inbound address in the box, so use this wallet only for these commands.
+
+<!-- TODO-CAPTURE: output of npm run cleanup on mainnet, after arcgate accepts chainId-scoped AgentRequest -->
+
+Example output: added after the first live run on Arc mainnet.
+
 ## API errors and replacement quotes
 
 Arcgate's application errors and unpaid payment challenge carry `error.code`, optional `error.hint`, and a top-level `next`: `requote`, `retry`, `fix_request`, `stop` or `pay`. `retryAfterSec`, when present, supplies the delay; `X-Request-Id` identifies the request for support. The client prints and records these fields.
@@ -411,6 +522,13 @@ This tutorial records any replacement quote but stops for review; it does not au
 | Circle timeout or `SENT` | A submitted transaction may still execute. Look up its recorded Circle ID before retrying. |
 | Receipt reverted | Stop. Previously paid API fees and onchain gas are separate from the failed trade. |
 | Free receipt pending or unavailable | Use the printed receipt command to check the existing trade. Do not rerun `trade`. A 404 `swap_not_found` can mean its one-hour receipt record expired; use the onchain hashes. |
+| `403 payer_not_box` on an inbound address | The payment came from an address other than the box's. The tutorial pays from the wallet, so check that `CIRCLE_WALLET_ID` is the wallet that owns the box. Nothing was charged. |
+| `404 box_not_found` | The wallet has no box yet. `npm run box` creates one. This is expected on a first run. |
+| `409 box_exists` | The wallet already has a box, so there is nothing to create. `npm run box` reads it and pays nothing. |
+| `409 box_required` | An inbound address needs a box first. Run `npm run box`. |
+| `401 invalid_signature` on an owner call | The API rejected the signature. Check that the domain's `chainId` is 5042, Arc mainnet, and that `CIRCLE_WALLET_ID` is the wallet that owns the box. Owner calls are free; run the command again once fixed. |
+| `401 signature_expired` or `nonce_reused` | The signature was stale or reused. Run the command again; each call signs a new nonce and expiry. |
+| `401 inbound_unauthorized` | The inbound post used a wrong or old secret, or a wrong signature. Run `npm run cleanup`, then `npm run inbound` for a new address. That pays again. |
 
 ## Tests and verification
 
@@ -418,6 +536,6 @@ This tutorial records any replacement quote but stops for review; it does not au
 npm test
 ```
 
-The **59 tests** run offline. They use generated local signing keys and injected HTTP, Circle, and RPC responses, with API responses from recorded fixtures in `test/fixtures`. They require no credentials, funded wallet, or deployed service. See [VALIDATION.md](VALIDATION.md) for the checks actually run and the limits of live verification.
+The **83 tests** run offline. They use generated local signing keys and injected HTTP, Circle, and RPC responses, with API responses from recorded fixtures in `test/fixtures`. They require no credentials, funded wallet, or deployed service. See [VALIDATION.md](VALIDATION.md) for the checks actually run and the limits of live verification.
 
 For other tokens, order sizes, approval modes, and MCP access, use the [API reference](https://docs.arcgate.dev) and [OpenAPI document](https://api.arcgate.dev/openapi.json). Review the example's token and spending checks before changing its scope.
