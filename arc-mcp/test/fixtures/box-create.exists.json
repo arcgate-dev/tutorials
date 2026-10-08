@@ -1,0 +1,1 @@
+{"result":{"content":[{"type":"text","text":"{\"error\":{\"code\":\"box_exists\",\"message\":\"this address already has a box: top it up instead\"},\"next\":\"stop\"}"}],"structuredContent":{"error":{"code":"box_exists","message":"this address already has a box: top it up instead"},"next":"stop"},"isError":true},"jsonrpc":"2.0","id":2}

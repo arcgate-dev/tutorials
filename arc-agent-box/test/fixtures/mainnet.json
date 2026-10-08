@@ -1,0 +1,3844 @@
+{
+  "capturedAt": "2026-10-08T15:16:40.742Z",
+  "apiUrl": "https://api.arcgate.dev",
+  "apiCommit": "6e04f6ab0a060417c852f87f20980e42a00fa3eb",
+  "address": "0xB0d14e90E1949F3D5EC8Bf9136EEB82525Af44E0",
+  "exchanges": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "731e7a9a"
+      },
+      "body": {
+        "ok": true,
+        "db": {
+          "ok": true,
+          "tokens": 250467,
+          "verified": 68,
+          "importedAt": 1791472550
+        },
+        "rulesVersion": "r2-383954828c",
+        "commit": "6e04f6ab0a060417c852f87f20980e42a00fa3eb",
+        "caches": {
+          "response": {
+            "hits": 0,
+            "misses": 8,
+            "size": 2,
+            "bytes": 21618
+          },
+          "candidates": {
+            "hits": 0,
+            "misses": 4,
+            "size": 2,
+            "bytes": 3671181
+          },
+          "generations": {
+            "keys": 5,
+            "bumps": 264353
+          },
+          "abuse": {
+            "missCacheSize": 0,
+            "payersTracked": 0,
+            "rateLimited": 0
+          },
+          "singleflight": {
+            "response": {
+              "hits": 0,
+              "leaders": 4
+            },
+            "probe": {
+              "hits": 0,
+              "leaders": 0
+            },
+            "depth": {
+              "hits": 0,
+              "leaders": 2
+            }
+          },
+          "quote": {
+            "lastEthCalls": 3,
+            "lastSafetyEthCalls": 0,
+            "lastCollapsed": false
+          }
+        },
+        "rpc": {
+          "counts": {
+            "chainstack:eth_getCode": 4,
+            "chainstack:eth_getBlockByNumber": 241,
+            "alchemy:eth_call": 16,
+            "arc_public:eth_call": 16,
+            "chainstack:eth_blockNumber": 753,
+            "alchemy:eth_getLogs": 5878,
+            "arc_public:eth_getLogs": 5483,
+            "chainstack:eth_call": 1137,
+            "chainstack:eth_simulateV1": 15
+          },
+          "total": 13543,
+          "endpoints": [
+            {
+              "id": "arc_public",
+              "health": 0.9999999999999996,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "archive": "closed",
+                "probe": "closed"
+              },
+              "weight": 100,
+              "priority": 3,
+              "capabilities": [
+                "logs",
+                "call",
+                "archive",
+                "probe",
+                "backfill"
+              ],
+              "calls": 5499,
+              "budget": {
+                "used": 406532,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 406050,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 482,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 30,
+                "rejected": 0
+              }
+            },
+            {
+              "id": "chainstack",
+              "health": 1,
+              "circuit": "closed",
+              "circuits": {
+                "simulate": "closed",
+                "call": "closed",
+                "probe": "closed"
+              },
+              "weight": 1,
+              "priority": 1,
+              "capabilities": [
+                "simulate",
+                "call",
+                "probe"
+              ],
+              "calls": 2150,
+              "budget": {
+                "used": 132227,
+                "limit": 3000000,
+                "pct": 0.044075666666666666,
+                "state": "ok"
+              },
+              "byCapability": {
+                "simulate": {
+                  "used": 97,
+                  "limit": null,
+                  "reserveMonthly": 2000000,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 132130,
+                  "limit": 1000000,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 100,
+                "rejected": 0
+              }
+            },
+            {
+              "id": "alchemy",
+              "health": 0.9999999999999996,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "archive": "closed",
+                "probe": "closed"
+              },
+              "weight": 50,
+              "priority": 2,
+              "capabilities": [
+                "logs",
+                "call",
+                "archive",
+                "probe",
+                "backfill"
+              ],
+              "calls": 5894,
+              "budget": {
+                "used": 412494,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 411953,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 541,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 60,
+                "rejected": 0
+              }
+            }
+          ]
+        },
+        "spend": {
+          "counts": {
+            "chainstack:eth_getCode": 4,
+            "chainstack:eth_getBlockByNumber": 241,
+            "alchemy:eth_call": 16,
+            "arc_public:eth_call": 16,
+            "chainstack:eth_blockNumber": 753,
+            "alchemy:eth_getLogs": 5878,
+            "arc_public:eth_getLogs": 5483,
+            "chainstack:eth_call": 1137,
+            "chainstack:eth_simulateV1": 15
+          },
+          "month": [
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 11196
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 310123
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 26784
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 178
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 3077
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 402
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 2241
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 18907
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 333
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 508
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 292
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 483
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 76
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 47
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 143539
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 11438
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 203
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 10
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getTransactionByHash",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getTransactionReceipt",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-10",
+              "calls": 406050
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getLogs",
+              "month": "2026-10",
+              "calls": 411953
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 65590
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 52542
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getCode",
+              "month": "2026-10",
+              "calls": 35
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 13989
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 506
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 454
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 34
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 28
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 1
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-10",
+              "calls": 71
+            }
+          ],
+          "budgets": {
+            "arc_public": {
+              "used": 406532,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            },
+            "chainstack": {
+              "used": 132227,
+              "limit": 3000000,
+              "pct": 0.044075666666666666,
+              "state": "ok"
+            },
+            "alchemy": {
+              "used": 412494,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            },
+            "etherscan": {
+              "used": 0,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            }
+          }
+        },
+        "indexer": {
+          "head": 24920404,
+          "streams": [
+            {
+              "stream": "poll:a:v4",
+              "nextBlock": 24920403,
+              "lag": 2
+            },
+            {
+              "stream": "poll:b:v3v2tax",
+              "nextBlock": 24920403,
+              "lag": 2
+            },
+            {
+              "stream": "poll:c:launchpads",
+              "nextBlock": 24920403,
+              "lag": 2
+            },
+            {
+              "stream": "poll:d:milestones",
+              "nextBlock": 24920403,
+              "lag": 2
+            },
+            {
+              "stream": "poll:f:aerodrome",
+              "nextBlock": 24920403,
+              "lag": 2
+            }
+          ],
+          "lastPollAt": 1791472548,
+          "backfill": [
+            {
+              "stream": "v4:pm:history",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 141.62578511647703,
+              "backoffUntil": null
+            },
+            {
+              "stream": "uniswap_v3:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 168.21000801239123,
+              "backoffUntil": null
+            },
+            {
+              "stream": "uniswap_v2:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 71.88456041385388,
+              "backoffUntil": null
+            },
+            {
+              "stream": "aerodrome_cl:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 87.56009644025369,
+              "backoffUntil": null
+            },
+            {
+              "stream": "o1:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 77.35203127956335,
+              "backoffUntil": null
+            },
+            {
+              "stream": "minara:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 78.19832338208771,
+              "backoffUntil": null
+            },
+            {
+              "stream": "tolly:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 77.96416886920258,
+              "backoffUntil": null
+            },
+            {
+              "stream": "foci:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 77.33283905253482,
+              "backoffUntil": null
+            },
+            {
+              "stream": "argus:backfill",
+              "nextBlock": 24920405,
+              "remainingBlocks": 0,
+              "blocksPerSec": 74.58684493010033,
+              "backoffUntil": null
+            },
+            {
+              "stream": "window48h:b",
+              "nextBlock": 22365749,
+              "remainingBlocks": 0,
+              "blocksPerSec": 0,
+              "backoffUntil": null
+            },
+            {
+              "stream": "agents:registries",
+              "nextBlock": 24901470,
+              "remainingBlocks": 18934,
+              "blocksPerSec": 27829.287189899358,
+              "backoffUntil": null
+            }
+          ],
+          "tradesRows": 250981,
+          "lagBlocks": 2,
+          "caughtUp": true,
+          "lastError": null,
+          "consecutiveFailures": 0,
+          "maxTxMs": 40.66421700082719,
+          "maxBlockingMs": 40.7347769998014,
+          "maxAggregateMs": 293.0220979999285
+        },
+        "safety": {
+          "enqueued": 12,
+          "collapsed": 0,
+          "dropped": 0,
+          "running": 0,
+          "done": 8,
+          "failed": 0,
+          "simulateCalls": 12,
+          "skippedPinned": 4
+        },
+        "payerIdentity": "x402",
+        "x402": {
+          "enabled": true,
+          "network": "eip155:5042"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "cc2b8eb1"
+      },
+      "body": {
+        "paths": {
+          "/trade/v1/search": {
+            "post": {
+              "operationId": "tradeSearch",
+              "x-payment": {
+                "configKey": "trade.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/quote": {
+            "post": {
+              "operationId": "tradeQuote",
+              "x-payment": {
+                "configKey": "trade.quote.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/swap": {
+            "post": {
+              "operationId": "tradeSwap",
+              "x-payment": {
+                "asset": "USDC",
+                "decimals": 6,
+                "tiers": [
+                  {
+                    "configKey": "trade.swap.price",
+                    "baseUnits": "10000",
+                    "appliesToUsdNotional": "< 1,000, a quote with no USD valuation, or unknown/expired quoteId"
+                  },
+                  {
+                    "configKey": "trade.swap.price_mid",
+                    "baseUnits": "50000",
+                    "appliesToUsdNotional": "1,000-10,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_large",
+                    "baseUnits": "500000",
+                    "appliesToUsdNotional": "> 10,000-100,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_max",
+                    "baseUnits": "5000000",
+                    "appliesToUsdNotional": "> 100,000"
+                  }
+                ]
+              }
+            }
+          },
+          "/trade/v1/swap/tx": {
+            "post": {
+              "operationId": "tradeSwapTx"
+            }
+          },
+          "/trade/v1/receipt": {
+            "post": {
+              "operationId": "tradeReceipt"
+            }
+          },
+          "/trade/v1/venues": {
+            "get": {
+              "operationId": "tradeVenues"
+            }
+          },
+          "/mcp": {
+            "get": {
+              "operationId": "mcpInfo"
+            },
+            "post": {
+              "operationId": "mcp"
+            }
+          },
+          "/agents/v1/{chainId}/search": {
+            "post": {
+              "operationId": "agentSearch",
+              "x-payment": {
+                "configKey": "agents.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/agent/{agentId}": {
+            "get": {
+              "operationId": "agentProfile",
+              "x-payment": {
+                "configKey": "agents.profile.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/wallet/{address}": {
+            "get": {
+              "operationId": "agentWallet",
+              "x-payment": {
+                "configKey": "agents.wallet.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box": {
+            "post": {
+              "operationId": "boxCreate",
+              "x-payment": {
+                "configKey": "agent.box.price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/topup": {
+            "post": {
+              "operationId": "boxTopUp",
+              "x-payment": {
+                "configKey": "agent.box.topup_price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/status": {
+            "get": {
+              "operationId": "boxStatus"
+            }
+          },
+          "/agent/v1/{address}/box/messages": {
+            "get": {
+              "operationId": "boxMessageList"
+            }
+          },
+          "/agent/v1/{address}/box/messages/{seq}": {
+            "get": {
+              "operationId": "boxMessageFetch"
+            },
+            "delete": {
+              "operationId": "boxMessageDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound": {
+            "post": {
+              "operationId": "inboundCreate",
+              "x-payment": {
+                "configKey": "agent.inbound.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/inbound/list": {
+            "get": {
+              "operationId": "inboundList"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}": {
+            "delete": {
+              "operationId": "inboundDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}/rotate": {
+            "post": {
+              "operationId": "inboundRotate"
+            }
+          },
+          "/agent/v1/{address}/watch": {
+            "post": {
+              "operationId": "watchCreate",
+              "x-payment": {
+                "configKey": "agent.watch.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/watch/list": {
+            "get": {
+              "operationId": "watchList"
+            }
+          },
+          "/agent/v1/{address}/watch/{id}": {
+            "delete": {
+              "operationId": "watchDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook": {
+            "post": {
+              "operationId": "webhookCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/webhook/list": {
+            "get": {
+              "operationId": "webhookList"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}": {
+            "delete": {
+              "operationId": "webhookDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/rotate": {
+            "post": {
+              "operationId": "webhookRotate"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/enable": {
+            "post": {
+              "operationId": "webhookEnable"
+            }
+          },
+          "/agent/v1/{address}/telegram": {
+            "post": {
+              "operationId": "telegramCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/telegram/list": {
+            "get": {
+              "operationId": "telegramList"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}": {
+            "delete": {
+              "operationId": "telegramDelete"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}/link": {
+            "post": {
+              "operationId": "telegramLink"
+            }
+          },
+          "/health": {
+            "get": {
+              "operationId": "health"
+            }
+          },
+          "/openapi.json": {
+            "get": {
+              "operationId": "openapi"
+            }
+          },
+          "/.well-known/agent-registration.json": {
+            "get": {
+              "operationId": "agentRegistration"
+            }
+          },
+          "/.well-known/agentkarma.json": {
+            "get": {
+              "operationId": "agentKarmaManifest"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/status",
+      "status": 404,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "7c230c73"
+      },
+      "body": {
+        "error": {
+          "code": "box_not_found",
+          "message": "this address has no box"
+        },
+        "next": "fix_request"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box",
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL2JveCIsImRlc2NyaXB0aW9uIjoiQWdlbnQgYm94IGNyZWF0ZSIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHgwOEE0Zjg3MzRBREFCMDhkMzQ2MUUzNTZiNUE0OThiODkzQmQ3QjVlIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "117c7239"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHgyMWFiNzdhM2RiYzVlMzMzYzIwNjVhZDY3ZjEyNTA0OTRiYWFmNzFmYWY2NTA3M2M0MTZhNTE4N2M0Yjg1N2ZiIiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAifQ==",
+        "x-request-id": "e1fcf184"
+      },
+      "body": {
+        "address": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "granted": {
+          "messages": 500,
+          "days": 30
+        },
+        "allowance": {
+          "messagesLeft": 500,
+          "expiresAt": 1794064560
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/status",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "4573b964"
+      },
+      "body": {
+        "address": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "createdAt": 1791472564,
+        "allowance": {
+          "messagesLeft": 500,
+          "expiresAt": 1794064564,
+          "expired": false
+        },
+        "counts": {
+          "messages": 0,
+          "inboundAddresses": 0,
+          "watches": 0,
+          "channels": 0
+        },
+        "unstoredWatchHits": 0,
+        "registeredAgents": {
+          "chainId": 5042,
+          "agents": []
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/inbound",
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL2luYm91bmQiLCJkZXNjcmlwdGlvbiI6IkFnZW50IGluYm91bmQgYWRkcmVzcyBjcmVhdGUiLCJtaW1lVHlwZSI6IiJ9LCJhY2NlcHRzIjpbeyJzY2hlbWUiOiJleGFjdCIsIm5ldHdvcmsiOiJlaXAxNTU6NTA0MiIsImFtb3VudCI6IjEwMDAwIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJwYXlUbyI6IjB4MDhBNGY4NzM0QURBQjA4ZDM0NjFFMzU2YjVBNDk4Yjg5M0JkN0I1ZSIsIm1heFRpbWVvdXRTZWNvbmRzIjozMDAsImV4dHJhIjp7Im5hbWUiOiJVU0RDIiwidmVyc2lvbiI6IjIifX1dfQ==",
+        "x-request-id": "f36c6d47"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/inbound",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHhmMWUyMDMzNThiNmM0MzZmNjkyYzNhZjljYTdjNmE2MTE5MjdmNmRhNjk3ZDYxMWQ5MTUxMWYyNDk4ZDZkNzMxIiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiMTAwMDAifQ==",
+        "x-request-id": "2978e272"
+      },
+      "body": {
+        "id": "39GFK4lyg1qyNGsehwQG_Q",
+        "url": "https://in.arcgate.dev/39GFK4lyg1qyNGsehwQG_Q",
+        "secret": "<redacted>",
+        "createdAt": 1791472564
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/39GFK4lyg1qyNGsehwQG_Q",
+      "requestBody": {
+        "run": "f489c0a8-0f32-4182-920a-7b2da1c06b9a",
+        "via": "signature",
+        "sentAt": 1791472566745,
+        "note": "a message from an outside service"
+      },
+      "status": 201,
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "body": {
+        "stored": true,
+        "idempotencyKey": "0x4d73f2ee0b8b524101d6bf75932f0e92281c6790f212d2209f73ba23f584676e"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/inbound/39GFK4lyg1qyNGsehwQG_Q/rotate",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "4e748e4b"
+      },
+      "body": {
+        "id": "39GFK4lyg1qyNGsehwQG_Q",
+        "url": "https://in.arcgate.dev/39GFK4lyg1qyNGsehwQG_Q",
+        "secret": "<redacted>"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/39GFK4lyg1qyNGsehwQG_Q",
+      "requestBody": {
+        "run": "f489c0a8-0f32-4182-920a-7b2da1c06b9a",
+        "via": "signature",
+        "sentAt": 1791472567017,
+        "note": "a message from an outside service"
+      },
+      "status": 401,
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "body": {
+        "error": {
+          "code": "inbound_unauthorized",
+          "message": "send a valid INBOUND-SIGNATURE (with INBOUND-TIMESTAMP) or the address's INBOUND-SECRET"
+        },
+        "next": "fix_request"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/39GFK4lyg1qyNGsehwQG_Q",
+      "requestBody": {
+        "run": "f489c0a8-0f32-4182-920a-7b2da1c06b9a",
+        "via": "secret",
+        "sentAt": 1791472567097,
+        "note": "a message from an outside service"
+      },
+      "status": 201,
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "body": {
+        "stored": true,
+        "idempotencyKey": "0xce71d260105ae7cfed4a764b718d4527b714a906cc561c268f36298004958d10"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "token",
+          "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            }
+          ]
+        }
+      },
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL3dhdGNoIiwiZGVzY3JpcHRpb24iOiJBZ2VudCB3YXRjaCBjcmVhdGUiLCJtaW1lVHlwZSI6IiJ9LCJhY2NlcHRzIjpbeyJzY2hlbWUiOiJleGFjdCIsIm5ldHdvcmsiOiJlaXAxNTU6NTA0MiIsImFtb3VudCI6IjEwMDAwIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJwYXlUbyI6IjB4MDhBNGY4NzM0QURBQjA4ZDM0NjFFMzU2YjVBNDk4Yjg5M0JkN0I1ZSIsIm1heFRpbWVvdXRTZWNvbmRzIjozMDAsImV4dHJhIjp7Im5hbWUiOiJVU0RDIiwidmVyc2lvbiI6IjIifX1dfQ==",
+        "x-request-id": "110a17dc"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "token",
+          "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            }
+          ]
+        }
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHhjYjBhOTMzZWViMzczMjBkNzU1MzQyNmFjYjM4YTkwYjBiZDJjMWJmMTZhMzE5ZjFhMjhmOTgxYmY5OTMxYzc0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiMTAwMDAifQ==",
+        "x-request-id": "290aeadc"
+      },
+      "body": {
+        "id": "ntShCrIdmxt0DKqdcg5vbQ",
+        "condition": {
+          "kind": "token",
+          "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            }
+          ]
+        },
+        "createdAt": 1791472567
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "screen",
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            },
+            {
+              "field": "safety_verdict",
+              "op": "eq",
+              "value": "ok"
+            }
+          ]
+        }
+      },
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL3dhdGNoIiwiZGVzY3JpcHRpb24iOiJBZ2VudCB3YXRjaCBjcmVhdGUiLCJtaW1lVHlwZSI6IiJ9LCJhY2NlcHRzIjpbeyJzY2hlbWUiOiJleGFjdCIsIm5ldHdvcmsiOiJlaXAxNTU6NTA0MiIsImFtb3VudCI6IjEwMDAwIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJwYXlUbyI6IjB4MDhBNGY4NzM0QURBQjA4ZDM0NjFFMzU2YjVBNDk4Yjg5M0JkN0I1ZSIsIm1heFRpbWVvdXRTZWNvbmRzIjozMDAsImV4dHJhIjp7Im5hbWUiOiJVU0RDIiwidmVyc2lvbiI6IjIifX1dfQ==",
+        "x-request-id": "5bdbd93a"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "screen",
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            },
+            {
+              "field": "safety_verdict",
+              "op": "eq",
+              "value": "ok"
+            }
+          ]
+        }
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHhlODA3YzI0ZjZhNjQ4MjcwMDIzZWZiMTU2NjI3ZGY2Njc5ZDg5NTZiNGY4MmQ0YWZmMGFiYmViZmIyZDNmYzE3IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiMTAwMDAifQ==",
+        "x-request-id": "41aef085"
+      },
+      "body": {
+        "id": "Ff12vrzahms4kM_YGAV3WQ",
+        "condition": {
+          "kind": "screen",
+          "where": [
+            {
+              "field": "volume_24h",
+              "op": "gt",
+              "value": 100000
+            },
+            {
+              "field": "safety_verdict",
+              "op": "eq",
+              "value": "ok"
+            }
+          ]
+        },
+        "createdAt": 1791472570
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "agents",
+          "chainId": 5042,
+          "on": [
+            "registered"
+          ]
+        }
+      },
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL3dhdGNoIiwiZGVzY3JpcHRpb24iOiJBZ2VudCB3YXRjaCBjcmVhdGUiLCJtaW1lVHlwZSI6IiJ9LCJhY2NlcHRzIjpbeyJzY2hlbWUiOiJleGFjdCIsIm5ldHdvcmsiOiJlaXAxNTU6NTA0MiIsImFtb3VudCI6IjEwMDAwIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJwYXlUbyI6IjB4MDhBNGY4NzM0QURBQjA4ZDM0NjFFMzU2YjVBNDk4Yjg5M0JkN0I1ZSIsIm1heFRpbWVvdXRTZWNvbmRzIjozMDAsImV4dHJhIjp7Im5hbWUiOiJVU0RDIiwidmVyc2lvbiI6IjIifX1dfQ==",
+        "x-request-id": "d5dc1f3f"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch",
+      "requestBody": {
+        "condition": {
+          "kind": "agents",
+          "chainId": 5042,
+          "on": [
+            "registered"
+          ]
+        }
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHgxNTFiZjMyZmM1NTE4NjhlNzEzNWY0MmQ0NTQ2NzJjZDcwYzcyMmNmZDQwNDJhMmM3MDZlNzllZTlkZTExZjk1IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiMTAwMDAifQ==",
+        "x-request-id": "5276cbba"
+      },
+      "body": {
+        "id": "cMwxW0sALwz7oLKmFu96pw",
+        "condition": {
+          "kind": "agents",
+          "chainId": 5042,
+          "on": [
+            "registered"
+          ]
+        },
+        "createdAt": 1791472574
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch/list",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "90ec36dc"
+      },
+      "body": {
+        "watches": [
+          {
+            "id": "ntShCrIdmxt0DKqdcg5vbQ",
+            "condition": {
+              "kind": "token",
+              "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 100000
+                }
+              ]
+            },
+            "createdAt": 1791472570,
+            "lastFiredAt": null,
+            "matchingTokens": null
+          },
+          {
+            "id": "Ff12vrzahms4kM_YGAV3WQ",
+            "condition": {
+              "kind": "screen",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 100000
+                },
+                {
+                  "field": "safety_verdict",
+                  "op": "eq",
+                  "value": "ok"
+                }
+              ]
+            },
+            "createdAt": 1791472574,
+            "lastFiredAt": null,
+            "matchingTokens": 0
+          },
+          {
+            "id": "cMwxW0sALwz7oLKmFu96pw",
+            "condition": {
+              "kind": "agents",
+              "chainId": 5042,
+              "on": [
+                "registered"
+              ]
+            },
+            "createdAt": 1791472576,
+            "lastFiredAt": null,
+            "matchingTokens": null
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/trade/v1/search",
+      "requestBody": {
+        "query": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+        "limit": 5
+      },
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvdHJhZGUvdjEvc2VhcmNoIiwiZGVzY3JpcHRpb24iOiJUb2tlbiBzZWFyY2giLCJtaW1lVHlwZSI6IiJ9LCJhY2NlcHRzIjpbeyJzY2hlbWUiOiJleGFjdCIsIm5ldHdvcmsiOiJlaXAxNTU6NTA0MiIsImFtb3VudCI6IjUwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHgwOEE0Zjg3MzRBREFCMDhkMzQ2MUUzNTZiNUE0OThiODkzQmQ3QjVlIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "1f491ab8"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/trade/v1/search",
+      "requestBody": {
+        "query": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+        "limit": 5
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHhmZjVkOWVjMTNkZDIwNThjYjBkMTBkZjI5MTdmZDEwZTBkYTQ5YWEzZGRjNGJkZjNlNTVlODhiNWNlOTBiZmQ0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMCJ9",
+        "x-request-id": "2289e560"
+      },
+      "body": {
+        "query": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+        "network": "eip155:5042",
+        "block": 24920451,
+        "resolution": "ambiguous",
+        "rulesVersion": "r2-383954828c",
+        "results": [
+          {
+            "address": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+            "symbol": "FAZE",
+            "name": "Faze",
+            "decimals": 18,
+            "match": "address",
+            "verification": {
+              "status": "unverified"
+            },
+            "evidence": {
+              "firstWithTicker": false,
+              "creatorLinked": false,
+              "depth2PctUsd": null,
+              "depthKind": null,
+              "depthAgeSec": null,
+              "volume24hUsd": "573697.219512",
+              "traders24h": 5,
+              "trades24h": 15,
+              "sells24h": 5,
+              "sellers24h": 2,
+              "topTraderShare24h": 0.49997876679791065,
+              "ageHours": null,
+              "posterior": null
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": null,
+              "creator": null,
+              "createdBlock": null,
+              "createdAt": null,
+              "website": null,
+              "twitter": null,
+              "telegram": null
+            },
+            "state": null,
+            "venues": [
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
+                "pair": "USDC",
+                "feeBps": null,
+                "hooks": "0xae0c41caef4a9b506ec74efa26226abdf7e6c840"
+              }
+            ],
+            "liquidityUsd": null,
+            "depth2PctUsd": null,
+            "volume24hUsd": "573697.219512",
+            "holders": null,
+            "safety": null,
+            "safetyByRoute": [
+              {
+                "routeId": "uniswap_v4:0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
+                "route": {
+                  "venue": "uniswap_v4",
+                  "poolId": "0x587568cff45acff865db4ab06bc9db9090c923891530bda9be7c28eacea68099",
+                  "pair": "USDC"
+                },
+                "verdict": null,
+                "buyTaxBps": null,
+                "sellTaxBps": null,
+                "checkedBlock": null
+              }
+            ],
+            "flags": [
+              "ambiguous_ticker",
+              "hooked_pool",
+              "impersonates_verified",
+              "safety_pending"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook",
+      "requestBody": {
+        "url": "https://aims-mechanical-cars-sunshine.trycloudflare.com",
+        "filter": [
+          "inbound",
+          "watch"
+        ]
+      },
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL3dlYmhvb2siLCJkZXNjcmlwdGlvbiI6IkFnZW50IHdlYmhvb2sgY2hhbm5lbCBjcmVhdGUiLCJtaW1lVHlwZSI6IiJ9LCJhY2NlcHRzIjpbeyJzY2hlbWUiOiJleGFjdCIsIm5ldHdvcmsiOiJlaXAxNTU6NTA0MiIsImFtb3VudCI6IjEwMDAwIiwiYXNzZXQiOiIweDM2MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCJwYXlUbyI6IjB4MDhBNGY4NzM0QURBQjA4ZDM0NjFFMzU2YjVBNDk4Yjg5M0JkN0I1ZSIsIm1heFRpbWVvdXRTZWNvbmRzIjozMDAsImV4dHJhIjp7Im5hbWUiOiJVU0RDIiwidmVyc2lvbiI6IjIifX1dfQ==",
+        "x-request-id": "d80c1e8c"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook",
+      "requestBody": {
+        "url": "https://aims-mechanical-cars-sunshine.trycloudflare.com",
+        "filter": [
+          "inbound",
+          "watch"
+        ]
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHhhNjk3OWY4OWYzYTM2YmVlOGUyZmU3YzdhOTIyYTJmNGJkMzkzZmY4YWMxNzIwZWRlZjlhYzhlZDU4ZTA2OWEyIiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiMTAwMDAifQ==",
+        "x-request-id": "0d50784d"
+      },
+      "body": {
+        "id": "NsXiu1aqhJuMUYJsWaxnCg",
+        "url": "https://aims-mechanical-cars-sunshine.trycloudflare.com",
+        "secret": "<redacted>",
+        "filter": [
+          "inbound",
+          "watch"
+        ],
+        "createdAt": 1791472581
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook/list",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "13f27336"
+      },
+      "body": {
+        "webhooks": [
+          {
+            "id": "NsXiu1aqhJuMUYJsWaxnCg",
+            "url": "https://aims-mechanical-cars-sunshine.trycloudflare.com",
+            "filter": [
+              "inbound",
+              "watch"
+            ],
+            "enabled": true,
+            "verifiedAt": null,
+            "failures": 0,
+            "lastError": null,
+            "createdAt": 1791472585
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook/list",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "84087c13"
+      },
+      "body": {
+        "webhooks": [
+          {
+            "id": "NsXiu1aqhJuMUYJsWaxnCg",
+            "url": "https://aims-mechanical-cars-sunshine.trycloudflare.com",
+            "filter": [
+              "inbound",
+              "watch"
+            ],
+            "enabled": true,
+            "verifiedAt": 1791472586,
+            "failures": 0,
+            "lastError": null,
+            "createdAt": 1791472585
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook/NsXiu1aqhJuMUYJsWaxnCg/rotate",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "b39c7dc9"
+      },
+      "body": {
+        "id": "NsXiu1aqhJuMUYJsWaxnCg",
+        "secret": "<redacted>"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/messages?cursor=0",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "71a7526d"
+      },
+      "body": {
+        "messages": [
+          {
+            "kind": "inbound",
+            "type": "inbound",
+            "idempotencyKey": "0x4d73f2ee0b8b524101d6bf75932f0e92281c6790f212d2209f73ba23f584676e",
+            "box": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+            "seq": 1,
+            "createdAt": 1791472566,
+            "expiresAt": 1794064566,
+            "payload": {
+              "untrusted": true,
+              "contentType": "application/json",
+              "encoding": "utf8",
+              "content": "{\"run\":\"f489c0a8-0f32-4182-920a-7b2da1c06b9a\",\"via\":\"signature\",\"sentAt\":1791472566745,\"note\":\"a message from an outside service\"}"
+            },
+            "source": {
+              "inboundAddressId": "39GFK4lyg1qyNGsehwQG_Q",
+              "signatureVerified": true
+            }
+          },
+          {
+            "kind": "inbound",
+            "type": "inbound",
+            "idempotencyKey": "0xce71d260105ae7cfed4a764b718d4527b714a906cc561c268f36298004958d10",
+            "box": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+            "seq": 2,
+            "createdAt": 1791472567,
+            "expiresAt": 1794064567,
+            "payload": {
+              "untrusted": true,
+              "contentType": "application/json",
+              "encoding": "utf8",
+              "content": "{\"run\":\"f489c0a8-0f32-4182-920a-7b2da1c06b9a\",\"via\":\"secret\",\"sentAt\":1791472567097,\"note\":\"a message from an outside service\"}"
+            },
+            "source": {
+              "inboundAddressId": "39GFK4lyg1qyNGsehwQG_Q",
+              "signatureVerified": false
+            }
+          },
+          {
+            "kind": "watch",
+            "type": "watch.token",
+            "idempotencyKey": "0x5b787c1620e08e9ad711b9ff46ca5c60eb6a34499b0aa2af7c382c351e85e8a9",
+            "box": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+            "seq": 3,
+            "createdAt": 1791472578,
+            "expiresAt": 1794064578,
+            "payload": {
+              "untrusted": true,
+              "contentType": "application/json",
+              "encoding": "utf8",
+              "content": "{\"watchId\":\"ntShCrIdmxt0DKqdcg5vbQ\",\"condition\":{\"kind\":\"token\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"where\":[{\"field\":\"volume_24h\",\"op\":\"gt\",\"value\":100000}]},\"changeId\":11755,\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"symbol\":\"FAZE\",\"observed\":{\"volume_24h\":573697.219512}}"
+            },
+            "source": {
+              "watchId": "ntShCrIdmxt0DKqdcg5vbQ"
+            }
+          }
+        ],
+        "nextCursor": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/messages?cursor=3",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "bc993db8"
+      },
+      "body": {
+        "messages": [],
+        "nextCursor": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/messages/2",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "9c7571ef"
+      },
+      "body": {
+        "kind": "inbound",
+        "type": "inbound",
+        "idempotencyKey": "0xce71d260105ae7cfed4a764b718d4527b714a906cc561c268f36298004958d10",
+        "box": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "seq": 2,
+        "createdAt": 1791472567,
+        "expiresAt": 1794064567,
+        "payload": {
+          "untrusted": true,
+          "contentType": "application/json",
+          "encoding": "utf8",
+          "content": "{\"run\":\"f489c0a8-0f32-4182-920a-7b2da1c06b9a\",\"via\":\"secret\",\"sentAt\":1791472567097,\"note\":\"a message from an outside service\"}"
+        },
+        "source": {
+          "inboundAddressId": "39GFK4lyg1qyNGsehwQG_Q",
+          "signatureVerified": false
+        }
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/messages/2",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "e4194aca"
+      },
+      "body": {
+        "deleted": true,
+        "seq": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/topup",
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL2JveC90b3B1cCIsImRlc2NyaXB0aW9uIjoiQWdlbnQgYm94IHRvcC11cCIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHgwOEE0Zjg3MzRBREFCMDhkMzQ2MUUzNTZiNUE0OThiODkzQmQ3QjVlIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "2f98fc3f"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/topup",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHg3ODZjYTc2MmM3YzJkMzIzY2Q0NDZiOTVhNzMyOTdkNGY1OWIxOTRjMjcxYjFkNmFlODNmNGM4ODFhYjZmNmQ3IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAifQ==",
+        "x-request-id": "3d4ee442"
+      },
+      "body": {
+        "address": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "granted": {
+          "messages": 500,
+          "days": 30
+        },
+        "allowance": {
+          "messagesLeft": 997,
+          "expiresAt": 1796656564
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/inbound/list",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "f36f429b"
+      },
+      "body": {
+        "addresses": [
+          {
+            "id": "39GFK4lyg1qyNGsehwQG_Q",
+            "url": "https://in.arcgate.dev/39GFK4lyg1qyNGsehwQG_Q",
+            "createdAt": 1791472566
+          }
+        ]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/inbound/39GFK4lyg1qyNGsehwQG_Q",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "03c305bd"
+      },
+      "body": {
+        "deleted": true,
+        "id": "39GFK4lyg1qyNGsehwQG_Q"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch/list",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "e9c89e32"
+      },
+      "body": {
+        "watches": [
+          {
+            "id": "ntShCrIdmxt0DKqdcg5vbQ",
+            "condition": {
+              "kind": "token",
+              "token": "0xf81afef268aca40717e0adcae7c41514327cfaab",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 100000
+                }
+              ]
+            },
+            "createdAt": 1791472570,
+            "lastFiredAt": 1791472578,
+            "matchingTokens": null
+          },
+          {
+            "id": "Ff12vrzahms4kM_YGAV3WQ",
+            "condition": {
+              "kind": "screen",
+              "where": [
+                {
+                  "field": "volume_24h",
+                  "op": "gt",
+                  "value": 100000
+                },
+                {
+                  "field": "safety_verdict",
+                  "op": "eq",
+                  "value": "ok"
+                }
+              ]
+            },
+            "createdAt": 1791472574,
+            "lastFiredAt": null,
+            "matchingTokens": 0
+          },
+          {
+            "id": "cMwxW0sALwz7oLKmFu96pw",
+            "condition": {
+              "kind": "agents",
+              "chainId": 5042,
+              "on": [
+                "registered"
+              ]
+            },
+            "createdAt": 1791472576,
+            "lastFiredAt": null,
+            "matchingTokens": null
+          }
+        ]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch/ntShCrIdmxt0DKqdcg5vbQ",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "4f65a4f3"
+      },
+      "body": {
+        "deleted": true,
+        "id": "ntShCrIdmxt0DKqdcg5vbQ"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch/Ff12vrzahms4kM_YGAV3WQ",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "49a5cd2b"
+      },
+      "body": {
+        "deleted": true,
+        "id": "Ff12vrzahms4kM_YGAV3WQ"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/watch/cMwxW0sALwz7oLKmFu96pw",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "95b1371c"
+      },
+      "body": {
+        "deleted": true,
+        "id": "cMwxW0sALwz7oLKmFu96pw"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook/list",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "baa12d90"
+      },
+      "body": {
+        "webhooks": [
+          {
+            "id": "NsXiu1aqhJuMUYJsWaxnCg",
+            "url": "https://aims-mechanical-cars-sunshine.trycloudflare.com",
+            "filter": [
+              "inbound",
+              "watch"
+            ],
+            "enabled": true,
+            "verifiedAt": 1791472586,
+            "failures": 0,
+            "lastError": null,
+            "createdAt": 1791472585
+          }
+        ]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/webhook/NsXiu1aqhJuMUYJsWaxnCg",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "569a006d"
+      },
+      "body": {
+        "deleted": true,
+        "id": "NsXiu1aqhJuMUYJsWaxnCg"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/status",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "612de5af"
+      },
+      "body": {
+        "address": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "createdAt": 1791472564,
+        "allowance": {
+          "messagesLeft": 997,
+          "expiresAt": 1796656564,
+          "expired": false
+        },
+        "counts": {
+          "messages": 2,
+          "inboundAddresses": 0,
+          "watches": 0,
+          "channels": 0
+        },
+        "unstoredWatchHits": 0,
+        "registeredAgents": {
+          "chainId": 5042,
+          "agents": []
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/status",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "1e7c8cea"
+      },
+      "body": {
+        "address": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "createdAt": 1791472564,
+        "allowance": {
+          "messagesLeft": 997,
+          "expiresAt": 1796656564,
+          "expired": false
+        },
+        "counts": {
+          "messages": 2,
+          "inboundAddresses": 0,
+          "watches": 0,
+          "channels": 0
+        },
+        "unstoredWatchHits": 0,
+        "registeredAgents": {
+          "chainId": 5042,
+          "agents": []
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/messages?cursor=0",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "5de3d103"
+      },
+      "body": {
+        "messages": [
+          {
+            "kind": "inbound",
+            "type": "inbound",
+            "idempotencyKey": "0x4d73f2ee0b8b524101d6bf75932f0e92281c6790f212d2209f73ba23f584676e",
+            "box": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+            "seq": 1,
+            "createdAt": 1791472566,
+            "expiresAt": 1794064566,
+            "payload": {
+              "untrusted": true,
+              "contentType": "application/json",
+              "encoding": "utf8",
+              "content": "{\"run\":\"f489c0a8-0f32-4182-920a-7b2da1c06b9a\",\"via\":\"signature\",\"sentAt\":1791472566745,\"note\":\"a message from an outside service\"}"
+            },
+            "source": {
+              "inboundAddressId": "39GFK4lyg1qyNGsehwQG_Q",
+              "signatureVerified": true
+            }
+          },
+          {
+            "kind": "watch",
+            "type": "watch.token",
+            "idempotencyKey": "0x5b787c1620e08e9ad711b9ff46ca5c60eb6a34499b0aa2af7c382c351e85e8a9",
+            "box": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+            "seq": 3,
+            "createdAt": 1791472578,
+            "expiresAt": 1794064578,
+            "payload": {
+              "untrusted": true,
+              "contentType": "application/json",
+              "encoding": "utf8",
+              "content": "{\"watchId\":\"ntShCrIdmxt0DKqdcg5vbQ\",\"condition\":{\"kind\":\"token\",\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"where\":[{\"field\":\"volume_24h\",\"op\":\"gt\",\"value\":100000}]},\"changeId\":11755,\"token\":\"0xf81afef268aca40717e0adcae7c41514327cfaab\",\"symbol\":\"FAZE\",\"observed\":{\"volume_24h\":573697.219512}}"
+            },
+            "source": {
+              "watchId": "ntShCrIdmxt0DKqdcg5vbQ"
+            }
+          }
+        ],
+        "nextCursor": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/messages?cursor=3",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "651e0a26"
+      },
+      "body": {
+        "messages": [],
+        "nextCursor": 3
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "3e3eeaa0"
+      },
+      "body": {
+        "ok": true,
+        "db": {
+          "ok": true,
+          "tokens": 250467,
+          "verified": 68,
+          "importedAt": 1791472586
+        },
+        "rulesVersion": "r2-383954828c",
+        "commit": "6e04f6ab0a060417c852f87f20980e42a00fa3eb",
+        "caches": {
+          "response": {
+            "hits": 0,
+            "misses": 14,
+            "size": 3,
+            "bytes": 23082
+          },
+          "candidates": {
+            "hits": 0,
+            "misses": 6,
+            "size": 2,
+            "bytes": 3671181
+          },
+          "generations": {
+            "keys": 14,
+            "bumps": 265740
+          },
+          "abuse": {
+            "missCacheSize": 0,
+            "payersTracked": 0,
+            "rateLimited": 0
+          },
+          "singleflight": {
+            "response": {
+              "hits": 0,
+              "leaders": 7
+            },
+            "probe": {
+              "hits": 0,
+              "leaders": 0
+            },
+            "depth": {
+              "hits": 0,
+              "leaders": 6
+            }
+          },
+          "quote": {
+            "lastEthCalls": 3,
+            "lastSafetyEthCalls": 0,
+            "lastCollapsed": false
+          }
+        },
+        "rpc": {
+          "counts": {
+            "chainstack:eth_getCode": 5,
+            "chainstack:eth_getBlockByNumber": 247,
+            "alchemy:eth_call": 16,
+            "arc_public:eth_call": 16,
+            "chainstack:eth_blockNumber": 756,
+            "alchemy:eth_getLogs": 5902,
+            "arc_public:eth_getLogs": 5507,
+            "chainstack:eth_call": 1156,
+            "chainstack:eth_simulateV1": 28
+          },
+          "total": 13633,
+          "endpoints": [
+            {
+              "id": "arc_public",
+              "health": 0.9999999999999996,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "archive": "closed",
+                "probe": "closed"
+              },
+              "weight": 100,
+              "priority": 3,
+              "capabilities": [
+                "logs",
+                "call",
+                "archive",
+                "probe",
+                "backfill"
+              ],
+              "calls": 5523,
+              "budget": {
+                "used": 406556,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 406074,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 482,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 1,
+                "max": 30,
+                "rejected": 0
+              }
+            },
+            {
+              "id": "chainstack",
+              "health": 1,
+              "circuit": "closed",
+              "circuits": {
+                "simulate": "closed",
+                "call": "closed",
+                "probe": "closed"
+              },
+              "weight": 1,
+              "priority": 1,
+              "capabilities": [
+                "simulate",
+                "call",
+                "probe"
+              ],
+              "calls": 2192,
+              "budget": {
+                "used": 132269,
+                "limit": 3000000,
+                "pct": 0.044089666666666666,
+                "state": "ok"
+              },
+              "byCapability": {
+                "simulate": {
+                  "used": 114,
+                  "limit": null,
+                  "reserveMonthly": 2000000,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 132155,
+                  "limit": 1000000,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 100,
+                "rejected": 0
+              }
+            },
+            {
+              "id": "alchemy",
+              "health": 0.9999999999999996,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "archive": "closed",
+                "probe": "closed"
+              },
+              "weight": 50,
+              "priority": 2,
+              "capabilities": [
+                "logs",
+                "call",
+                "archive",
+                "probe",
+                "backfill"
+              ],
+              "calls": 5918,
+              "budget": {
+                "used": 412518,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 411977,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 541,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 1,
+                "max": 60,
+                "rejected": 0
+              }
+            }
+          ]
+        },
+        "spend": {
+          "counts": {
+            "chainstack:eth_getCode": 5,
+            "chainstack:eth_getBlockByNumber": 247,
+            "alchemy:eth_call": 16,
+            "arc_public:eth_call": 16,
+            "chainstack:eth_blockNumber": 756,
+            "alchemy:eth_getLogs": 5902,
+            "arc_public:eth_getLogs": 5507,
+            "chainstack:eth_call": 1156,
+            "chainstack:eth_simulateV1": 28
+          },
+          "month": [
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 11196
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 310123
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 26784
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 178
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 3077
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 402
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 2241
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 18907
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 333
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 508
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 292
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 483
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 76
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 47
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 143539
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 11438
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 203
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 10
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getTransactionByHash",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getTransactionReceipt",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-10",
+              "calls": 406074
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getLogs",
+              "month": "2026-10",
+              "calls": 411977
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 65609
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 52545
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getCode",
+              "month": "2026-10",
+              "calls": 36
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 13995
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 506
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 454
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 34
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 28
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 1
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-10",
+              "calls": 84
+            }
+          ],
+          "budgets": {
+            "arc_public": {
+              "used": 406556,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            },
+            "chainstack": {
+              "used": 132269,
+              "limit": 3000000,
+              "pct": 0.044089666666666666,
+              "state": "ok"
+            },
+            "alchemy": {
+              "used": 412518,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            },
+            "etherscan": {
+              "used": 0,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            }
+          }
+        },
+        "indexer": {
+          "head": 24920497,
+          "streams": [
+            {
+              "stream": "poll:a:v4",
+              "nextBlock": 24920473,
+              "lag": 25
+            },
+            {
+              "stream": "poll:b:v3v2tax",
+              "nextBlock": 24920473,
+              "lag": 25
+            },
+            {
+              "stream": "poll:c:launchpads",
+              "nextBlock": 24920473,
+              "lag": 25
+            },
+            {
+              "stream": "poll:d:milestones",
+              "nextBlock": 24920473,
+              "lag": 25
+            },
+            {
+              "stream": "poll:f:aerodrome",
+              "nextBlock": 24920473,
+              "lag": 25
+            }
+          ],
+          "lastPollAt": 1791472584,
+          "backfill": [
+            {
+              "stream": "v4:pm:history",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 141.26167261703375,
+              "backoffUntil": null
+            },
+            {
+              "stream": "uniswap_v3:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 168.44285891875887,
+              "backoffUntil": null
+            },
+            {
+              "stream": "uniswap_v2:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 71.77593952828131,
+              "backoffUntil": null
+            },
+            {
+              "stream": "aerodrome_cl:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 87.61654316272144,
+              "backoffUntil": null
+            },
+            {
+              "stream": "o1:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 77.40887679652323,
+              "backoffUntil": null
+            },
+            {
+              "stream": "minara:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 78.06473372906109,
+              "backoffUntil": null
+            },
+            {
+              "stream": "tolly:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 78.00222962420555,
+              "backoffUntil": null
+            },
+            {
+              "stream": "foci:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 77.23925808620892,
+              "backoffUntil": null
+            },
+            {
+              "stream": "argus:backfill",
+              "nextBlock": 24920475,
+              "remainingBlocks": 22,
+              "blocksPerSec": 74.48016203465181,
+              "backoffUntil": null
+            },
+            {
+              "stream": "window48h:b",
+              "nextBlock": 22365749,
+              "remainingBlocks": 0,
+              "blocksPerSec": 0,
+              "backoffUntil": null
+            },
+            {
+              "stream": "agents:registries",
+              "nextBlock": 24901470,
+              "remainingBlocks": 19027,
+              "blocksPerSec": 27829.287189899358,
+              "backoffUntil": null
+            }
+          ],
+          "tradesRows": 251093,
+          "lagBlocks": 25,
+          "caughtUp": true,
+          "lastError": null,
+          "consecutiveFailures": 0,
+          "maxTxMs": 40.66421700082719,
+          "maxBlockingMs": 40.7347769998014,
+          "maxAggregateMs": 293.0220979999285
+        },
+        "safety": {
+          "enqueued": 27,
+          "collapsed": 0,
+          "dropped": 0,
+          "running": 0,
+          "done": 16,
+          "failed": 0,
+          "simulateCalls": 23,
+          "skippedPinned": 11
+        },
+        "payerIdentity": "x402",
+        "x402": {
+          "enabled": true,
+          "network": "eip155:5042"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "516027e9"
+      },
+      "body": {
+        "paths": {
+          "/trade/v1/search": {
+            "post": {
+              "operationId": "tradeSearch",
+              "x-payment": {
+                "configKey": "trade.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/quote": {
+            "post": {
+              "operationId": "tradeQuote",
+              "x-payment": {
+                "configKey": "trade.quote.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/swap": {
+            "post": {
+              "operationId": "tradeSwap",
+              "x-payment": {
+                "asset": "USDC",
+                "decimals": 6,
+                "tiers": [
+                  {
+                    "configKey": "trade.swap.price",
+                    "baseUnits": "10000",
+                    "appliesToUsdNotional": "< 1,000, a quote with no USD valuation, or unknown/expired quoteId"
+                  },
+                  {
+                    "configKey": "trade.swap.price_mid",
+                    "baseUnits": "50000",
+                    "appliesToUsdNotional": "1,000-10,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_large",
+                    "baseUnits": "500000",
+                    "appliesToUsdNotional": "> 10,000-100,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_max",
+                    "baseUnits": "5000000",
+                    "appliesToUsdNotional": "> 100,000"
+                  }
+                ]
+              }
+            }
+          },
+          "/trade/v1/swap/tx": {
+            "post": {
+              "operationId": "tradeSwapTx"
+            }
+          },
+          "/trade/v1/receipt": {
+            "post": {
+              "operationId": "tradeReceipt"
+            }
+          },
+          "/trade/v1/venues": {
+            "get": {
+              "operationId": "tradeVenues"
+            }
+          },
+          "/mcp": {
+            "get": {
+              "operationId": "mcpInfo"
+            },
+            "post": {
+              "operationId": "mcp"
+            }
+          },
+          "/agents/v1/{chainId}/search": {
+            "post": {
+              "operationId": "agentSearch",
+              "x-payment": {
+                "configKey": "agents.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/agent/{agentId}": {
+            "get": {
+              "operationId": "agentProfile",
+              "x-payment": {
+                "configKey": "agents.profile.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/wallet/{address}": {
+            "get": {
+              "operationId": "agentWallet",
+              "x-payment": {
+                "configKey": "agents.wallet.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box": {
+            "post": {
+              "operationId": "boxCreate",
+              "x-payment": {
+                "configKey": "agent.box.price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/topup": {
+            "post": {
+              "operationId": "boxTopUp",
+              "x-payment": {
+                "configKey": "agent.box.topup_price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/status": {
+            "get": {
+              "operationId": "boxStatus"
+            }
+          },
+          "/agent/v1/{address}/box/messages": {
+            "get": {
+              "operationId": "boxMessageList"
+            }
+          },
+          "/agent/v1/{address}/box/messages/{seq}": {
+            "get": {
+              "operationId": "boxMessageFetch"
+            },
+            "delete": {
+              "operationId": "boxMessageDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound": {
+            "post": {
+              "operationId": "inboundCreate",
+              "x-payment": {
+                "configKey": "agent.inbound.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/inbound/list": {
+            "get": {
+              "operationId": "inboundList"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}": {
+            "delete": {
+              "operationId": "inboundDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}/rotate": {
+            "post": {
+              "operationId": "inboundRotate"
+            }
+          },
+          "/agent/v1/{address}/watch": {
+            "post": {
+              "operationId": "watchCreate",
+              "x-payment": {
+                "configKey": "agent.watch.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/watch/list": {
+            "get": {
+              "operationId": "watchList"
+            }
+          },
+          "/agent/v1/{address}/watch/{id}": {
+            "delete": {
+              "operationId": "watchDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook": {
+            "post": {
+              "operationId": "webhookCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/webhook/list": {
+            "get": {
+              "operationId": "webhookList"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}": {
+            "delete": {
+              "operationId": "webhookDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/rotate": {
+            "post": {
+              "operationId": "webhookRotate"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/enable": {
+            "post": {
+              "operationId": "webhookEnable"
+            }
+          },
+          "/agent/v1/{address}/telegram": {
+            "post": {
+              "operationId": "telegramCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/telegram/list": {
+            "get": {
+              "operationId": "telegramList"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}": {
+            "delete": {
+              "operationId": "telegramDelete"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}/link": {
+            "post": {
+              "operationId": "telegramLink"
+            }
+          },
+          "/health": {
+            "get": {
+              "operationId": "health"
+            }
+          },
+          "/openapi.json": {
+            "get": {
+              "operationId": "openapi"
+            }
+          },
+          "/.well-known/agent-registration.json": {
+            "get": {
+              "operationId": "agentRegistration"
+            }
+          },
+          "/.well-known/agentkarma.json": {
+            "get": {
+              "operationId": "agentKarmaManifest"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/topup",
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL2JveC90b3B1cCIsImRlc2NyaXB0aW9uIjoiQWdlbnQgYm94IHRvcC11cCIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHgwOEE0Zjg3MzRBREFCMDhkMzQ2MUUzNTZiNUE0OThiODkzQmQ3QjVlIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "6191234d"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/topup",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-response": "eyJzdWNjZXNzIjp0cnVlLCJwYXllciI6IjB4YjBkMTRlOTBlMTk0OWYzZDVlYzhiZjkxMzZlZWI4MjUyNWFmNDRlMCIsInRyYW5zYWN0aW9uIjoiMHg0Mzk2MmQxNGY4YmE4Y2U0MjRlZjQwMTZhYmVkN2I4NjVjOTNhZmM3NDE5NTg0M2YwOTYwMzgxMjIzNGUzM2E3IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAifQ==",
+        "x-request-id": "d460ea9f"
+      },
+      "body": {
+        "address": "0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0",
+        "granted": {
+          "messages": 3,
+          "days": 0
+        },
+        "allowance": {
+          "messagesLeft": 1000,
+          "expiresAt": 1796656564
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "e6b9b36a"
+      },
+      "body": {
+        "ok": true,
+        "db": {
+          "ok": true,
+          "tokens": 250467,
+          "verified": 68,
+          "importedAt": 1791472598
+        },
+        "rulesVersion": "r2-383954828c",
+        "commit": "6e04f6ab0a060417c852f87f20980e42a00fa3eb",
+        "caches": {
+          "response": {
+            "hits": 0,
+            "misses": 14,
+            "size": 3,
+            "bytes": 23082
+          },
+          "candidates": {
+            "hits": 0,
+            "misses": 6,
+            "size": 2,
+            "bytes": 3671181
+          },
+          "generations": {
+            "keys": 20,
+            "bumps": 266135
+          },
+          "abuse": {
+            "missCacheSize": 0,
+            "payersTracked": 0,
+            "rateLimited": 0
+          },
+          "singleflight": {
+            "response": {
+              "hits": 0,
+              "leaders": 7
+            },
+            "probe": {
+              "hits": 0,
+              "leaders": 0
+            },
+            "depth": {
+              "hits": 0,
+              "leaders": 9
+            }
+          },
+          "quote": {
+            "lastEthCalls": 3,
+            "lastSafetyEthCalls": 0,
+            "lastCollapsed": false
+          }
+        },
+        "rpc": {
+          "counts": {
+            "chainstack:eth_getCode": 5,
+            "chainstack:eth_getBlockByNumber": 250,
+            "alchemy:eth_call": 16,
+            "arc_public:eth_call": 16,
+            "chainstack:eth_blockNumber": 756,
+            "alchemy:eth_getLogs": 5908,
+            "arc_public:eth_getLogs": 5513,
+            "chainstack:eth_call": 1166,
+            "chainstack:eth_simulateV1": 35
+          },
+          "total": 13665,
+          "endpoints": [
+            {
+              "id": "arc_public",
+              "health": 0.9999999999999996,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "archive": "closed",
+                "probe": "closed"
+              },
+              "weight": 100,
+              "priority": 3,
+              "capabilities": [
+                "logs",
+                "call",
+                "archive",
+                "probe",
+                "backfill"
+              ],
+              "calls": 5529,
+              "budget": {
+                "used": 406562,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 406080,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 482,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 30,
+                "rejected": 0
+              }
+            },
+            {
+              "id": "chainstack",
+              "health": 1,
+              "circuit": "closed",
+              "circuits": {
+                "simulate": "closed",
+                "call": "closed",
+                "probe": "closed"
+              },
+              "weight": 1,
+              "priority": 1,
+              "capabilities": [
+                "simulate",
+                "call",
+                "probe"
+              ],
+              "calls": 2212,
+              "budget": {
+                "used": 132289,
+                "limit": 3000000,
+                "pct": 0.044096333333333335,
+                "state": "ok"
+              },
+              "byCapability": {
+                "simulate": {
+                  "used": 124,
+                  "limit": null,
+                  "reserveMonthly": 2000000,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 132165,
+                  "limit": 1000000,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 100,
+                "rejected": 0
+              }
+            },
+            {
+              "id": "alchemy",
+              "health": 0.9999999999999996,
+              "circuit": "closed",
+              "circuits": {
+                "logs": "closed",
+                "call": "closed",
+                "archive": "closed",
+                "probe": "closed"
+              },
+              "weight": 50,
+              "priority": 2,
+              "capabilities": [
+                "logs",
+                "call",
+                "archive",
+                "probe",
+                "backfill"
+              ],
+              "calls": 5924,
+              "budget": {
+                "used": 412524,
+                "limit": null,
+                "pct": 0,
+                "state": "ok"
+              },
+              "byCapability": {
+                "logs": {
+                  "used": 411983,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                },
+                "call": {
+                  "used": 541,
+                  "limit": null,
+                  "reserveMonthly": null,
+                  "spillover": false
+                }
+              },
+              "queue": {
+                "waiting": 0,
+                "max": 60,
+                "rejected": 0
+              }
+            }
+          ]
+        },
+        "spend": {
+          "counts": {
+            "chainstack:eth_getCode": 5,
+            "chainstack:eth_getBlockByNumber": 250,
+            "alchemy:eth_call": 16,
+            "arc_public:eth_call": 16,
+            "chainstack:eth_blockNumber": 756,
+            "alchemy:eth_getLogs": 5908,
+            "arc_public:eth_getLogs": 5513,
+            "chainstack:eth_call": 1166,
+            "chainstack:eth_simulateV1": 35
+          },
+          "month": [
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 11196
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 310123
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 26784
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 178
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 3077
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 402
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 2241
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 18907
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 333
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 508
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-09",
+              "calls": 292
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_simulateV1",
+              "month": "2026-09",
+              "calls": 483
+            },
+            {
+              "provider": "arc_anvil_local",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 76
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getCode",
+              "month": "2026-09",
+              "calls": 47
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getLogs",
+              "month": "2026-09",
+              "calls": 143539
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_blockNumber",
+              "month": "2026-09",
+              "calls": 11438
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_call",
+              "month": "2026-09",
+              "calls": 203
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBalance",
+              "month": "2026-09",
+              "calls": 10
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getTransactionByHash",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getTransactionReceipt",
+              "month": "2026-09",
+              "calls": 2
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_getLogs",
+              "month": "2026-10",
+              "calls": 406080
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getLogs",
+              "month": "2026-10",
+              "calls": 411983
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 65619
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 52545
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getCode",
+              "month": "2026-10",
+              "calls": 36
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 13998
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 506
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_call",
+              "month": "2026-10",
+              "calls": 454
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 34
+            },
+            {
+              "provider": "arc_public",
+              "method": "eth_blockNumber",
+              "month": "2026-10",
+              "calls": 28
+            },
+            {
+              "provider": "alchemy",
+              "method": "eth_getBlockByNumber",
+              "month": "2026-10",
+              "calls": 1
+            },
+            {
+              "provider": "chainstack",
+              "method": "eth_simulateV1",
+              "month": "2026-10",
+              "calls": 91
+            }
+          ],
+          "budgets": {
+            "arc_public": {
+              "used": 406562,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            },
+            "chainstack": {
+              "used": 132289,
+              "limit": 3000000,
+              "pct": 0.044096333333333335,
+              "state": "ok"
+            },
+            "alchemy": {
+              "used": 412524,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            },
+            "etherscan": {
+              "used": 0,
+              "limit": null,
+              "pct": 0,
+              "state": "ok"
+            }
+          }
+        },
+        "indexer": {
+          "head": 24920497,
+          "streams": [
+            {
+              "stream": "poll:a:v4",
+              "nextBlock": 24920496,
+              "lag": 2
+            },
+            {
+              "stream": "poll:b:v3v2tax",
+              "nextBlock": 24920496,
+              "lag": 2
+            },
+            {
+              "stream": "poll:c:launchpads",
+              "nextBlock": 24920496,
+              "lag": 2
+            },
+            {
+              "stream": "poll:d:milestones",
+              "nextBlock": 24920496,
+              "lag": 2
+            },
+            {
+              "stream": "poll:f:aerodrome",
+              "nextBlock": 24920496,
+              "lag": 2
+            }
+          ],
+          "lastPollAt": 1791472595,
+          "backfill": [
+            {
+              "stream": "v4:pm:history",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 141.37232985310496,
+              "backoffUntil": null
+            },
+            {
+              "stream": "uniswap_v3:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 168.45134326488596,
+              "backoffUntil": null
+            },
+            {
+              "stream": "uniswap_v2:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 71.8082445380255,
+              "backoffUntil": null
+            },
+            {
+              "stream": "aerodrome_cl:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 87.53349774633409,
+              "backoffUntil": null
+            },
+            {
+              "stream": "o1:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 77.30531114198648,
+              "backoffUntil": null
+            },
+            {
+              "stream": "minara:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 78.14407822256359,
+              "backoffUntil": null
+            },
+            {
+              "stream": "tolly:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 77.90139694770545,
+              "backoffUntil": null
+            },
+            {
+              "stream": "foci:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 77.31043902778244,
+              "backoffUntil": null
+            },
+            {
+              "stream": "argus:backfill",
+              "nextBlock": 24920498,
+              "remainingBlocks": 0,
+              "blocksPerSec": 74.55754655756371,
+              "backoffUntil": null
+            },
+            {
+              "stream": "window48h:b",
+              "nextBlock": 22365749,
+              "remainingBlocks": 0,
+              "blocksPerSec": 0,
+              "backoffUntil": null
+            },
+            {
+              "stream": "agents:registries",
+              "nextBlock": 24901470,
+              "remainingBlocks": 19027,
+              "blocksPerSec": 27829.287189899358,
+              "backoffUntil": null
+            }
+          ],
+          "tradesRows": 251139,
+          "lagBlocks": 2,
+          "caughtUp": true,
+          "lastError": null,
+          "consecutiveFailures": 0,
+          "maxTxMs": 40.66421700082719,
+          "maxBlockingMs": 40.7347769998014,
+          "maxAggregateMs": 293.0220979999285
+        },
+        "safety": {
+          "enqueued": 31,
+          "collapsed": 0,
+          "dropped": 0,
+          "running": 1,
+          "done": 18,
+          "failed": 0,
+          "simulateCalls": 29,
+          "skippedPinned": 12
+        },
+        "payerIdentity": "x402",
+        "x402": {
+          "enabled": true,
+          "network": "eip155:5042"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "c3a53acc"
+      },
+      "body": {
+        "paths": {
+          "/trade/v1/search": {
+            "post": {
+              "operationId": "tradeSearch",
+              "x-payment": {
+                "configKey": "trade.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/quote": {
+            "post": {
+              "operationId": "tradeQuote",
+              "x-payment": {
+                "configKey": "trade.quote.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/trade/v1/swap": {
+            "post": {
+              "operationId": "tradeSwap",
+              "x-payment": {
+                "asset": "USDC",
+                "decimals": 6,
+                "tiers": [
+                  {
+                    "configKey": "trade.swap.price",
+                    "baseUnits": "10000",
+                    "appliesToUsdNotional": "< 1,000, a quote with no USD valuation, or unknown/expired quoteId"
+                  },
+                  {
+                    "configKey": "trade.swap.price_mid",
+                    "baseUnits": "50000",
+                    "appliesToUsdNotional": "1,000-10,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_large",
+                    "baseUnits": "500000",
+                    "appliesToUsdNotional": "> 10,000-100,000 inclusive"
+                  },
+                  {
+                    "configKey": "trade.swap.price_max",
+                    "baseUnits": "5000000",
+                    "appliesToUsdNotional": "> 100,000"
+                  }
+                ]
+              }
+            }
+          },
+          "/trade/v1/swap/tx": {
+            "post": {
+              "operationId": "tradeSwapTx"
+            }
+          },
+          "/trade/v1/receipt": {
+            "post": {
+              "operationId": "tradeReceipt"
+            }
+          },
+          "/trade/v1/venues": {
+            "get": {
+              "operationId": "tradeVenues"
+            }
+          },
+          "/mcp": {
+            "get": {
+              "operationId": "mcpInfo"
+            },
+            "post": {
+              "operationId": "mcp"
+            }
+          },
+          "/agents/v1/{chainId}/search": {
+            "post": {
+              "operationId": "agentSearch",
+              "x-payment": {
+                "configKey": "agents.search.price",
+                "baseUnits": "5000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/agent/{agentId}": {
+            "get": {
+              "operationId": "agentProfile",
+              "x-payment": {
+                "configKey": "agents.profile.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agents/v1/{chainId}/wallet/{address}": {
+            "get": {
+              "operationId": "agentWallet",
+              "x-payment": {
+                "configKey": "agents.wallet.price",
+                "baseUnits": "100",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box": {
+            "post": {
+              "operationId": "boxCreate",
+              "x-payment": {
+                "configKey": "agent.box.price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/topup": {
+            "post": {
+              "operationId": "boxTopUp",
+              "x-payment": {
+                "configKey": "agent.box.topup_price",
+                "baseUnits": "50000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/box/status": {
+            "get": {
+              "operationId": "boxStatus"
+            }
+          },
+          "/agent/v1/{address}/box/messages": {
+            "get": {
+              "operationId": "boxMessageList"
+            }
+          },
+          "/agent/v1/{address}/box/messages/{seq}": {
+            "get": {
+              "operationId": "boxMessageFetch"
+            },
+            "delete": {
+              "operationId": "boxMessageDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound": {
+            "post": {
+              "operationId": "inboundCreate",
+              "x-payment": {
+                "configKey": "agent.inbound.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/inbound/list": {
+            "get": {
+              "operationId": "inboundList"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}": {
+            "delete": {
+              "operationId": "inboundDelete"
+            }
+          },
+          "/agent/v1/{address}/inbound/{id}/rotate": {
+            "post": {
+              "operationId": "inboundRotate"
+            }
+          },
+          "/agent/v1/{address}/watch": {
+            "post": {
+              "operationId": "watchCreate",
+              "x-payment": {
+                "configKey": "agent.watch.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/watch/list": {
+            "get": {
+              "operationId": "watchList"
+            }
+          },
+          "/agent/v1/{address}/watch/{id}": {
+            "delete": {
+              "operationId": "watchDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook": {
+            "post": {
+              "operationId": "webhookCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/webhook/list": {
+            "get": {
+              "operationId": "webhookList"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}": {
+            "delete": {
+              "operationId": "webhookDelete"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/rotate": {
+            "post": {
+              "operationId": "webhookRotate"
+            }
+          },
+          "/agent/v1/{address}/webhook/{id}/enable": {
+            "post": {
+              "operationId": "webhookEnable"
+            }
+          },
+          "/agent/v1/{address}/telegram": {
+            "post": {
+              "operationId": "telegramCreate",
+              "x-payment": {
+                "configKey": "agent.channel.price",
+                "baseUnits": "10000",
+                "asset": "USDC",
+                "decimals": 6
+              }
+            }
+          },
+          "/agent/v1/{address}/telegram/list": {
+            "get": {
+              "operationId": "telegramList"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}": {
+            "delete": {
+              "operationId": "telegramDelete"
+            }
+          },
+          "/agent/v1/{address}/telegram/{id}/link": {
+            "post": {
+              "operationId": "telegramLink"
+            }
+          },
+          "/health": {
+            "get": {
+              "operationId": "health"
+            }
+          },
+          "/openapi.json": {
+            "get": {
+              "operationId": "openapi"
+            }
+          },
+          "/.well-known/agent-registration.json": {
+            "get": {
+              "operationId": "agentRegistration"
+            }
+          },
+          "/.well-known/agentkarma.json": {
+            "get": {
+              "operationId": "agentKarmaManifest"
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/topup",
+      "status": 402,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "payment-required": "eyJ4NDAyVmVyc2lvbiI6MiwiZXJyb3IiOiJQYXltZW50IHJlcXVpcmVkIiwicmVzb3VyY2UiOnsidXJsIjoiaHR0cHM6Ly9hcGkuYXJjZ2F0ZS5kZXYvYWdlbnQvdjEvMHhiMGQxNGU5MGUxOTQ5ZjNkNWVjOGJmOTEzNmVlYjgyNTI1YWY0NGUwL2JveC90b3B1cCIsImRlc2NyaXB0aW9uIjoiQWdlbnQgYm94IHRvcC11cCIsIm1pbWVUeXBlIjoiIn0sImFjY2VwdHMiOlt7InNjaGVtZSI6ImV4YWN0IiwibmV0d29yayI6ImVpcDE1NTo1MDQyIiwiYW1vdW50IjoiNTAwMDAiLCJhc3NldCI6IjB4MzYwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInBheVRvIjoiMHgwOEE0Zjg3MzRBREFCMDhkMzQ2MUUzNTZiNUE0OThiODkzQmQ3QjVlIiwibWF4VGltZW91dFNlY29uZHMiOjMwMCwiZXh0cmEiOnsibmFtZSI6IlVTREMiLCJ2ZXJzaW9uIjoiMiJ9fV19",
+        "x-request-id": "a38f672c"
+      },
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/agent/v1/0xb0d14e90e1949f3d5ec8bf9136eeb82525af44e0/box/topup",
+      "status": 409,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "x-request-id": "98de2695"
+      },
+      "body": {
+        "error": {
+          "code": "allowance_full",
+          "message": "the box already has 1000 messages left and an expiry 60 days ahead, the most it can hold: a top-up would add nothing"
+        },
+        "next": "stop"
+      }
+    }
+  ]
+}

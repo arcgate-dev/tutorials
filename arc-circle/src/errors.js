@@ -3,12 +3,17 @@
 export class ArcgateError extends Error {
   constructor(operation, response, body, paymentResponse) {
     const requestId = response.headers.get('x-request-id');
-    super(`${operation}: HTTP ${response.status} (${body.error?.code ?? 'request_failed'})`
+    // Arcgate errors carry { code, message, hint }; the x402 middleware's 502 carries a plain string.
+    const reason = typeof body.error === 'string' ? body.error : body.error?.code ?? 'request_failed';
+    const paid = ['search', 'quote', 'swap'].includes(operation);
+    super(`${operation}: HTTP ${response.status} (${reason})`
       + (body.next ? `; next=${body.next}` : '')
       + (body.retryAfterSec !== undefined ? `; retryAfterSec=${body.retryAfterSec}` : '')
       + (body.error?.hint ? `; ${body.error.hint}` : '')
       + (paymentResponse?.success === false ? `; payment settlement failed: ${paymentResponse.errorReason ?? 'unknown reason'}` : '')
-      + (response.status === 402 && ['search', 'quote', 'swap'].includes(operation)
+      + ((paid && response.status === 502) || paymentResponse?.errorReason === 'payment_response_expired'
+        ? '; the payment may have settled; check the PAYMENT-RESPONSE transaction or your USDC balance before paying again' : '')
+      + (response.status === 402 && paid
         ? '; check the payment amount, authorization and USDC balance before starting a new paid run' : '')
       + (body.quote ? `; free replacement quote ${body.quote.quoteId} available for review` : '')
       + (requestId ? `; requestId=${requestId}` : '')

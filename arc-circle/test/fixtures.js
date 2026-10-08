@@ -1,58 +1,99 @@
 import { randomBytes } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { privateKeyToAccount } from 'viem/accounts';
-import { encodeFunctionData, erc20Abi, getAddress, zeroAddress } from 'viem';
-import { loadConfig } from '../src/config.js';
+import { decodeFunctionData, encodeFunctionData, erc20Abi, getAddress } from 'viem';
+import { forNetwork, loadConfig } from '../src/config.js';
 import { routerAbi } from '../src/guards.js';
 import { authorizationTypes, USDC } from '../src/payment.js';
 
 // Random ephemeral keys exist only in memory. No account, RPC or deployment is used.
 export const account = privateKeyToAccount(`0x${randomBytes(32).toString('hex')}`);
-export const wallet = { id: 'test-wallet-id', address: account.address, blockchain: 'ARC' };
-export const config = loadConfig({});
+export const MAINNET = 'eip155:5042';
+export const TESTNET = 'eip155:5042002';
+export const config = forNetwork(loadConfig({}), MAINNET, {});
+// Free responses captured from the arcgate localnet (never written by hand).
+export const captured = JSON.parse(readFileSync(new URL('./fixtures/localnet-free.json', import.meta.url), 'utf8'));
+export const testnetOffer = captured.search402.paymentRequired.accepts[0];
+// The localnet stack's PAY_TO differs from the row's pinned one, so it arrives through the override.
+export const testnetConfig = forNetwork(loadConfig({ API_URL: 'http://127.0.0.1:19800' }), TESTNET, { ARCGATE_PAY_TO: testnetOffer.payTo });
+export const pinnedTestnetConfig = forNetwork(loadConfig({ API_URL: 'http://127.0.0.1:19800' }), TESTNET, {});
 export const other = getAddress('0x1111111111111111111111111111111111111111');
-export const hash = `0x${'ab'.repeat(32)}`;
-export const offer = { scheme: 'exact', network: config.network, amount: '5000', asset: USDC,
-  payTo: config.payTo, maxTimeoutSeconds: 300, extra: { name: 'USDC', version: '2' } };
-export const required = { x402Version: 2, resource: { url: `${config.apiUrl}/trade/v1/search`, description: 'Search', mimeType: 'application/json' }, accepts: [offer] };
 export const encodeHeader = data => Buffer.from(JSON.stringify(data)).toString('base64');
-export const receiptHeader = encodeHeader({ success: true, transaction: hash, network: config.network, payer: wallet.address });
 export const circleSigner = { signTypedData: async ({ data }) => ({ data: { signature: await account.signTypedData(JSON.parse(data)) } }) };
 
-export function authorization() {
-  const now = Math.floor(Date.now() / 1000);
-  return { domain: { name: 'USDC', version: '2', chainId: 5042, verifyingContract: USDC },
+// Every API response below is cloned from the paid localnet run (search -> quote -> swap -> receipt).
+// A test that needs a variant mutates its own clone and says why on the line that does it.
+export const run = JSON.parse(readFileSync(new URL('./fixtures/localnet-run.json', import.meta.url), 'utf8'));
+export const taker = getAddress(run.taker);
+// The flow's wallet is the captured taker, on the testnet row's Circle blockchain.
+export const wallet = { id: 'test-wallet-id', address: taker, blockchain: 'ARC-TESTNET' };
+// The payment tests sign with the in-memory ephemeral key above; the captured taker's key does not exist here.
+export const paymentWallet = { id: 'test-wallet-id', address: account.address, blockchain: 'ARC' };
+
+// Time is pinned to the moment the run was captured. The quote (expires 22:11:14Z), the swap (expires 22:14:19Z)
+// and the swap's own deadline (22:14:19Z, 280 seconds on, inside the guard's 630-second window) all lie after it,
+// so every guard sees the same clock it saw when the localnet answered.
+export const capturedMs = Date.parse(run.capturedAt);
+export const now = Math.floor(capturedMs / 1000);
+export const pinTime = t => t.mock.timers.enable({ apis: ['Date'], now: capturedMs });
+
+export const search = () => structuredClone(run.run.search.body);
+export const quote = () => structuredClone(run.run.quote.body);
+export const tradeReceipt = () => structuredClone(run.run.receipt.body);
+export const receiptCommand = () => structuredClone(run.run.receiptCommand);
+export const required = () => structuredClone(run.run.search.paymentRequired);
+export const offer = () => required().accepts[0];
+export const settlement = () => structuredClone(run.run.search.paymentResponse);
+export const [approveHash, swapHash] = run.run.receipt.body.transactions.map(tx => tx.hash);
+export const minOut = BigInt(run.run.swap.body.minAmountOut);
+export const delivered = BigInt(run.run.receipt.body.delivered);
+
+// Override: the captured challenge is on eip155:5042002; the mainnet-row cases need the same offer on eip155:5042 paying the row's pinned recipient.
+export function mainnetRequired() {
+  const challenge = required();
+  for (const accepted of challenge.accepts) { accepted.network = config.network; accepted.payTo = config.payTo; }
+  return challenge;
+}
+export const mainnetOffer = () => mainnetRequired().accepts[0];
+// Override: these tests pay with the in-memory key, not the captured taker, and the mainnet row settles on eip155:5042.
+export const receiptHeader = (cfg = config) => encodeHeader({ ...settlement(), payer: paymentWallet.address, network: cfg.network });
+
+export function authorization(cfg = config, chainId = 5042) {
+  const issued = Math.floor(Date.now() / 1000);
+  return { domain: { name: 'USDC', version: '2', chainId, verifyingContract: USDC },
     primaryType: 'TransferWithAuthorization', types: structuredClone(authorizationTypes),
-    message: { from: wallet.address, to: config.payTo, value: 5000n, validAfter: BigInt(now - 10), validBefore: BigInt(now + 300), nonce: `0x${'01'.repeat(32)}` } };
+    message: { from: paymentWallet.address, to: cfg.payTo, value: BigInt(offer().amount), validAfter: BigInt(issued - 10), validBefore: BigInt(issued + 300), nonce: `0x${'01'.repeat(32)}` } };
 }
 
-export function quote() {
-  return { quoteId: 'q_1234567890abcdef', network: 'eip155:5042', side: 'exactIn',
-    sell: { address: USDC, decimals: 6, amount: '1', amountRaw: '1000000' },
-    buy: { address: config.buyToken, decimals: 8 }, best: { amountOutQuoted: '0.000012', minAmountOut: '0.00001188', executable: true },
-    readiness: { taker: wallet.address.toLowerCase(), balance: { token: USDC, required: '1000000', available: '3000000', enough: true },
-      approval: { mode: 'permit2', needs: 'approve_and_sign_permit' }, approve: { needs: 'approve' },
-      gas: { estimatedUsdc: '0.01', available: '1.98', enough: true },
-      fees: { swapUsdc: '0.01', payer: wallet.address.toLowerCase(), payerAvailable: '2.99', enough: true },
-      totalCostUsdc: '0.02', ready: true },
-    slippageBps: 100, safety: { verdict: 'pinned' }, expiresAt: new Date(Date.now() + 120_000).toISOString() };
+// The captured swap's router call, decoded. A refusal case mutates one argument and re-encodes it.
+export const swapArgs = () => decodeFunctionData({ abi: routerAbi, data: run.run.swap.body.transactions[1].data }).args;
+
+// The captured swap targets the localnet router, which is the testnet row's. Without arguments it is returned as captured.
+export function swap(args, cfg = testnetConfig) {
+  const body = structuredClone(run.run.swap.body);
+  const [approve, trade] = body.transactions;
+  if (getAddress(trade.to) !== getAddress(cfg.router)) {
+    // Override: re-point the approval spender and the swap target at this row's router.
+    approve.data = encodeFunctionData({ abi: erc20Abi, functionName: 'approve', args: [cfg.router, decodeFunctionData({ abi: erc20Abi, data: approve.data }).args[1]] });
+    trade.to = cfg.router;
+  }
+  // Override: re-encode the swap calldata with the caller's (mutated) decoded arguments.
+  if (args) trade.data = encodeFunctionData({ abi: routerAbi, functionName: 'executeGraph', args });
+  return body;
 }
 
-export function tradeReceipt() {
-  return { quoteId: 'q_1234567890abcdef', result: 'pass', token: config.buyToken.toLowerCase(),
-    recipient: wallet.address.toLowerCase(), minAmountOut: '1188', delivered: '1200', block: 100,
-    transactions: [{ hash, purpose: 'swap', status: 'success', block: 100 }], reason: null };
-}
-
-export function swapArgs() {
-  return [USDC, 1_000_000n, config.buyToken, 1188n, wallet.address, BigInt(Math.floor(Date.now() / 1000) + 300),
-    [{ step: { target: other, tokenIn: USDC, mode: 0, amountOffset: 4, data: '0x12345678' }, tokenOut: config.buyToken, weight: 1n, remainingWeight: 1n, minOut: 1188n }],
-    { mode: 0, permit: { details: { token: zeroAddress, amount: 0n, expiration: 0, nonce: 0 }, spender: zeroAddress, sigDeadline: 0n }, signature: '0x' }];
-}
-
-export function swap(args = swapArgs()) {
-  return { quoteId: 'q_1234567890abcdef', recipient: wallet.address, signatures: [], safety: { verdict: 'pinned' },
-    expiresAt: new Date(Date.now() + 120_000).toISOString(), minAmountOut: '1188', transactions: [
-      { purpose: 'approve', to: USDC, data: encodeFunctionData({ abi: erc20Abi, functionName: 'approve', args: [config.router, 1_000_000n] }), value: '0', gas: '100000' },
-      { purpose: 'swap', to: config.router, data: encodeFunctionData({ abi: routerAbi, functionName: 'executeGraph', args }), value: '0', gas: '500000' },
-    ] };
+// Answers the two free calls inspect makes with the captured localnet responses.
+export function freeFetch({ health = captured.health, required = captured.search402.paymentRequired } = {}) {
+  const urls = [];
+  const fetchFn = async url => {
+    urls.push(String(url));
+    if (String(url).endsWith('/health')) return Response.json(health);
+    if (String(url).endsWith('/trade/v1/search')) {
+      return new Response(JSON.stringify(captured.search402.body), { status: 402,
+        headers: { 'content-type': 'application/json', 'payment-required': encodeHeader(required) } });
+    }
+    throw new Error(`Unexpected free call ${url}`);
+  };
+  fetchFn.urls = urls;
+  return fetchFn;
 }

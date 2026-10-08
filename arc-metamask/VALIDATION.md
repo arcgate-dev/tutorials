@@ -1,5 +1,107 @@
 # Validation
 
+## Mainnet run, 2026-10-08 (UTC), api.arcgate.dev at commit 6e04f6ab0a060417c852f87f20980e42a00fa3eb
+
+Issue #11. The README's commands ran once each, in order, against `https://api.arcgate.dev` from a clean state (`npm ci`, `cp .env.example .env`), with the tutorial code at `epic/7` `21745f4` (unmodified; that code still accepted a missing `next`, which this change now refuses, and production sent `next` on every answer): `inspect` (15:15:25Z), `connect` (15:15:30Z), `search` (15:15:38Z), `quote` (15:15:54Z), `preview` (15:16:20Z), `trade -- --execute` (15:16:54Z to 15:17:49Z) and `receipt` (15:17:59Z). Every run passed. Sources: the captured stdout and API exchanges (PAYMENT-SIGNATURE never recorded) behind the README's example output and `test/fixtures/mainnet-run.json`, and the run logs `.runs/f09f7f6c-87f9-41a2-b379-45aa4658d270.jsonl` (search), `.runs/2fda8ee4-ed00-423c-9892-3f3d95f98910.jsonl` (preview) and `.runs/342269d2-e4c9-47c6-bed4-011bbd3794e9.jsonl` (trade), not committed.
+
+- `/health`: `ok: true`, `commit` `6e04f6ab0a060417c852f87f20980e42a00fa3eb`, `rulesVersion` `r2-383954828c`, `x402.network` `eip155:5042`. The 402 offered `exact` on `eip155:5042`, USDC `0x3600000000000000000000000000000000000000`, payTo `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e`.
+- Payer: the `mm` server wallet `0x72e1…35a3`, trading mode `beast` before the run, never switched. USDC 7.959815 before.
+- Prices from `https://api.arcgate.dev/openapi.json` `x-payment` on 2026-10-08: search 5000 base units, quote 10000, swap 10000 (USD notional under 1,000).
+
+Every paid step. Each hash was checked with `eth_getTransactionReceipt` on `https://rpc.mainnet.arc.io`: status `0x1`, and one USDC `Transfer` from `0x72e1…35a3` to `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e` for the price.
+
+| Command | Operation | Price (base units) | Settlement tx | requestId |
+| --- | --- | --- | --- | --- |
+| `search` | search | 5000 | `0x4601505503e786de0e72216596551710695d892bd82c6f26c93aceca4355248c` | `b1ec669f` |
+| `quote` | search | 5000 | `0x3ff58f3539cc4ed5cb3da81ee3898a742798de309a3be9fcccc82cd06231e93c` | `d99f612d` |
+| `quote` | quote | 10000 | `0xb90b58e13e02ec1442ec9b5fbfeeeb1960b094380f391518be532acd94ae4468` | `7d2c3249` |
+| `preview` | search | 5000 | `0xb8055f20ee9f8b41cea8ee1382f91b5776a9a153075f0b04920348038ba8e956` | `a00dcdbc` |
+| `preview` | quote | 10000 | `0x25613382d0e91383701703f3e7fdc1bda62b613b464d339a1c3504535b257995` | `6d1b5c8e` |
+| `preview` | swap | 10000 | `0xf7b57084d4ef7a504081a42b23e6d412151668b2177788b2aca61026bd745088` | `17d65d5b` |
+| `trade` | search | 5000 | `0x5da5444d774f4a34bc5579d0a1986fd4fdd12739942e94f881d6ecb561b6c2c5` | `4d492eaf` |
+| `trade` | quote | 10000 | `0xf5b5fa4ef12884055763efbc5b09b488d4a1f67fa4dc8d433e3f1ff4851e0b68` | `4cf4c60a` |
+| `trade` | swap | 10000 | `0xb029ebbeb97aa0734a57d3aae4d09731030a495657a089826c6769352ae6d378` | `31a1882a` |
+
+The trade:
+
+- Quote `q_0f992fbf19628259`: sell 0.5 USDC, quoted 0.00000607 cirBTC, minimum 0.000006 (600 base units). `mm decode` read `executeGraph` through router `0x6cf4f7785d479b9ec1c3abe2fb569525380baede`, `amountIn` 500000, `minOut` 600, recipient the wallet, funding Permit2.
+- The wallet already held a USDC allowance to Permit2, so the first `/swap` returned no approval and none was sent. The Permit2 `PermitSingle` (spender the router, amount 500000, nonce 2) was signed with `mm wallet sign-typed-data`; the free `/swap/tx` returned the swap with `permitAttached: true` and no outstanding signature.
+- Swap [`0xe46347fc25c721681217809fbb11ddc41c5e17fc92663663b1f879879be78e2e`](https://explorer.arc.io/tx/0xe46347fc25c721681217809fbb11ddc41c5e17fc92663663b1f879879be78e2e), sent with `mm wallet send-transaction` in Beast Mode, mined in block 24920618 with status `0x1`. Gas 247,387 at an effective 22.44 gwei: 0.005552 USDC.
+- Received 607 base units (0.00000607 cirBTC), against the 600 minimum. The cirBTC balance went from 597 to 1204.
+- `/trade/v1/receipt` (free), asked by the trade and again by `npm run receipt -- q_0f992fbf19628259 0xe46347fc…6e2e`: `result: "pass"`, `delivered: "607"`, `minAmountOut: "600"`, `next: "done"`, the swap `status: "success"`.
+
+Total spent: API fees 70000 base units (0.07 USDC: four searches, three quotes, two swaps), the 0.50 USDC order and 0.005552 USDC gas, 0.575552 USDC. The wallet's USDC read 7.384262 afterward, a fall of 0.575553; the extra base unit is gas rounding.
+
+## Epic #7 check: Beast Mode preview on the arcgate localnet, October 8, 2026 (UTC): not passed, wallet out of testnet USDC
+
+The epic branch `epic/7` at `41e891b` ran `npm run connect` (14:12:15Z) and `npm run preview` (14:12:18Z to 14:13:09Z) against the arcgate localnet. `preview` did **not** pass. Sources: `.runs/connect-epic-1008.log`, `.runs/preview-epic-1008.log` and the run logs `.runs/6222be9e-1e75-4609-9423-ba55e8959fa2.jsonl` and `.runs/ee740579-b7b5-4ff8-a31c-23cf7a377b06.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`. The localnet api container was built at 12:14Z from the arcgate checkout, whose last commit before then is `27c0ddb3`; the service does not confirm it. `ARCGATE_PAY_TO` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`.
+- `mm wallet trading-mode get --json` reported `beast` for `0x72e17261e04e6162a62f034d8d71053ea37d35a3`. `connect` passed and printed testnet USDC **0.03**, enough for one 0.025 preview.
+- Two `preview` processes ran at the same time on this wallet (started 14:12:26Z and 14:12:27Z, one run log each). Each paid search (5000; `0x290f1246e0d7195e8f70fe753b204c537a4ebc235cc0a0a4105c882bf5f2588b` and `0xfee093fc3faa317a2c58e4ed0c2ef25e19ef322cc83e35fcc1f32846a938a73f`) and quote (10000; `0xc6faba8f7f6cb05d6ee360a85e106121ceb0af11f2557a9e6757021dc47e9dc3` and `0x303333749b99553019cb23a6b884a26d4d40b1938ffef703122a6632e84177c7`). Quote `q_50945d59bcf8755b`: sell 0.5 USDC, quoted 0.00000596 cirBTC, minimum 0.0000059.
+- Both swaps were then refused with **HTTP 402** before settling (`request_failed`, request IDs `97dadbd2` and `591a31dc`, no payment response): the two runs had spent the whole 0.03. `connect` afterward printed testnet USDC **0**.
+- Nothing was signed beyond the x402 authorizations and nothing was sent.
+- Not rerun: the wallet needs at least 0.025 testnet USDC, and funding it is the owner's call. The last passing preview is October 7's, below.
+- The balance re-read at 14:27:29Z was 0 (0 base units) on Arc testnet USDC, so it was not rerun, and funding is the owner's step. Source: `.runs/balance-20261008T142719Z-41260.log`, not committed.
+
+Offline: `npm test` reports 67 pass, 0 fail.
+
+## Epic #7 check: Beast Mode preview on the arcgate localnet, October 7, 2026 (UTC)
+
+The epic branch `epic/7` at `18adb0a` ran `npm run preview` (23:54:17Z to 23:55:07Z) and `npm run trade -- --execute` (23:55:10Z) against the arcgate localnet. Sources: `.runs/preview-epic.log`, `.runs/trade-epic.log` and the run log `.runs/7d93ef69-d046-4e94-99b0-f115eea05f5e.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`, so the arcgate checkout is `5addf63f`; the service does not confirm it. `ARCGATE_PAY_TO` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`.
+- `mm wallet trading-mode get --json` reported `beast` for `0x72e17261e04e6162a62f034d8d71053ea37d35a3` before the run; it was not switched.
+- `preview` passed. Testnet USDC was 0.055 at the start:
+  - search `0x1b158d3153774f159d0972317bb7b90467730866120ad4971779d376138aac0e` (`4c2831e4`, 5000 base units)
+  - quote `0xcb6c278f9817cbaab770b3b0a4dbd491e50bec18313d7c0b202b37f2e0b72023` (`8b075782`, 10000)
+  - swap `0x3349fe53505b343a34d632666fbdd11b70f753fd300b32527db4b758203ef8ed` (`a8905d58`, 10000)
+- Quote `q_d3451165bb2b9778`: sell 0.5 USDC, quoted 0.00000596 cirBTC, minimum 0.0000059. `mm decode` read `executeGraph` through router `0x0ea7461542fe051c013ab0f5860190bc847f3271`, `amountIn` 500000, `minOut` 590, recipient the wallet, funding Permit2, `permitAttached` false. The permit was not signed and nothing was sent.
+- `trade -- --execute` was refused before any payment, as designed on this row: "The API pays on eip155:5042002 but trades on eip155:5042. mm broadcasts to the real chain, so the trade runs only where the API pays on Arc mainnet. Use npm run preview here. No payment signed."
+- A balance read on Arc testnet afterward showed 0.030 USDC, which reconciles with the 25000 base units spent.
+
+Offline: `npm test` reports 67 pass, 0 fail.
+
+## October 7, 2026 (UTC): Beast Mode on the arcgate localnet (testnet x402)
+
+Beast Mode, against the arcgate localnet at `http://127.0.0.1:19800`. The API takes its x402 payments on Arc testnet (`eip155:5042002`) and trades on a fork of Arc mainnet, so `trade` is refused before any payment. The run logs (`.runs/e946fb7f-41fb-4ff5-a3e7-f8376b9e30af.jsonl` and `.runs/135bf36b-066a-48a1-a38b-6114fe51aa88.jsonl`) are not committed.
+
+- Arcgate checkout `5addf63f`. `/health` reports `commit: null`, so that commit is not confirmed by the service.
+- `API_URL` `http://127.0.0.1:19800`. `/health` is `ok: true` with `x402.network` `eip155:5042002` and `rulesVersion` `r2-383954828c`.
+- The `mm` trading mode was `beast`, read before the run and never switched. The payer is the server wallet `0x72e17261e04E6162a62f034D8d71053Ea37D35A3`.
+- The 402 offered `payTo` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`, which was set as `ARCGATE_PAY_TO`. `inspect` passed and showed the same `/health` and 402 blocks that `connect` and `preview` printed; its output was not saved.
+- `connect` passed at 22:17:06Z.
+- `preview` passed at 22:17:11Z. Testnet USDC was 0.105 before the run (printed by `connect` and `preview`). The three x402 settlements below took 25000 base units, leaving 0.080 (derived, not read):
+  - search `0x44c73192ac9333206d785a0be483cc1223469a0897e66f26335c26aebe9ad951` (requestId `93e8e93c`, 5000 base units)
+  - quote `0x7d14595b86a36f64d35b8e95dcae4d7c587425ab3802529b2ab9d12d612fd145` (`e5658371`, 10000)
+  - swap `0x7ab65f8ac26ca1d6625358a7850c35c5ed9b2ca4f79bf9ae06b902fb48931489` (`37c48d8d`, 10000)
+- The quote was `q_268dcf17694b3475`: sell 0.5 USDC, quoted output 0.00000596 cirBTC, minimum 0.0000059 cirBTC.
+- `mm decode` read the swap as `executeGraph` through router `0x0ea7461542fe051c013ab0f5860190bc847f3271`: `amountIn` 500000, `minOut` 590, recipient the wallet, funding through Permit2, `permitAttached` false.
+- The Permit2 permit had domain chainId 5042, spender `0x0ea7461542fe051c013ab0f5860190bc847f3271`, amount 500000, expiration 1794003456, nonce 0 and sigDeadline 1791411756. The permit was not signed and nothing was sent.
+- `trade -- --execute` at 22:17:45Z was refused before any payment. Its last line was: "The API pays on eip155:5042002 but trades on eip155:5042. mm broadcasts to the real chain, so the trade runs only where the API pays on Arc mainnet. Use npm run preview here. No payment signed."
+
+Why the trade was refused: `mm` broadcasts to the real chain, but the localnet trades on a fork. Signing this Permit2 would authorize the fork's router address on real Arc mainnet. The mainnet trade belongs to #11.
+
+QA's confirming preview ran at 22:23Z (`.runs/135bf36b-066a-48a1-a38b-6114fe51aa88.jsonl`, not committed) and passed: search `0xffe1e91627ccbb626ce4363ce786877c8af3a2ada073926602f218206e6a5f7b` (`e4cceee7`), quote `0x355c48285322543d503cdf4e085aa05a01b64f5a0b6c362d0e6034f8752f4c53` (`58276dcd`), swap `0xbfd71ad8c1b177daea5306ba69279b029678434acfec42c3294b599c2f1d4710` (`8b06c15f`). It spent another 0.025 testnet USDC. A balance read afterward on Arc testnet showed 55000 base units (0.055).
+
+Offline: `npm test` reports 67 pass, 0 fail.
+
+## October 7, 2026 (UTC): Beast Mode only, network row, captured responses; the mainnet trade is blocked at payment
+
+The tutorial now runs every wallet command in Beast Mode only (no `--beast` flag, no policy script), takes its payment network from `/health` and the 402, and its tests clone every API response from a capture. No Beast Mode trade was completed on October 7, and the mainnet-trade replay test was later dropped because the trade capture and its test are #11's.
+
+Offline: 67 tests, 67 pass. `every wallet command refuses to run in Guard Mode` passes (connect, search, quote, preview and `trade --execute` read `wallet trading-mode get`, refuse with the Guard Mode message, and sign, send and fetch nothing). The same test fails against the code before this change (commit `7ddf913`'s source): with only `src/config.js` updated so the import resolves, `main()` ignores the injected `mm` runner, so it never reads the trading mode and tries to start the real `mm` (`message must name Guard Mode: Could not start mm`).
+
+Live, against `https://api.arcgate.dev` (commit `603c5f1`, `/health` ok, `x402.network` `eip155:5042`):
+
+- `mm wallet trading-mode get --json` reported `beast`. `npm run inspect` and `npm run connect` passed; the wallet held 7.959815 USDC on Arc mainnet.
+- `npm run trade -- --execute` ran twice (09:20:24Z and 09:20:45Z, the allowed maximum). Both stopped at the first paid call: `search` signed its x402 payment with `mm`, and the API answered **HTTP 402 with an empty body and no `PAYMENT-RESPONSE`** (`requestId` `a80a73bc` and `a9ceb06e`; run logs `.runs/2855b233-d189-493d-92e2-0b981eee9a17.jsonl` and `.runs/d48846c0-d13d-47d6-a6f1-3234ffef4b26.jsonl`, not committed). No settlement hash was returned, the USDC balance was unchanged at 7.959815 afterward, and no transaction was sent. The 0.50 USDC order was never started.
+- Earlier on October 7 (00:09Z to 02:58Z), 38 runs mostly failed at the same facilitator step (`402 invalid_exact_evm_transaction_failed` "Request exceeds defined limit", or no `PAYMENT-RESPONSE`) and spent 0.23 USDC. The production preview that did succeed is captured in `test/fixtures/mainnet-run.json` (00:23:19Z).
+
+Against the arcgate localnet (`http://127.0.0.1:19800`, payment on `eip155:5042002`): `inspect` and `connect` passed with `ARCGATE_PAY_TO` taken from the 402. The `mm` wallet held 0.005 testnet USDC, less than the 0.025 a preview costs, so `preview` was not rerun; the preview that is recorded is the 2026-10-07T00:11Z one in `test/fixtures/localnet-run.json`. `trade` on this row is refused before any payment, because `mm` broadcasts to the real chain and the localnet is a fork. That was superseded the same day by the funded run in the section above, where `preview` passed.
+
+OpenAPI gate (Ajv 2020 with ajv-formats, outside the repository) over every request and response in `test/fixtures/*.json` against `arcgate/docs/openapi.json` (sha256 `a7bbe7e4ea6730df974bb1b7c9b9b11cdff77c5bc9cf3520702d2890253ee698`): 46 checks, 44 pass. Both failures are the deployed API's own drift from that spec in `mainnet-run.json`: the search result lacks `evidence.trades24h`, `sells24h`, `sellers24h`, `topTraderShare24h` and `origin.website`/`twitter`, and the quote lacks the required `next` and has extra `buy.verification` properties. Every localnet capture passes. The trade schemas match `cf70f87`, where the localnet capture was taken, except one description line in `QuoteBestOut`. They differ from the deployed `https://api.arcgate.dev/openapi.json`, which lags (26 of the 37 trade, health and payment schemas differ).
+
 ## Retest on September 30, 2026 (UTC): current API, same MetaMask blocker
 
 The tutorial now uses the current Arcgate API: the Permit2 second round is the **free `POST /trade/v1/swap/tx`** (not a second paid `/swap`), and a finished trade is confirmed with the **free `POST /trade/v1/receipt`**. The executing command's API budget fell from 0.035 to **0.025 USDC**. All 36 offline tests pass.
@@ -25,7 +127,7 @@ The owner switched the wallet to Beast Mode (`mm wallet trading-mode set beast`,
 
 This isolates the Guard Mode failure to its outflow and token-recipient evaluators: the same transaction path passes when only threat scanning applies.
 
-Separately, the x402 facilitator (`facilitator.arcusnetwork.co`) intermittently answered `invalid_exact_evm_signature` (402, nothing settled) for valid `mm` signatures: 3 of 16 payment attempts that day, all from ad-hoc scripts that reused the tutorial's payment client (two searches and a quote for another token); no tutorial command hit it. The signatures had `v` 27/28 and low `s`, and recovered to the wallet. An immediate retry settled each time.
+Separately, the x402 facilitator (`facilitator.arcusnetwork.co`) intermittently answered `invalid_exact_evm_signature` (402, with no settlement transaction in `PAYMENT-RESPONSE`) for valid `mm` signatures: 3 of 16 payment attempts that day, all from ad-hoc scripts that reused the tutorial's payment client (two searches and a quote for another token); no tutorial command hit it. The signatures had `v` 27/28 and low `s`, and recovered to the wallet. As history only: each new payment made afterward settled.
 
 ## September 29, 2026 (UTC)
 

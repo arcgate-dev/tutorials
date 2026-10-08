@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "arcgate": {
+      "type": "http",
+      "url": "https://api.arcgate.dev/mcp"
+    }
+  }
+}

@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tutorial: [arc-circle, arc-metamask]
+        tutorial: [arc-circle, arc-metamask, arc-agent-box, arc-mcp, arc-claude-agent]
     defaults:
       run:
         working-directory: ${{ matrix.tutorial }}
@@ -20,3 +20,4 @@ jobs:
           cache-dependency-path: ${{ matrix.tutorial }}/package-lock.json
       - run: npm ci --ignore-scripts
       - run: npm test
+      - run: npm run typecheck --if-present
