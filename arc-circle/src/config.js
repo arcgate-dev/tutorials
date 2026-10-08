@@ -1,6 +1,7 @@
 import { getAddress, parseUnits } from 'viem';
 
 export const CIRBTC = '0x171a4217b86a807a64eb94757db6849fb4bdbaa0';
+export const USDC = '0x3600000000000000000000000000000000000000';
 
 // The API names its payment network in /health and in the unpaid 402. Everything
 // that depends on that network lives in this one table; any other network is refused.
@@ -24,6 +25,40 @@ export const NETWORKS = {
   },
 };
 
+// Every route this tutorial calls, operationId -> [method, path template], as in arcgate's OpenAPI document.
+// A paid call is authenticated by its x402 payment; an owner call is free and signed by the wallet (src/agent.js).
+export const PAID_OPERATIONS = {
+  search: ['POST', '/trade/v1/search'],
+  quote: ['POST', '/trade/v1/quote'],
+  swap: ['POST', '/trade/v1/swap'],
+  boxCreate: ['POST', '/agent/v1/{address}/box'],
+  inboundCreate: ['POST', '/agent/v1/{address}/inbound'],
+};
+export const OWNER_OPERATIONS = {
+  boxStatus: ['GET', '/agent/v1/{address}/box/status'],
+  boxMessageList: ['GET', '/agent/v1/{address}/box/messages'],
+  boxMessageFetch: ['GET', '/agent/v1/{address}/box/messages/{seq}'],
+  boxMessageDelete: ['DELETE', '/agent/v1/{address}/box/messages/{seq}'],
+  inboundList: ['GET', '/agent/v1/{address}/inbound/list'],
+  inboundDelete: ['DELETE', '/agent/v1/{address}/inbound/{id}'],
+};
+// The six fields an owner call signs (arcgate's packages/core/src/agent/signing.ts).
+export const agentRequestTypes = { AgentRequest: [
+  { name: 'address', type: 'address' }, { name: 'method', type: 'string' }, { name: 'path', type: 'string' },
+  { name: 'bodyHash', type: 'bytes32' }, { name: 'nonce', type: 'bytes32' }, { name: 'expiry', type: 'uint64' },
+] };
+
+
+// Spending caps per command, overriding loadConfig's trade caps. The price is the live 402 offer, bounded by the cap.
+// messages and cleanup are free and have no paid client.
+export const COMMAND_CAPS = {
+  box: { maxPayment: 50_000n, maxTotal: 50_000n }, // One boxCreate, 0.05 USDC.
+  inbound: { maxPayment: 10_000n, maxTotal: 10_000n }, // One inboundCreate, 0.01 USDC.
+};
+
+// The resolved network row with the command's own spending cap on top; the trade commands keep loadConfig's.
+export const commandConfig = (resolved, command) => ({ ...resolved, ...COMMAND_CAPS[command] });
+
 function isLoopbackHttp(url) {
   return url.protocol === 'http:' && ['127.0.0.1', 'localhost'].includes(url.hostname);
 }
@@ -46,6 +81,13 @@ export function assertLoopback(value, name) {
   if (url.username || url.password || !isLoopbackHttp(url)) {
     throw new Error(`${name} must be http on localhost or 127.0.0.1 (loopback only), with no credentials.`);
   }
+}
+
+// An inbound address: the notifier's origin and one path segment, the address id.
+export function inboundUrl(value) {
+  const url = checkedUrl(value, 'The inbound url');
+  if (url.search || url.hash || !/^\/[A-Za-z0-9_-]+$/.test(url.pathname)) throw new Error('An inbound url is an origin and one path segment.');
+  return value;
 }
 
 function apiOrigin(value) {

@@ -1,11 +1,12 @@
 import { x402Client, x402HTTPClient } from '@x402/core/client';
 import { decodePaymentRequiredHeader, decodePaymentResponseHeader } from '@x402/core/http';
 import { ExactEvmScheme } from '@x402/evm/exact/client';
-import { getAddress } from 'viem';
+import { erc20Abi, formatUnits, getAddress } from 'viem';
+import { signedPath } from './agent.js';
 import { signTypedData } from './circle.js';
+import { PAID_OPERATIONS, USDC } from './config.js';
 import { readApiResponse } from './errors.js';
 
-export const USDC = '0x3600000000000000000000000000000000000000';
 export const authorizationTypes = { TransferWithAuthorization: [
   { name: 'from', type: 'address' }, { name: 'to', type: 'address' },
   { name: 'value', type: 'uint256' }, { name: 'validAfter', type: 'uint256' },
@@ -39,6 +40,21 @@ export function assertAuthorization(data, wallet, config, now = Math.floor(Date.
   }
 }
 
+// Reads the wallet's USDC on the payment chain and prints it. With `enforce`, too little for the run's budget is an error.
+export async function checkFunds({ feeRpc, wallet, config, log = console.log, enforce = true }) {
+  if (await feeRpc.getChainId() !== config.paymentChainId) throw new Error(`The payment RPC is not chain ${config.paymentChainId}.`);
+  const fees = await feeRpc.readContract({ address: USDC, abi: erc20Abi, functionName: 'balanceOf', args: [wallet.address] });
+  log(JSON.stringify({ address: wallet.address, blockchain: wallet.blockchain, network: config.network, usdcBalance: formatUnits(fees, 6) }, null, 2));
+  if (enforce && fees < config.maxTotal) throw new Error(`Fund your ${config.blockchain} wallet with USDC on ${config.network} for API fees.`);
+  return fees;
+}
+
+// The paid client, with the balance checked once, just before the first payment of the run.
+export function fundedOnce(api, checkFundsFn) {
+  let checked;
+  return async (...args) => { checked ??= checkFundsFn(); await checked; return api(...args); };
+}
+
 export async function paymentRequired(response) {
   const header = response.headers.get('payment-required');
   const body = header ? decodePaymentRequiredHeader(header) : await response.json();
@@ -63,9 +79,12 @@ export function createArcgateClient({ circle, wallet, config, fetchFn = fetch, r
   const httpClient = new x402HTTPClient(client);
 
   return async function call(operation, body) {
-    if (!['search', 'quote', 'swap'].includes(operation)) throw new Error('Unknown Arcgate operation.');
-    const url = `${config.apiUrl}/trade/v1/${operation}`;
-    const init = { method: 'POST', redirect: 'error', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) };
+    if (!Object.hasOwn(PAID_OPERATIONS, operation)) throw new Error('Unknown Arcgate operation.');
+    const [method, template] = PAID_OPERATIONS[operation];
+    const url = `${config.apiUrl}${signedPath(template, wallet.address)}`;
+    // A content-type and a body go out only when the call has a body.
+    const init = { method, redirect: 'error', headers: body === undefined ? {} : { 'content-type': 'application/json' },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }) };
     const request = headers => fetchFn(url, { ...init, headers, signal: AbortSignal.timeout(90_000) });
     const unpaid = await request(init.headers);
     if (unpaid.status !== 402) {
@@ -76,6 +95,7 @@ export function createArcgateClient({ circle, wallet, config, fetchFn = fetch, r
     const offer = required.accepts.find(value => acceptOffer(value, config));
     if (!offer) throw new Error(`${operation}: payment network, asset, recipient, price or timeout differs from the configured limits. Run npm run inspect.`);
     if (reserved + BigInt(offer.amount) > config.maxTotal) throw new Error('This run would exceed the total API payment budget.');
+    record({ operation, amount: offer.amount, network: offer.network, state: 'offered' });
     // Reserve before signing; a timeout must never free the budget for a replacement payment.
     reserved += BigInt(offer.amount);
     const payload = await client.createPaymentPayload({ ...required, accepts: [offer] });

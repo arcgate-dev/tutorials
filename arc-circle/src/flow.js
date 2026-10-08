@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { erc20Abi, formatUnits, getAddress, parseEventLogs, parseUnits } from 'viem';
-import { USDC } from './payment.js';
+import { USDC } from './config.js';
 import { pickToken, reviewQuote, reviewSwap } from './guards.js';
 
 // Dependencies are explicit so the entire tutorial can be tested without any
