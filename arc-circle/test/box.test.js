@@ -7,7 +7,6 @@ import { boxStep, cleanupStep, inboundStep, messagesStep } from '../src/box.js';
 import { COMMAND_CAPS, commandConfig, inboundUrl, OWNER_OPERATIONS, PAID_OPERATIONS } from '../src/config.js';
 import { ArcgateError } from '../src/errors.js';
 import { checkFunds, createArcgateClient, fundedOnce } from '../src/payment.js';
-import { createHmac } from 'node:crypto';
 import { inspect } from '../src/main.js';
 import { getReceipt } from '../src/receipt.js';
 import { postInbound } from '../src/inbound.js';
@@ -262,11 +261,11 @@ test('the INBOUND-SIGNATURE is the HMAC-SHA256 of "<timestamp>." and the raw bod
   await postInbound({ url: 'https://notify.example/abc', secret: 's\u00e9cret', body, now: () => 1_700_000_000_999, fetchFn: async (_url, sent) => { init = sent; return json({ stored: true }, 201); } });
   const raw = JSON.stringify(body);
   assert.equal(init.body, raw);
-  const expected = createHmac('sha256', Buffer.from('s\u00e9cret', 'utf8')).update('1700000000.').update(raw).digest('hex');
+  // Computed once with arcgate's own inboundSignature (packages/core/src/agent/inboundAuth.ts) for this secret, timestamp and body.
+  const expected = '7eb3804de9c54757cd22be7499c474a7cb229770cf0079a9308b47484166dece';
   const headers = new Headers(init.headers);
   assert.equal(headers.get('inbound-timestamp'), '1700000000');
   assert.equal(headers.get('inbound-signature'), expected);
-  assert.match(expected, /^[0-9a-f]{64}$/);
 });
 
 test('every successful owner call is recorded as ok with its status, never its body', async () => {
@@ -308,4 +307,15 @@ test('inspect, receipt and inbound send through the one request helper: no redir
   await postInbound({ url: 'https://notify.example/abc', secret: 's', body: {}, fetchFn: async (_url, init) => { inits.push(init); return json({}, 201); } });
   assert.equal(inits.length, 4);
   for (const init of inits) { assert.equal(init.redirect, 'error'); assert.ok(init.signal instanceof AbortSignal); }
+});
+
+test('on the localnet row an owner call signs for the trade chain 5042, not the payment network 5042002', async () => {
+  const fetchFn = server({ [`GET ${ownerPath('box/status')}`]: json({ address: base }) });
+  const testnetSigner = ownerSigner({ circle: circleSigner, wallet, config: testnetConfig });
+  await createAgentClient({ signer: testnetSigner, config: testnetConfig, fetchFn })('boxStatus');
+  const { init } = fetchFn.calls[0];
+  const headers = new Headers(init.headers);
+  const data = agentTypedData({ address: wallet.address, method: 'GET', path: ownerPath('box/status'),
+    nonce: headers.get('agent-nonce'), expiry: Number(headers.get('agent-expiry')), chainId: 5042 });
+  assert.equal(await recoverTypedDataAddress({ ...data, signature: headers.get('agent-signature') }), wallet.address);
 });

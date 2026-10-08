@@ -536,6 +536,6 @@ This tutorial records any replacement quote but stops for review; it does not au
 npm test
 ```
 
-The **83 tests** run offline. They use generated local signing keys and injected HTTP, Circle, and RPC responses, with API responses from recorded fixtures in `test/fixtures`. They require no credentials, funded wallet, or deployed service. See [VALIDATION.md](VALIDATION.md) for the checks actually run and the limits of live verification.
+The **84 tests** run offline. They use generated local signing keys and injected HTTP, Circle, and RPC responses, with API responses from recorded fixtures in `test/fixtures`. They require no credentials, funded wallet, or deployed service. See [VALIDATION.md](VALIDATION.md) for the checks actually run and the limits of live verification.
 
 For other tokens, order sizes, approval modes, and MCP access, use the [API reference](https://docs.arcgate.dev) and [OpenAPI document](https://api.arcgate.dev/openapi.json). Review the example's token and spending checks before changing its scope.
