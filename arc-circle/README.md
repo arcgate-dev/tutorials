@@ -4,7 +4,7 @@ Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect
 
 Everything you need to run the example is in this folder. The dependencies are the public Circle SDK, x402 SDK, and viem. Arcgate does not need an API key: your wallet pays per call. Your Circle credentials go to Circle, never to Arcgate.
 
-**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. **October 8, 2026:** the request and response shapes below were checked against [the OpenAPI document](https://api.arcgate.dev/openapi.json). A fresh funded mainnet run is pending; until it lands, example responses marked *illustrative* show the shape of a real response, not values from a mainnet run. See [the validation record and transaction receipts](VALIDATION.md).
+**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. **October 8, 2026:** the request and response shapes below were checked against [the OpenAPI document](https://api.arcgate.dev/openapi.json). **October 8, 2026 mainnet run:** every command below ran against https://api.arcgate.dev through a Circle developer-controlled `ARC` wallet; the example outputs are from that run, with long lists trimmed. See [the validation record and transaction receipts](VALIDATION.md).
 
 ## Before you start
 
@@ -24,12 +24,12 @@ This walkthrough uses real funds. Its default limits are **0.01 USDC per API cal
 | `npm run search` | Resolves cirBTC | 0.005 USDC |
 | `npm run quote` | Searches, then quotes 1 USDC | 0.015 USDC total |
 | `npm run preview` | Searches, quotes, and builds an unsigned swap | 0.025 USDC total |
-| `npm run trade -- --execute` | Runs the same three calls, broadcasts, then checks the receipt | 0.025 USDC, plus the trade and gas |
+| `npm run trade -- --execute` | Runs the same three calls, broadcasts, then checks the receipt | 0.025 USDC, plus the 1 USDC order and gas |
 | `npm run receipt -- <quoteId> <txHash> [txHash ...]` | Checks an already submitted trade without Circle credentials | Free |
 
 Prices come from the `x-payment` entries in [https://api.arcgate.dev/openapi.json](https://api.arcgate.dev/openapi.json), as of October 8, 2026: search 5000 base units (0.005 USDC), quote 10000 (0.01 USDC), swap 10000 (0.01 USDC) for an order under 1,000 USD. Check that document for the current figures.
 
-Each command starts a new run. Running all four paid commands costs 0.07 USDC in API fees. A preview pays for its API calls even though it does not send the swap. The code refuses prices above its limits.
+Each command starts a new run. Running all four paid commands (search, quote, preview and trade: nine payments) costs 0.07 USDC in API fees, plus the 1 USDC order and gas. A preview pays for its API calls even though it does not send the swap. The code refuses prices above its limits.
 
 These prices apply to this tutorial's trade of at most 1 USDC. The API's swap fee increases for larger orders; see [current pricing](https://docs.arcgate.dev/#arcgate/description/prices). An application error with an `error.code` (such as 409 `quote_stale`) is refused without settlement and is not charged, and an ordinary settlement failure such as `insufficient_funds` normally charges nothing. A paid HTTP 502 (`X402MiddlewareError`) or a settlement failure with `payment_response_expired` may have settled; the error message then includes `; the payment may have settled; check the PAYMENT-RESPONSE transaction or your USDC balance before paying again`. A successful quote with an unsafe verdict or insufficient wallet readiness is still a paid answer, even though this tutorial stops on it.
 
@@ -116,7 +116,16 @@ Then connect:
 npm run connect
 ```
 
-The output is a JSON object with your `address`, the `blockchain` and `network` the check used, and `usdcBalance`.
+The output is a JSON object with your `address`, the `blockchain` and `network` the check used, and `usdcBalance`:
+
+```json
+{
+  "address": "0x6D2f707D75431A6f37C106b2c5085D5e42F7842d",
+  "blockchain": "ARC",
+  "network": "eip155:5042",
+  "usdcBalance": "24.417394"
+}
+```
 
 Connecting reads the wallet and balance; it does not sign or pay. The check requires `accountType: "EOA"`, `blockchain` equal to `config.blockchain` (`ARC` here), and `state: "LIVE"`. `connect` also prints the `network`. `state: "LIVE"` means the wallet is active; the separate `blockchain` check establishes its network. Circle documents Arc support in its [supported blockchains](https://developers.circle.com/wallets/supported-blockchains) table.
 
@@ -201,14 +210,18 @@ The script supplies your wallet address as `taker`, so the response also reports
 - `gas` and `fees`: estimated native USDC gas and the remaining swap API fee, with balance checks for the taker and x402 payer.
 - `totalCostUsdc`: swap fee plus estimated gas, excluding the traded principal and the search/quote fees already paid. The gas estimate uses the default Permit2 plan, so the exact-approval flow's actual gas can differ.
 
-The script prints readiness and stops if `readiness.ready` is false, `next` is anything other than `"swap"`, or `best.executable` is false. A good quote ends like this (*illustrative of the shape*, shortened; the quote ID and amounts are from a recorded run, not a mainnet run):
+The script prints readiness and stops if `readiness.ready` is false, `next` is anything other than `"swap"`, or `best.executable` is false. A good quote ends like this (from the October 8 mainnet run; `readiness` is cut to its verdict):
 
 ```json
 {
-  "quoteId": "q_9b4fe45c89ab130a",
-  "best": { "amountOutQuoted": "0.00001193", "minAmountOut": "0.00001181", "executable": true },
-  "safety": { "verdict": "pinned" },
+  "quoteId": "q_041293ee1292c865",
+  "expiresAt": "2026-10-08T15:45:15.651Z",
+  "sell": "1",
+  "amountOutQuoted": "0.00001227",
+  "minAmountOut": "0.00001214",
+  "safety": "pinned",
   "readiness": { "ready": true },
+  "warnings": [],
   "next": "swap"
 }
 ```
@@ -237,19 +250,30 @@ const swap = await api('swap', {
 
 `api` is the paid HTTP helper from [src/payment.js](src/payment.js); `runFlow` shows all three calls together in [src/flow.js](src/flow.js).
 
-`POST /trade/v1/swap` re-quotes and simulates the trade from your wallet, so you need the sell amount and gas headroom even for a preview. Arcgate returns unsigned `transactions[]`. This tutorial requests **`approval: "approve"`**: at most one ERC-20 approval for the exact sell amount, followed by the swap. An existing allowance or a route funded by native USDC can make the approval unnecessary. A swap response with `next: "send"` and an empty `signatures` array means the transactions are ready to send in order. This example refuses to send anything else. *Illustrative of the shape* (recorded run, not a mainnet run; each transaction's `to` and the calldata are cut here):
+`POST /trade/v1/swap` re-quotes and simulates the trade from your wallet, so you need the sell amount and gas headroom even for a preview. Arcgate returns unsigned `transactions[]`. This tutorial requests **`approval: "approve"`**: at most one ERC-20 approval for the exact sell amount, followed by the swap. An existing allowance or a route funded by native USDC can make the approval unnecessary. A swap response with `next: "send"` and an empty `signatures` array means the transactions are ready to send in order. This example refuses to send anything else. The preview prints the decoded transactions (October 8 mainnet run):
 
 ```json
 {
-  "quoteId": "q_9b4fe45c89ab130a",
-  "signatures": [],
   "transactions": [
-    { "data": "0x095ea7b3…", "value": "0", "gas": "72070", "purpose": "approve" },
-    { "data": "0xfdbcb692…", "value": "0", "gas": "307150", "purpose": "swap" }
-  ],
-  "amountOutSimulated": "1193",
-  "minAmountOut": "1181",
-  "next": "send"
+    {
+      "purpose": "approve",
+      "token": "0x3600000000000000000000000000000000000000",
+      "spender": "0x6Cf4F7785D479B9Ec1c3abe2fB569525380BAEdE",
+      "amount": "1000000"
+    },
+    {
+      "purpose": "swap",
+      "router": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
+      "tokenIn": "0x3600000000000000000000000000000000000000",
+      "amountIn": "1000000",
+      "tokenOut": "0x171A4217b86A807A64eB94757Db6849fb4bDbAA0",
+      "minOut": "1214",
+      "recipient": "0x6D2f707D75431A6f37C106b2c5085D5e42F7842d",
+      "deadline": "1791474511",
+      "funding": "ERC-20 USDC (6 decimals)",
+      "steps": 1
+    }
+  ]
 }
 ```
 
@@ -318,24 +342,35 @@ if (!response.ok) throw new Error(`receipt: ${response.status} ${receipt.error?.
 - `result: "pending"`: wait at least 5 seconds and query the receipt again. Do not broadcast again.
 - `result: "fail"`: inspect `reason` and `next`. `stop` means a swap succeeded but the fill failed the check; do not trade again. `requote` means no swap succeeded; inspect the transactions before deciding on a new trade.
 
-A passing receipt, *illustrative of the shape* (recorded run, not a mainnet run, so the block numbers are not mainnet blocks):
+A passing receipt from the October 8 mainnet run (quote `q_2c7fc22c2998df9a`):
 
 ```json
 {
-  "quoteId": "q_9b4fe45c89ab130a",
+  "quoteId": "q_2c7fc22c2998df9a",
   "result": "pass",
-  "minAmountOut": "1181",
-  "delivered": "1193",
+  "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+  "recipient": "0x6d2f707d75431a6f37c106b2c5085d5e42f7842d",
+  "minAmountOut": "1214",
+  "delivered": "1227",
+  "block": 24923746,
   "transactions": [
-    { "purpose": "approve", "status": "success", "block": 23584079 },
-    { "purpose": "swap", "status": "success", "block": 23584080 }
+    {
+      "hash": "0xc7dc8a42eb3891fdb3b56fec5a5121c3096fad85875817a7096e86d06667d4ec",
+      "purpose": "approve",
+      "status": "success",
+      "block": 24923741
+    },
+    {
+      "hash": "0x243755e798ba3b58ecf346bdab1c8c417fa9d0c88f8d49a7ca79c7e153b0528f",
+      "purpose": "swap",
+      "status": "success",
+      "block": 24923746
+    }
   ],
   "reason": null,
   "next": "done"
 }
 ```
-
-(Each transaction's `hash`, and the top-level `token`, `recipient` and `block`, are left out here.)
 
 The trade command prints a ready-to-run `npm run receipt -- ...` command with its quote ID and hashes. You can also fill them in yourself:
 
