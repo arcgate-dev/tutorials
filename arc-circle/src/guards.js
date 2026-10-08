@@ -1,5 +1,5 @@
 import { decodeFunctionData, erc20Abi, getAddress, parseAbi, parseUnits } from 'viem';
-import { USDC } from './payment.js';
+import { agentRequestTypes, OWNER_OPERATIONS, USDC } from './config.js';
 
 // The public ArcgateRouter executeGraph interface. This is an ABI description,
 // not the router implementation. No Arcgate package or ABI download is needed.
@@ -73,4 +73,24 @@ export function reviewSwap(swap, quote, wallet, config, minOut, now = Math.floor
     return { purpose: 'swap', router: tx.to, tokenIn, amountIn: String(amountIn), tokenOut,
       minOut: String(minimum), recipient, deadline: String(deadline), funding: native ? 'native USDC (18 decimals)' : 'ERC-20 USDC (6 decimals)', steps: steps.length };
   });
+}
+
+// An owner call signs exactly one AgentRequest, for one of OWNER_OPERATIONS on this wallet's own path, for under a minute.
+const agentRequestShape = JSON.stringify(agentRequestTypes);
+const ownerRoute = (method, template, address) => new RegExp(`^${method} ${template
+  .replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace('{address}', address.toLowerCase()).replace(/\{(?:seq|id)\}/g, '[\\w-]+')}$`);
+export function assertAgentRequest(data, wallet, config, now = Math.floor(Date.now() / 1000)) {
+  const { domain, message, types, primaryType } = data;
+  const shape = Object.fromEntries(Object.entries(types).filter(([name]) => name !== 'EIP712Domain'));
+  const hex32 = /^0x[0-9a-fA-F]{64}$/;
+  if (primaryType !== 'AgentRequest' || JSON.stringify(shape) !== agentRequestShape
+      || JSON.stringify(Object.keys(domain).sort()) !== '["chainId","name","version"]'
+      || domain.name !== 'arcgate' || domain.version !== '1' || domain.chainId !== config.tradeChainId
+      || getAddress(message.address) !== wallet.address
+      || typeof message.path !== 'string' || typeof message.method !== 'string'
+      || !Object.values(OWNER_OPERATIONS).some(([method, template]) => ownerRoute(method, template, wallet.address).test(`${message.method} ${message.path}`))
+      || !hex32.test(message.nonce) || !hex32.test(message.bodyHash)
+      || BigInt(message.expiry) <= BigInt(now) || BigInt(message.expiry) > BigInt(now + 90)) {
+    throw new Error('Refusing an unexpected AgentRequest.');
+  }
 }

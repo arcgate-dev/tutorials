@@ -1,3 +1,5 @@
+import { PAID_OPERATIONS } from './config.js';
+
 // Preserve the API's next action and optional free quote for callers, without
 // automatically retrying a payment or accepting a different trade.
 export class ArcgateError extends Error {
@@ -5,7 +7,7 @@ export class ArcgateError extends Error {
     const requestId = response.headers.get('x-request-id');
     // Arcgate errors carry { code, message, hint }; the x402 middleware's 502 carries a plain string.
     const reason = typeof body.error === 'string' ? body.error : body.error?.code ?? 'request_failed';
-    const paid = ['search', 'quote', 'swap'].includes(operation);
+    const paid = Object.hasOwn(PAID_OPERATIONS, operation);
     super(`${operation}: HTTP ${response.status} (${reason})`
       + (body.next ? `; next=${body.next}` : '')
       + (body.retryAfterSec !== undefined ? `; retryAfterSec=${body.retryAfterSec}` : '')

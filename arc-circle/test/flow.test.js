@@ -5,7 +5,7 @@ import { loadConfig, requireApiKey } from '../src/config.js';
 import { runFlow } from '../src/flow.js';
 import { pickToken, reviewQuote, reviewSwap } from '../src/guards.js';
 import * as app from '../src/main.js';
-import { USDC } from '../src/payment.js';
+import { USDC } from '../src/config.js';
 import { approveHash, config, delivered, minOut, now, other, pinTime, quote, run, search, swap, swapArgs, swapHash, testnetConfig, tradeReceipt, wallet } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };

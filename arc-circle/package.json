@@ -13,6 +13,10 @@
     "preview": "node --env-file-if-exists=.env src/main.js preview",
     "trade": "node --env-file-if-exists=.env src/main.js trade",
     "receipt": "node --env-file-if-exists=.env src/main.js receipt",
+    "box": "node --env-file-if-exists=.env src/main.js box",
+    "inbound": "node --env-file-if-exists=.env src/main.js inbound",
+    "messages": "node --env-file-if-exists=.env src/main.js messages",
+    "cleanup": "node --env-file-if-exists=.env src/main.js cleanup",
     "wallet:create": "node --env-file-if-exists=.env src/create-wallet.js",
     "test": "node --test test/*.test.js"
   },

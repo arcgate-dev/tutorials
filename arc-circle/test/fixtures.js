@@ -4,7 +4,8 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { decodeFunctionData, encodeFunctionData, erc20Abi, getAddress } from 'viem';
 import { forNetwork, loadConfig } from '../src/config.js';
 import { routerAbi } from '../src/guards.js';
-import { authorizationTypes, USDC } from '../src/payment.js';
+import { USDC } from '../src/config.js';
+import { authorizationTypes } from '../src/payment.js';
 
 // Random ephemeral keys exist only in memory. No account, RPC or deployment is used.
 export const account = privateKeyToAccount(`0x${randomBytes(32).toString('hex')}`);
