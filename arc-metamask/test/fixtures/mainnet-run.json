@@ -1,9 +1,9 @@
 {
-  "capturedAt": "2026-10-07T00:23:19.966Z",
-  "source": "npm run preview against https://api.arcgate.dev (Arc mainnet), mm wallet in Beast Mode signing x402 on chain 5042; PAYMENT-SIGNATURE never recorded. Only search, quote and the first swap: no npm run trade -- --execute completed (the production facilitator failed every attempt), so there is no final /swap/tx or receipt capture",
-  "healthCommit": "603c5f15143bc4e54c69dccf0539a10c0ff18ddf",
+  "capturedAt": "2026-10-08T15:17:20.415Z",
+  "source": "npm run trade -- --execute against https://api.arcgate.dev on Arc mainnet (eip155:5042), mm server wallet in Beast Mode, 2026-10-08; PAYMENT-SIGNATURE never recorded.",
+  "healthCommit": "6e04f6ab0a060417c852f87f20980e42a00fa3eb",
   "rulesVersion": "r2-383954828c",
-  "taker": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+  "taker": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
   "search": {
     "request": {
       "query": "cirBTC",
@@ -11,12 +11,20 @@
     },
     "unpaid": {
       "status": 402,
-      "requestId": "716d7160",
+      "requestId": "e5865bd8",
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      },
       "paymentRequired": {
         "x402Version": 2,
         "error": "Payment required",
         "resource": {
-          "url": "http://api.arcgate.dev/trade/v1/search",
+          "url": "https://api.arcgate.dev/trade/v1/search",
           "description": "Token search",
           "mimeType": ""
         },
@@ -34,29 +42,15 @@
             }
           }
         ]
-      },
-      "body": {
-        "error": {
-          "code": "payment_required",
-          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
-          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
-        },
-        "next": "pay"
       }
     },
     "paid": {
       "status": 200,
-      "requestId": "d57f0a17",
-      "paymentResponse": {
-        "success": true,
-        "payer": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
-        "transaction": "0xade681e0670bec5b8ebc4cd6e5fe9fb18573b0f7e91d08e2b4432e0a74ae0800",
-        "network": "eip155:5042"
-      },
+      "requestId": "4d492eaf",
       "body": {
         "query": "cirBTC",
         "network": "eip155:5042",
-        "block": 24644601,
+        "block": 24920521,
         "resolution": "verified",
         "rulesVersion": "r2-383954828c",
         "results": [
@@ -80,10 +74,14 @@
               "creatorLinked": false,
               "depth2PctUsd": "336094.678403",
               "depthKind": "measured",
-              "depthAgeSec": 1196157,
-              "volume24hUsd": "5920698.174529",
-              "traders24h": 2057,
-              "ageHours": 3386.9088888888887,
+              "depthAgeSec": 1336195,
+              "volume24hUsd": "5629972.068675",
+              "traders24h": 2257,
+              "trades24h": 19612,
+              "sells24h": 8999,
+              "sellers24h": 1904,
+              "topTraderShare24h": 0.3031803767784436,
+              "ageHours": 3425.8083333333334,
               "posterior": null
             },
             "discovered": "index",
@@ -91,7 +89,10 @@
               "launchpad": "direct",
               "creator": null,
               "createdBlock": 560194,
-              "createdAt": "2026-05-18T21:28:28.000Z"
+              "createdAt": "2026-05-18T21:28:28.000Z",
+              "website": null,
+              "twitter": null,
+              "telegram": null
             },
             "state": "pool_only",
             "venues": [
@@ -154,7 +155,7 @@
             ],
             "liquidityUsd": "17000020.6821",
             "depth2PctUsd": "336094.678403",
-            "volume24hUsd": "5920698.174529",
+            "volume24hUsd": "5629972.068675",
             "holders": null,
             "safety": null,
             "safetyByRoute": [],
@@ -174,18 +175,25 @@
               "creatorLinked": false,
               "depth2PctUsd": null,
               "depthKind": null,
-              "depthAgeSec": 279,
+              "depthAgeSec": 125,
               "volume24hUsd": null,
               "traders24h": null,
-              "ageHours": 484.89472222222224,
-              "posterior": 0.1060649084752373
+              "trades24h": null,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": 523.7941666666667,
+              "posterior": 0.10856182284785351
             },
             "discovered": "index",
             "origin": {
               "launchpad": "argus",
               "creator": "0x5247ca47b02b2fbad7a52478512309bc7b40467f",
               "createdBlock": 21207078,
-              "createdAt": "2026-09-16T19:29:19.000Z"
+              "createdAt": "2026-09-16T19:29:19.000Z",
+              "website": "https://x.com/jerallaire/status/2039738698628223219?utm_source",
+              "twitter": "https://x.com/jerallaire/status/2039738698628223219?utm_source",
+              "telegram": null
             },
             "state": "pool_only",
             "venues": [
@@ -210,6 +218,9 @@
               "sellTaxBps": null,
               "buyImpactBps": null,
               "roundTripLossBps": null,
+              "sellImpactBps": null,
+              "sellDelaySec": null,
+              "exitSellTaxBps": null,
               "scope": {
                 "block": 0,
                 "walletProfile": "fresh_eoa"
@@ -239,18 +250,25 @@
               "creatorLinked": false,
               "depth2PctUsd": null,
               "depthKind": null,
-              "depthAgeSec": 279,
+              "depthAgeSec": 125,
               "volume24hUsd": null,
               "traders24h": null,
-              "ageHours": 473.88972222222225,
-              "posterior": 0.1060649084752373
+              "trades24h": null,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": 512.7891666666667,
+              "posterior": 0.10856182284785351
             },
             "discovered": "index",
             "origin": {
               "launchpad": "argus",
               "creator": "0x2654ddf31e5d8dda52fe8c1d759be186d316d8a6",
               "createdBlock": 21285279,
-              "createdAt": "2026-09-17T06:29:37.000Z"
+              "createdAt": "2026-09-17T06:29:37.000Z",
+              "website": null,
+              "twitter": null,
+              "telegram": null
             },
             "state": "pool_only",
             "venues": [
@@ -275,6 +293,9 @@
               "sellTaxBps": null,
               "buyImpactBps": null,
               "roundTripLossBps": null,
+              "sellImpactBps": null,
+              "sellDelaySec": null,
+              "exitSellTaxBps": null,
               "scope": {
                 "block": 0,
                 "walletProfile": "fresh_eoa"
@@ -287,87 +308,6 @@
               "impersonates_canonical",
               "no_usdc_pool",
               "sell_tax",
-              "shared_ticker"
-            ]
-          },
-          {
-            "address": "0x560f6b48d41056de13983ad1601d76d3d851a30b",
-            "symbol": "cirBTC",
-            "name": "Circle Wrapped Bitcoin",
-            "decimals": 8,
-            "match": "symbol",
-            "verification": {
-              "status": "unverified"
-            },
-            "evidence": {
-              "firstWithTicker": false,
-              "creatorLinked": false,
-              "depth2PctUsd": "0",
-              "depthKind": "measured",
-              "depthAgeSec": 279,
-              "volume24hUsd": "15000000.18354",
-              "traders24h": 2,
-              "ageHours": null,
-              "posterior": 0.05242137225112175
-            },
-            "discovered": "index",
-            "origin": {
-              "launchpad": null,
-              "creator": null,
-              "createdBlock": null,
-              "createdAt": null
-            },
-            "state": null,
-            "venues": [
-              {
-                "venue": "uniswap_v4",
-                "poolId": "0xf04cf7eb237dde531e1944612dde85a120e8cf4af58ac691ef5055e15b0e4f8c",
-                "pair": "USDC",
-                "feeBps": null,
-                "hooks": "0xfaf6f34371d750164162e9c66a565b3eb7330840"
-              }
-            ],
-            "liquidityUsd": null,
-            "depth2PctUsd": "0",
-            "volume24hUsd": "15000000.18354",
-            "holders": null,
-            "safety": {
-              "routeId": "uniswap_v4:0xf04cf7eb237dde531e1944612dde85a120e8cf4af58ac691ef5055e15b0e4f8c",
-              "route": {
-                "venue": "uniswap_v4",
-                "poolId": "0xf04cf7eb237dde531e1944612dde85a120e8cf4af58ac691ef5055e15b0e4f8c",
-                "pair": "USDC"
-              },
-              "verdict": "inconclusive",
-              "canSell": null,
-              "buyTaxBps": 10000,
-              "sellTaxBps": null,
-              "buyImpactBps": 0,
-              "roundTripLossBps": null,
-              "scope": {
-                "block": 24644073,
-                "walletProfile": "fresh_eoa"
-              }
-            },
-            "safetyByRoute": [
-              {
-                "routeId": "uniswap_v4:0xf04cf7eb237dde531e1944612dde85a120e8cf4af58ac691ef5055e15b0e4f8c",
-                "route": {
-                  "venue": "uniswap_v4",
-                  "poolId": "0xf04cf7eb237dde531e1944612dde85a120e8cf4af58ac691ef5055e15b0e4f8c",
-                  "pair": "USDC"
-                },
-                "verdict": "inconclusive",
-                "buyTaxBps": 10000,
-                "sellTaxBps": null,
-                "checkedBlock": 24644073
-              }
-            ],
-            "flags": [
-              "buy_tax",
-              "hooked_pool",
-              "illiquid",
-              "impersonates_canonical",
               "shared_ticker"
             ]
           },
@@ -385,18 +325,25 @@
               "creatorLinked": false,
               "depth2PctUsd": null,
               "depthKind": null,
-              "depthAgeSec": 279,
+              "depthAgeSec": 125,
               "volume24hUsd": "0",
               "traders24h": 0,
+              "trades24h": 0,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
               "ageHours": null,
-              "posterior": 0.01937631125858711
+              "posterior": 0.019832456375434564
             },
             "discovered": "index",
             "origin": {
               "launchpad": null,
               "creator": null,
               "createdBlock": null,
-              "createdAt": null
+              "createdAt": null,
+              "website": null,
+              "twitter": null,
+              "telegram": null
             },
             "state": null,
             "venues": [
@@ -421,6 +368,82 @@
               "sellTaxBps": null,
               "buyImpactBps": null,
               "roundTripLossBps": null,
+              "sellImpactBps": null,
+              "sellDelaySec": null,
+              "exitSellTaxBps": null,
+              "scope": {
+                "block": 0,
+                "walletProfile": "fresh_eoa"
+              }
+            },
+            "safetyByRoute": [],
+            "flags": [
+              "hooked_pool",
+              "impersonates_canonical",
+              "no_usdc_pool",
+              "shared_ticker"
+            ]
+          },
+          {
+            "address": "0xdd6367859f24bfc968ae94d06b540f4efc56fee1",
+            "symbol": "CIRBTC",
+            "name": "cirBTC",
+            "decimals": 18,
+            "match": "symbol",
+            "verification": {
+              "status": "unverified"
+            },
+            "evidence": {
+              "firstWithTicker": false,
+              "creatorLinked": false,
+              "depth2PctUsd": null,
+              "depthKind": null,
+              "depthAgeSec": 125,
+              "volume24hUsd": null,
+              "traders24h": null,
+              "trades24h": null,
+              "sells24h": null,
+              "sellers24h": null,
+              "topTraderShare24h": null,
+              "ageHours": null,
+              "posterior": 0.019832456375434564
+            },
+            "discovered": "index",
+            "origin": {
+              "launchpad": null,
+              "creator": null,
+              "createdBlock": null,
+              "createdAt": null,
+              "website": null,
+              "twitter": null,
+              "telegram": null
+            },
+            "state": null,
+            "venues": [
+              {
+                "venue": "uniswap_v4",
+                "poolId": "0xed7ac9fbb49cb048fd08768e6b69a9f3041944022f4a396bdf6dc381939e89a3",
+                "pair": "cirBTC",
+                "feeBps": null,
+                "hooks": "0xf0d631d54c7e1040ccfa1c2ed737973d6a652544"
+              }
+            ],
+            "liquidityUsd": null,
+            "depth2PctUsd": null,
+            "volume24hUsd": null,
+            "holders": null,
+            "safety": {
+              "routeId": "none:none",
+              "route": null,
+              "verdict": "inconclusive",
+              "canSell": null,
+              "buyTaxBps": null,
+              "sellTaxBps": null,
+              "buyImpactBps": null,
+              "roundTripLossBps": null,
+              "sellImpactBps": null,
+              "sellDelaySec": null,
+              "exitSellTaxBps": null,
               "scope": {
                 "block": 0,
                 "walletProfile": "fresh_eoa"
@@ -435,6 +458,13 @@
             ]
           }
         ]
+      },
+      "paymentResponse": {
+        "success": true,
+        "payer": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+        "transaction": "0x5da5444d774f4a34bc5579d0a1986fd4fdd12739942e94f881d6ecb561b6c2c5",
+        "network": "eip155:5042",
+        "amount": "5000"
       }
     }
   },
@@ -451,12 +481,20 @@
     },
     "unpaid": {
       "status": 402,
-      "requestId": "b08ac1ff",
+      "requestId": "3973c418",
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      },
       "paymentRequired": {
         "x402Version": 2,
         "error": "Payment required",
         "resource": {
-          "url": "http://api.arcgate.dev/trade/v1/quote",
+          "url": "https://api.arcgate.dev/trade/v1/quote",
           "description": "Swap quote",
           "mimeType": ""
         },
@@ -474,30 +512,16 @@
             }
           }
         ]
-      },
-      "body": {
-        "error": {
-          "code": "payment_required",
-          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
-          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
-        },
-        "next": "pay"
       }
     },
     "paid": {
       "status": 200,
-      "requestId": "67968dfd",
-      "paymentResponse": {
-        "success": true,
-        "payer": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
-        "transaction": "0x918d82c9ac011e0c3ae1e05c6b03076efca73207b6b6e18c35ed12ec3d940855",
-        "network": "eip155:5042"
-      },
+      "requestId": "4cf4c60a",
       "body": {
-        "quoteId": "q_c1841a6cfe6817e3",
+        "quoteId": "q_0f992fbf19628259",
         "network": "eip155:5042",
-        "block": 24644641,
-        "expiresAt": "2026-10-07T00:25:10.837Z",
+        "block": 24920562,
+        "expiresAt": "2026-10-08T15:19:08.498Z",
         "side": "exactIn",
         "sell": {
           "address": "0x3600000000000000000000000000000000000000",
@@ -545,77 +569,10 @@
                 "feeBps": 1
               }
             ],
-            "amountOutQuoted": "0.00000584",
+            "amountOutQuoted": "0.00000607",
             "buyTaxBps": 0,
             "costVsMidBps": 0,
             "gasUsdc": "0.004695",
-            "fee": {
-              "bps": 0,
-              "amount": "0",
-              "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
-              "collector": null
-            },
-            "executable": true,
-            "providerQuoteAgeBlocks": 0,
-            "partialFill": false
-          },
-          {
-            "type": "direct",
-            "routeId": "0x3600000000000000000000000000000000000000>0x171a4217b86a807a64eb94757db6849fb4bdbaa0|uniswap_v3:0xd680122f266754b39c2c3bcc750ce75a6b0e6aa1",
-            "provider": "native",
-            "hops": [
-              {
-                "venue": "uniswap_v3",
-                "poolId": "0xd680122f266754b39c2c3bcc750ce75a6b0e6aa1",
-                "tokenIn": "USDC",
-                "tokenOut": "cirBTC",
-                "tokenInAddress": "0x3600000000000000000000000000000000000000",
-                "tokenOutAddress": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
-                "feeBps": 100
-              }
-            ],
-            "amountOutQuoted": "0.00000005",
-            "buyTaxBps": 0,
-            "costVsMidBps": 9914,
-            "gasUsdc": "0.004822",
-            "fee": {
-              "bps": 0,
-              "amount": "0",
-              "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
-              "collector": null
-            },
-            "executable": true,
-            "providerQuoteAgeBlocks": 0,
-            "partialFill": false
-          },
-          {
-            "type": "two_hop",
-            "routeId": "0x3600000000000000000000000000000000000000>0x171a4217b86a807a64eb94757db6849fb4bdbaa0|uniswap_v3:0x964cff2cccb9059e83d507df348f070e5257a2e0>uniswap_v3:0xbb505c923d0ce6364b6d1769fd85bd62b0c0e9c9",
-            "provider": "native",
-            "hops": [
-              {
-                "venue": "uniswap_v3",
-                "poolId": "0x964cff2cccb9059e83d507df348f070e5257a2e0",
-                "tokenIn": "USDC",
-                "tokenOut": "WETH",
-                "tokenInAddress": "0x3600000000000000000000000000000000000000",
-                "tokenOutAddress": "0x128cc466b61f542da60c70e3aa11c10e19b84edb",
-                "feeBps": 30
-              },
-              {
-                "venue": "uniswap_v3",
-                "poolId": "0xbb505c923d0ce6364b6d1769fd85bd62b0c0e9c9",
-                "tokenIn": "WETH",
-                "tokenOut": "cirBTC",
-                "tokenInAddress": "0x128cc466b61f542da60c70e3aa11c10e19b84edb",
-                "tokenOutAddress": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
-                "feeBps": 30
-              }
-            ],
-            "amountOutQuoted": "0.00000581",
-            "buyTaxBps": 0,
-            "costVsMidBps": 51,
-            "gasUsdc": "0.007357",
             "fee": {
               "bps": 0,
               "amount": "0",
@@ -750,14 +707,20 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x5220d79e70eac27781af2c45dc9f33d395d456626abdcff70691e91525cef971",
-            "pair": "0x828b3612d96a4a66570c5644dbc0f9b7fb8ac8c4",
+            "poolId": "0xeb1feeef4ba2d1b1d6240a82bd772de78a6c06041da965329a60229eb1e9f35b",
+            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xeb1feeef4ba2d1b1d6240a82bd772de78a6c06041da965329a60229eb1e9f35b",
-            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
+            "poolId": "0x52318b3f2dfc135e5fe16afedeb0f82aa1beea91e27c8b3daf0a62eb82b8cfd5",
+            "pair": "0xece5ca8bf9220718e5727754026757512212cb3c",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0x5220d79e70eac27781af2c45dc9f33d395d456626abdcff70691e91525cef971",
+            "pair": "0x828b3612d96a4a66570c5644dbc0f9b7fb8ac8c4",
             "reason": "excluded by request"
           },
           {
@@ -780,8 +743,8 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x52318b3f2dfc135e5fe16afedeb0f82aa1beea91e27c8b3daf0a62eb82b8cfd5",
-            "pair": "0xece5ca8bf9220718e5727754026757512212cb3c",
+            "poolId": "0xaeb9d181f03a31547bdc6dcb1d4a86b102723c6390a55270de876b5e5c825864",
+            "pair": "0x2ba0f44bdfc17fba30eda9cdbecb908ca45b043b",
             "reason": "excluded by request"
           },
           {
@@ -792,26 +755,20 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xaeb9d181f03a31547bdc6dcb1d4a86b102723c6390a55270de876b5e5c825864",
-            "pair": "0x2ba0f44bdfc17fba30eda9cdbecb908ca45b043b",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
             "poolId": "0x85711d83258e088cc914dd5c5a65211a9714dd50a8a3a8c65e897e55c07bf3db",
             "pair": "0xa398c6420ce94f8b56c98887fd73522d05af60cd",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xd9df17d0caf4bcbd1f4bb01a04258759e46a8bfad79375d7ae32854ac086a238",
-            "pair": "0xab8627214a1efdff7e8d93d3f410850f0b9becfc",
+            "poolId": "0xbcb805f39d6cd6dfa1f6d71f31d5705a8313d17a161d1bf0d672ac55fdd4cac9",
+            "pair": "0x128cc466b61f542da60c70e3aa11c10e19b84edb",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xbcb805f39d6cd6dfa1f6d71f31d5705a8313d17a161d1bf0d672ac55fdd4cac9",
-            "pair": "0x128cc466b61f542da60c70e3aa11c10e19b84edb",
+            "poolId": "0xd9df17d0caf4bcbd1f4bb01a04258759e46a8bfad79375d7ae32854ac086a238",
+            "pair": "0xab8627214a1efdff7e8d93d3f410850f0b9becfc",
             "reason": "excluded by request"
           },
           {
@@ -830,6 +787,12 @@
             "venue": "uniswap_v4",
             "poolId": "0xa462217e654e02285b05069bec7773b78fc1b75b8d48e92327e47f88af212e78",
             "pair": "0xf6b8304c0ddeeb1f0d31a7919c81850e8d78ff54",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0xc7bf1438bb3b6f26fb9cdb9d88fefc2a1277a8b5813f15060bb52add59a270a3",
+            "pair": "0x2ba0f44bdfc17fba30eda9cdbecb908ca45b043b",
             "reason": "excluded by request"
           },
           {
@@ -858,14 +821,14 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xc7bf1438bb3b6f26fb9cdb9d88fefc2a1277a8b5813f15060bb52add59a270a3",
-            "pair": "0x2ba0f44bdfc17fba30eda9cdbecb908ca45b043b",
+            "poolId": "0x15c2845a624eb4c10734c0149110978d57b24d57b2c84010b0db6b0ffff8040a",
+            "pair": "0x6ed6e37c05a200cc3b55f00c1279a07b4bf52cd8",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x15c2845a624eb4c10734c0149110978d57b24d57b2c84010b0db6b0ffff8040a",
-            "pair": "0x6ed6e37c05a200cc3b55f00c1279a07b4bf52cd8",
+            "poolId": "0x83bd432b4b678cbc19920c2ae696e6661f7bc73b693b804e42e83c6a75000f3a",
+            "pair": "0x30ed6a37665c50f799125923185b0fc171d36f0c",
             "reason": "excluded by request"
           },
           {
@@ -876,14 +839,14 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xf8b7e0884fe4a6b5ba7f2f7fe11bfd96c6763f3afd14aa7e32798f57c48a7007",
-            "pair": "0x5c7e7830189943b2e3e53142ed645ee7499dbf83",
+            "poolId": "0x2524c1f36fea3ebde50686b5ab8d888831779eae7439db5fd837fcbf59f05dee",
+            "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x83bd432b4b678cbc19920c2ae696e6661f7bc73b693b804e42e83c6a75000f3a",
-            "pair": "0x30ed6a37665c50f799125923185b0fc171d36f0c",
+            "poolId": "0xf8b7e0884fe4a6b5ba7f2f7fe11bfd96c6763f3afd14aa7e32798f57c48a7007",
+            "pair": "0x5c7e7830189943b2e3e53142ed645ee7499dbf83",
             "reason": "excluded by request"
           },
           {
@@ -902,12 +865,6 @@
             "venue": "uniswap_v4",
             "poolId": "0x82c8c2be4c72b0454b08f7353b7f9674d08d856a641710c374eca5dc7b71f3b5",
             "pair": "0x80aee430d4a3f08856ec271d230931d3d6cae764",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0x2524c1f36fea3ebde50686b5ab8d888831779eae7439db5fd837fcbf59f05dee",
-            "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
           },
           {
@@ -966,14 +923,14 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xa93bc1cacad0d1b78db93e2e418d202915a435de9e63150194c54afba2654560",
-            "pair": "0xcbf14dc9eb500e67548114db13b1dc8834879a5f",
+            "poolId": "0xd4d25a5384c34a8d8163c4e79a86f54ad3b3198032990921162d1a12fa0ef1d7",
+            "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0xd4d25a5384c34a8d8163c4e79a86f54ad3b3198032990921162d1a12fa0ef1d7",
-            "pair": "0x3600000000000000000000000000000000000000",
+            "poolId": "0xa93bc1cacad0d1b78db93e2e418d202915a435de9e63150194c54afba2654560",
+            "pair": "0xcbf14dc9eb500e67548114db13b1dc8834879a5f",
             "reason": "excluded by request"
           },
           {
@@ -1002,6 +959,24 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0x12da1664a2636b6137f3bb87951b86e0f6f1c5c73451c29a779860078d49a2b0",
+            "pair": "0x981f13feaff3f085cc11461b894922284ddef4bf",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0x266ecece1d716f9a35a87cbc9834c0ef81f342e7b85ea45000070848a1fe1ffe",
+            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0x6261e96e47243a172a58435089fdaee73e638c02545402bf68eaba8e243dc04d",
+            "pair": "0x178b01f61cbea1d2a5581fe1621be607835ec349",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0x1730cf9452fc872796a64beb5e582f2a7f4fee1352db15c532d9962c55c342ad",
             "pair": "0x3322664469c922179a4563a69bb08109e8325bec",
             "reason": "excluded by request"
@@ -1020,20 +995,8 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x12da1664a2636b6137f3bb87951b86e0f6f1c5c73451c29a779860078d49a2b0",
-            "pair": "0x981f13feaff3f085cc11461b894922284ddef4bf",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
             "poolId": "0x277ee17ce1b8d104c7199bc4352a9b58467a585c8ae1b1bd735af7fce16b1a8d",
             "pair": "0x3600000000000000000000000000000000000000",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0x6261e96e47243a172a58435089fdaee73e638c02545402bf68eaba8e243dc04d",
-            "pair": "0x178b01f61cbea1d2a5581fe1621be607835ec349",
             "reason": "excluded by request"
           },
           {
@@ -1046,12 +1009,6 @@
             "venue": "uniswap_v4",
             "poolId": "0xf28ec7a890a8ba2f87be4e72c2fddf2df3be960928e35a697b26d6f4d30d9dd0",
             "pair": "0x143229bcab11c7663319f7ebdc73c45cdcb9be3c",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0x266ecece1d716f9a35a87cbc9834c0ef81f342e7b85ea45000070848a1fe1ffe",
-            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
             "reason": "excluded by request"
           },
           {
@@ -1092,6 +1049,12 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0x7556b11067000b3ac865e50f3aad328b157560c61945273797d3428bc4add903",
+            "pair": "0xd0314ca110099d486e4d93bb8007f2dc047e5852",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0xa98825bd12f6cb771d1ec978e92332770d811262f5faf3166a9261b30b0ba5f5",
             "pair": "0xb5d6434b16246d0e4c01231e9517998baf42623c",
             "reason": "excluded by request"
@@ -1100,12 +1063,6 @@
             "venue": "uniswap_v4",
             "poolId": "0xc293499438ca26ebda6ef77da19418485588223c4b8869d9b4e7e0d760a6b595",
             "pair": "0xfc5f1fd26316c0299e71b6b8ad1aa5109153b65d",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0x7556b11067000b3ac865e50f3aad328b157560c61945273797d3428bc4add903",
-            "pair": "0xd0314ca110099d486e4d93bb8007f2dc047e5852",
             "reason": "excluded by request"
           },
           {
@@ -1188,6 +1145,12 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0xeb5437ebb5c3884d2245a7e3f6ca32d85800af119571393765caebd975928b82",
+            "pair": "0x3600000000000000000000000000000000000000",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0xb85bda7ca86084e5a0924a3ab10295571c69723d6b65c313ca6e808463302e5f",
             "pair": "0xf34f564f248a933384f3eda970ffadaed77c7c97",
             "reason": "excluded by request"
@@ -1208,12 +1171,6 @@
             "venue": "uniswap_v4",
             "poolId": "0xd8a9bee84da751d14c6cfb2424ff9d1dd5121a2952898ef275815d070bb5bc49",
             "pair": "0x0bfd30e98edf3d49ae507da82761ec747ecfed75",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0xeb5437ebb5c3884d2245a7e3f6ca32d85800af119571393765caebd975928b82",
-            "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
           },
           {
@@ -1244,6 +1201,12 @@
             "venue": "uniswap_v4",
             "poolId": "0xd8794b1e9b849b34d8a4155a101668f94ca49b691bb1787f7436f76176907b83",
             "pair": "0x4b715c1ac1e01fa2441024e8207c536dfb406e05",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0xe6364d7239d8c82641ecc5bef71bd92130a36e8209e7de5fed82ef7e4f279257",
+            "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
           },
           {
@@ -1284,6 +1247,18 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0x75a1f5c4ec1ce9c0d1b75bd6b7c877e4fb1666ea3f89d4dcb4997091f08e545d",
+            "pair": "0xba28197ad6825f305bb7b60173cb82145a246c75",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0xbe2acda7eb6e9dcb2237f854d4a3043c3958b376afdc11daf38108543d61dacf",
+            "pair": "0xa13123a0f14e58e296b09dd880b661b2a4259084",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0xc5ed877d8ffd9418dd6a1b059f02882f18e701410e4e3312c99d417900a748e1",
             "pair": "0x75f91bd3e175c3bd39837e37dd9d81b13bfa5549",
             "reason": "excluded by request"
@@ -1298,6 +1273,12 @@
             "venue": "uniswap_v4",
             "poolId": "0x61fc55c5feec69784224df3dcacc5d828855f08003768e9da9b40421c7238a6a",
             "pair": "0x16367f5bb3999259a53ce796fab0079fdcd0ff61",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v2",
+            "poolId": "0xb27ca8d107bf469667ae890e89d755d38751e6bc",
+            "pair": "0x981f13feaff3f085cc11461b894922284ddef4bf",
             "reason": "excluded by request"
           },
           {
@@ -1331,21 +1312,9 @@
             "reason": "excluded by request"
           },
           {
-            "venue": "uniswap_v2",
-            "poolId": "0xb27ca8d107bf469667ae890e89d755d38751e6bc",
-            "pair": "0x981f13feaff3f085cc11461b894922284ddef4bf",
-            "reason": "excluded by request"
-          },
-          {
             "venue": "uniswap_v4",
             "poolId": "0xc97ac1b22b56d2d6ff8025f364424e372d34124a90489d1b200fbfa5a06c6631",
             "pair": "0xb969b1fb1c4ebd407fef8622947af85f3d1cff28",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0xbe2acda7eb6e9dcb2237f854d4a3043c3958b376afdc11daf38108543d61dacf",
-            "pair": "0xa13123a0f14e58e296b09dd880b661b2a4259084",
             "reason": "excluded by request"
           },
           {
@@ -1376,12 +1345,6 @@
             "venue": "uniswap_v4",
             "poolId": "0xe56af7c13946f8f2175b29ce3d2af8147e9038aa5378f12ae579c24e222763b3",
             "pair": "0xac3097b0ed00eec59ee28200b31815ba35a9a2d5",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0xe6364d7239d8c82641ecc5bef71bd92130a36e8209e7de5fed82ef7e4f279257",
-            "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
           },
           {
@@ -1644,8 +1607,26 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0x186788a1cb1364f9241b908b20cb98a7d6268633e99bf22d977f210741d13582",
+            "pair": "0xeb64987643db71c76b2a2be7e723decc995e5b37",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0x18aeaae90665932a1a691b3d894c181a577cf61bd2111e7a1684d7f4c62b9a0e",
             "pair": "0x7ab57dbb90191a41eeff91de3b24422cb773a360",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0x1c8d86627bfdea5ca17df85e9a2c31dff0fb55a3fb98a4c3beeb8975e0755984",
+            "pair": "0xeb64987643db71c76b2a2be7e723decc995e5b37",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0x446e765a7805a122d071f90524d8814e5d19a6f1a965ade68b0001a82ebfd9b4",
+            "pair": "0x128cc466b61f542da60c70e3aa11c10e19b84edb",
             "reason": "excluded by request"
           },
           {
@@ -1686,6 +1667,12 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0xa68b9547e0d3d7695fbf2bfbdc84b2aaba7be65ae2adc4dbf0524be40960476e",
+            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0xa75118a03f73f4d3a5c29991d6153def47e899fb7208d38885a6ff5231dfc7a2",
             "pair": "0xb096b9d8eb8849750ec14cc46d3b64a0026a0018",
             "reason": "excluded by request"
@@ -1694,6 +1681,12 @@
             "venue": "uniswap_v4",
             "poolId": "0xab57105f46c425988bcbeb5f94a5e30b1e67ad4b7d7f2c78b23b875a7f98471a",
             "pair": "0x0f9b51961bd3e887f5230793452745eb6e90db29",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0xac0d2e801c62681c7e1304050cd53fa0819f691506a9ecff115e0cb7a879ab54",
+            "pair": "0x425dadccceb15e50360f04cf68e00794ff9bf4c9",
             "reason": "excluded by request"
           },
           {
@@ -1718,6 +1711,12 @@
             "venue": "uniswap_v4",
             "poolId": "0xcb0df81b8c084bd07e4908249f7d423408bfaa66352fe7cbd2de1adf72251593",
             "pair": "0x82c6fb61f64f6629a107bd6bdb856bb52363b732",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0xd234d78636b619941b39f32cedb9685ff73bf7e4f2c445c2aac3e1cf4790a8dc",
+            "pair": "0xeb64987643db71c76b2a2be7e723decc995e5b37",
             "reason": "excluded by request"
           },
           {
@@ -1788,20 +1787,14 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x186788a1cb1364f9241b908b20cb98a7d6268633e99bf22d977f210741d13582",
-            "pair": "0xeb64987643db71c76b2a2be7e723decc995e5b37",
+            "poolId": "0x15789c0a59899c49c624ca5de1a2cc4865ba1226dcd1880aa5faff83a8eb220f",
+            "pair": "0xf766cd8b0b6dde6878ff9848f73a4a774c921cfb",
             "reason": "excluded by request"
           },
           {
             "venue": "uniswap_v4",
             "poolId": "0x1a3d1594bf0f18cce751df801e23d3c7f20e4b264af2e0b97dcfe015cf2296a8",
             "pair": "0x07704b06981ea962b87296362a1281484d160000",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0x1c8d86627bfdea5ca17df85e9a2c31dff0fb55a3fb98a4c3beeb8975e0755984",
-            "pair": "0xeb64987643db71c76b2a2be7e723decc995e5b37",
             "reason": "excluded by request"
           },
           {
@@ -1907,9 +1900,9 @@
             "reason": "excluded by request"
           },
           {
-            "venue": "uniswap_v4",
-            "poolId": "0xa68b9547e0d3d7695fbf2bfbdc84b2aaba7be65ae2adc4dbf0524be40960476e",
-            "pair": "0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1",
+            "venue": "uniswap_v2",
+            "poolId": "0xa50ef02d4e703cb257969bac5f2141620b256c55",
+            "pair": "0xadb050501b4347aaea8becb1f02b738b7b592e05",
             "reason": "excluded by request"
           },
           {
@@ -1922,12 +1915,6 @@
             "venue": "uniswap_v4",
             "poolId": "0xa8fc71d8187401ef10d88d28e78a80297e6216796bf9bfc2cc87daee034c7d05",
             "pair": "0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0xac0d2e801c62681c7e1304050cd53fa0819f691506a9ecff115e0cb7a879ab54",
-            "pair": "0x425dadccceb15e50360f04cf68e00794ff9bf4c9",
             "reason": "excluded by request"
           },
           {
@@ -1946,12 +1933,6 @@
             "venue": "uniswap_v4",
             "poolId": "0xcfaad9bc605e7ce5c5821ab8a57ae624bf3f33f81e0ebacdd037e274416348f6",
             "pair": "0x8d1a01160068e44c6ca11bf7807ae62498fb37dd",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0xd234d78636b619941b39f32cedb9685ff73bf7e4f2c445c2aac3e1cf4790a8dc",
-            "pair": "0xeb64987643db71c76b2a2be7e723decc995e5b37",
             "reason": "excluded by request"
           },
           {
@@ -2360,12 +2341,6 @@
             "venue": "uniswap_v4",
             "poolId": "0x14dffff29a02b82ff39b05992226d5e75a115625c36b499ea9cc104892aaed6a",
             "pair": "0xcac4098684cc7fc6bea101d9b9c641cfa7d783ea",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
-            "poolId": "0x15789c0a59899c49c624ca5de1a2cc4865ba1226dcd1880aa5faff83a8eb220f",
-            "pair": "0xf766cd8b0b6dde6878ff9848f73a4a774c921cfb",
             "reason": "excluded by request"
           },
           {
@@ -3090,12 +3065,6 @@
           },
           {
             "venue": "uniswap_v4",
-            "poolId": "0x446e765a7805a122d071f90524d8814e5d19a6f1a965ade68b0001a82ebfd9b4",
-            "pair": "0x128cc466b61f542da60c70e3aa11c10e19b84edb",
-            "reason": "excluded by request"
-          },
-          {
-            "venue": "uniswap_v4",
             "poolId": "0x44c6bc919b3f958223d4c3168c63f759336b64558eae279f921f10d1a89cf1f6",
             "pair": "0x3600000000000000000000000000000000000000",
             "reason": "excluded by request"
@@ -3422,6 +3391,12 @@
             "venue": "uniswap_v4",
             "poolId": "0x5d84a7e374fa026634697c090ef7fd590e7f710050c810dfb02a49c70e5dde89",
             "pair": "0xa7c54fe078e6209821ba5d8ab4329f0a531afb43",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
+            "poolId": "0x5e0351ff11fa9af8860edf947b255e90bae7de97dd0497dec6bd41a97436822e",
+            "pair": "0xdfb2772acf77e880ac8ba1ea23b8a29b82defee1",
             "reason": "excluded by request"
           },
           {
@@ -4938,6 +4913,12 @@
           },
           {
             "venue": "uniswap_v4",
+            "poolId": "0xd0bc32399af0ee73069d041470dabb9e3a401dc95cc7064751a7aa3f831a4c7f",
+            "pair": "0x313c87e367791fe16ae97754554f4871bfe7fcb6",
+            "reason": "excluded by request"
+          },
+          {
+            "venue": "uniswap_v4",
             "poolId": "0xd0c1d5a8a3152642165e144a2752e5a0fd28e2ed17874e81ec622c640a2132db",
             "pair": "0xc9f623652b7bac866863a8dba01981079ce8fee1",
             "reason": "excluded by request"
@@ -5588,10 +5569,10 @@
         "best": {
           "type": "direct",
           "provider": "native",
-          "amountOutQuoted": "0.00000584",
-          "amountOutSimulated": "0.00000584",
-          "amountOutRaw": "584",
-          "minAmountOut": "0.00000578",
+          "amountOutQuoted": "0.00000607",
+          "amountOutSimulated": "0.00000607",
+          "amountOutRaw": "607",
+          "minAmountOut": "0.000006",
           "gasUsdc": "0.004695",
           "fee": {
             "bps": 0,
@@ -5607,8 +5588,8 @@
               "routeIndex": 0,
               "shareBps": 10000,
               "amountIn": "0.5",
-              "amountOut": "0.00000584",
-              "minAmountOut": "0.00000578"
+              "amountOut": "0.00000607",
+              "minAmountOut": "0.000006"
             }
           ]
         },
@@ -5629,10 +5610,10 @@
           "sellDelaySec": null,
           "revertReason": null,
           "scope": {
-            "block": 24644641,
+            "block": 24920562,
             "walletProfile": "fresh_eoa",
             "sellDelaySec": null,
-            "tokenAgeSec": 12192881
+            "tokenAgeSec": 12332918
           },
           "note": "Both endpoints are pinned assets; graph delivery was measured at the quote block."
         },
@@ -5640,14 +5621,22 @@
         "attestation": {
           "type": "eip712",
           "signer": "0x217a999614251d67cdc468f1c8547fe1e8c3e1db",
-          "signature": "0x93b0c5ade0e0fbebb7b1bbe02b7b03a9c8e6c6747f440e6375e21b4ae50f1d685f9f740e97b1d0cac5ce2fb792a8658ff4ad5ce48c35ed53e6906e24e99447a21b"
-        }
+          "signature": "0xfc2e4a7f9685eb3f94e0db0e96ea98b3d1cd2b1f2b56464ea3bdc5abab15ab3344446e89f9288d1392c9272a9c330a76f4f052711cc7e70f49384e0bbe0aec691b"
+        },
+        "next": "swap"
+      },
+      "paymentResponse": {
+        "success": true,
+        "payer": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+        "transaction": "0xf5b5fa4ef12884055763efbc5b09b488d4a1f67fa4dc8d433e3f1ff4851e0b68",
+        "network": "eip155:5042",
+        "amount": "10000"
       }
     }
   },
   "swap": {
     "request": {
-      "quoteId": "q_c1841a6cfe6817e3",
+      "quoteId": "q_0f992fbf19628259",
       "taker": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
       "recipient": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
       "approval": "permit2",
@@ -5655,12 +5644,20 @@
     },
     "unpaid": {
       "status": 402,
-      "requestId": "94a67ec8",
+      "requestId": "f460dab5",
+      "body": {
+        "error": {
+          "code": "payment_required",
+          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
+          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
+        },
+        "next": "pay"
+      },
       "paymentRequired": {
         "x402Version": 2,
         "error": "Payment required",
         "resource": {
-          "url": "http://api.arcgate.dev/trade/v1/swap",
+          "url": "https://api.arcgate.dev/trade/v1/swap",
           "description": "Swap transactions",
           "mimeType": ""
         },
@@ -5678,29 +5675,15 @@
             }
           }
         ]
-      },
-      "body": {
-        "error": {
-          "code": "payment_required",
-          "message": "Payment required. The price is in the PAYMENT-REQUIRED header.",
-          "hint": "If your x402 client refuses to pay, allow Arc USDC in it (network eip155:5042, asset 0x3600000000000000000000000000000000000000, with a per-payment maximum). See https://docs.arcgate.dev/#arcgate/description/paying-arcgate-from-your-own-code"
-        },
-        "next": "pay"
       }
     },
     "paid": {
       "status": 200,
-      "requestId": "31158749",
-      "paymentResponse": {
-        "success": true,
-        "payer": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
-        "transaction": "0xce946c3ab3a1d5cd6a9051e145ee48f243e3034870a22079037615cb92052284",
-        "network": "eip155:5042"
-      },
+      "requestId": "31a1882a",
       "body": {
-        "quoteId": "q_c1841a6cfe6817e3",
-        "block": 24644656,
-        "expiresAt": "2026-10-07T00:28:18.000Z",
+        "quoteId": "q_0f992fbf19628259",
+        "block": 24920582,
+        "expiresAt": "2026-10-08T15:22:17.000Z",
         "signatures": [
           {
             "kind": "permit2",
@@ -5749,11 +5732,11 @@
                 "details": {
                   "token": "0x3600000000000000000000000000000000000000",
                   "amount": "500000",
-                  "expiration": "1793924598",
+                  "expiration": "1794064637",
                   "nonce": "2"
                 },
                 "spender": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
-                "sigDeadline": "1791332898"
+                "sigDeadline": "1791472937"
               }
             }
           }
@@ -5761,30 +5744,121 @@
         "transactions": [
           {
             "to": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
-            "data": "0xfdbcb6920000000000000000000000003600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000000024200000000000000000000000072e17261e04e6162a62f034d8d71053ea37d35a3000000000000000000000000000000000000000000000000000000006ac59222000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000000000024200000000000000000000000053bf6b0684ec7ef91e1387da3d1a1769bc5a6f7700000000000000000000000036000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008400000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e404e45aaf0000000000000000000000003600000000000000000000000000000000000000000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa000000000000000000000000000000000000000000000000000000000000000640000000000000000000000006cf4f7785d479b9ec1c3abe2fb569525380baede7fffffffffffffffffffffffffffffffffffffffffffffffffffffffa3a3a3a40000000000000000000000000000000000000000000000000000000000000242000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000",
+            "data": "0xfdbcb6920000000000000000000000003600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000000025800000000000000000000000072e17261e04e6162a62f034d8d71053ea37d35a3000000000000000000000000000000000000000000000000000000006ac7b529000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000000000025800000000000000000000000053bf6b0684ec7ef91e1387da3d1a1769bc5a6f7700000000000000000000000036000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008400000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e404e45aaf0000000000000000000000003600000000000000000000000000000000000000000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa000000000000000000000000000000000000000000000000000000000000000640000000000000000000000006cf4f7785d479b9ec1c3abe2fb569525380baede7fffffffffffffffffffffffffffffffffffffffffffffffffffffffa3a3a3a40000000000000000000000000000000000000000000000000000000000000258000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000",
             "value": "0",
-            "gas": "366378",
+            "gas": "366330",
             "purpose": "swap"
           }
         ],
-        "amountOutSimulated": "584",
-        "minAmountOut": "578",
+        "amountOutSimulated": "607",
+        "minAmountOut": "600",
         "recipient": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
         "safety": {
           "verdict": "pinned",
           "scope": {
             "walletProfile": "taker",
-            "block": 24644656
+            "block": 24920582
           }
         },
         "attestation": {
           "type": "eip712",
           "signer": "0x217a999614251d67cdc468f1c8547fe1e8c3e1db",
-          "signature": "0x7036206b3dcb34d383f7c08eb99193f6062f58c241c0d352f24c6cc172d661974d286e6b26ffa9ae7283439b8affebb158174bc63a1715e6464c5647f6f5a74e1b"
+          "signature": "0x3cfeb24b52f77faa4f423cd1ed212dce2c79328fc647d09bf10df2531b0f02750e1a223e8a234176b353a56ebd5217bd598e636b44b6941c0cf0ae1f69d536c31c"
         },
         "warnings": [],
         "next": "sign_permit"
+      },
+      "paymentResponse": {
+        "success": true,
+        "payer": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+        "transaction": "0xb029ebbeb97aa0734a57d3aae4d09731030a495657a089826c6769352ae6d378",
+        "network": "eip155:5042",
+        "amount": "10000"
       }
+    }
+  },
+  "swapTx": {
+    "request": {
+      "quoteId": "q_0f992fbf19628259",
+      "taker": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
+      "recipient": "0x72e17261e04E6162a62f034D8d71053Ea37D35A3",
+      "deadlineSec": 300,
+      "permit": {
+        "message": {
+          "details": {
+            "token": "0x3600000000000000000000000000000000000000",
+            "amount": "500000",
+            "expiration": "1794064637",
+            "nonce": "2"
+          },
+          "spender": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
+          "sigDeadline": "1791472937"
+        },
+        "signature": "0x4bed20747a192de249806a2e5f3b7e3d8a2d4960523a68f29e93855c870831e356f61aac57be22442079ee017d4bacfb924ff1c5e3b2c3e2121ef21952da96601b"
+      }
+    },
+    "status": 200,
+    "requestId": "87db03a2",
+    "body": {
+      "quoteId": "q_0f992fbf19628259",
+      "block": 24920599,
+      "expiresAt": "2026-10-08T15:22:17.000Z",
+      "signatures": [],
+      "transactions": [
+        {
+          "to": "0x6cf4f7785d479b9ec1c3abe2fb569525380baede",
+          "data": "0xfdbcb6920000000000000000000000003600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000000025800000000000000000000000072e17261e04e6162a62f034d8d71053ea37d35a3000000000000000000000000000000000000000000000000000000006ac7b529000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa0000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000000000025800000000000000000000000053bf6b0684ec7ef91e1387da3d1a1769bc5a6f7700000000000000000000000036000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008400000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e404e45aaf0000000000000000000000003600000000000000000000000000000000000000000000000000000000000000171a4217b86a807a64eb94757db6849fb4bdbaa000000000000000000000000000000000000000000000000000000000000000640000000000000000000000006cf4f7785d479b9ec1c3abe2fb569525380baede7fffffffffffffffffffffffffffffffffffffffffffffffffffffffa3a3a3a4000000000000000000000000000000000000000000000000000000000000025800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007a120000000000000000000000000000000000000000000000000000000006aef40fd00000000000000000000000000000000000000000000000000000000000000020000000000000000000000006cf4f7785d479b9ec1c3abe2fb569525380baede000000000000000000000000000000000000000000000000000000006ac7b529000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000414bed20747a192de249806a2e5f3b7e3d8a2d4960523a68f29e93855c870831e356f61aac57be22442079ee017d4bacfb924ff1c5e3b2c3e2121ef21952da96601b00000000000000000000000000000000000000000000000000000000000000",
+          "value": "0",
+          "gas": "322846",
+          "purpose": "swap"
+        }
+      ],
+      "amountOutSimulated": "607",
+      "minAmountOut": "600",
+      "recipient": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+      "safety": {
+        "verdict": "pinned",
+        "scope": {
+          "walletProfile": "taker",
+          "block": 24920599
+        }
+      },
+      "attestation": {
+        "type": "eip712",
+        "signer": "0x217a999614251d67cdc468f1c8547fe1e8c3e1db",
+        "signature": "0x206d18a62a783714f5e1809004b7cc6de2ff2a0dfd0925a69405f8fdd803daed36eb1db394baf58e50855bbf42115bdf9971e312b7abdd245c1c2c3b7f08d0811b"
+      },
+      "warnings": [],
+      "next": "send"
+    }
+  },
+  "receipt": {
+    "request": {
+      "quoteId": "q_0f992fbf19628259",
+      "txHashes": [
+        "0xe46347fc25c721681217809fbb11ddc41c5e17fc92663663b1f879879be78e2e"
+      ]
+    },
+    "status": 200,
+    "requestId": "d67ccfee",
+    "body": {
+      "quoteId": "q_0f992fbf19628259",
+      "result": "pass",
+      "token": "0x171a4217b86a807a64eb94757db6849fb4bdbaa0",
+      "recipient": "0x72e17261e04e6162a62f034d8d71053ea37d35a3",
+      "minAmountOut": "600",
+      "delivered": "607",
+      "block": 24920618,
+      "transactions": [
+        {
+          "hash": "0xe46347fc25c721681217809fbb11ddc41c5e17fc92663663b1f879879be78e2e",
+          "purpose": "swap",
+          "status": "success",
+          "block": 24920618
+        }
+      ],
+      "reason": null,
+      "next": "done"
     }
   }
 }

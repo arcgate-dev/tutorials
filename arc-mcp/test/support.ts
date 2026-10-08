@@ -5,7 +5,7 @@ import { keccak256, recoverTypedDataAddress, type Address, type Hex } from 'viem
 
 export const USDC: Address = '0x3600000000000000000000000000000000000000';
 export const CIRBTC: Address = '0x171a4217b86a807a64eb94757db6849fb4bdbaa0';
-export const API_URL = 'http://127.0.0.1:19800';
+export const API_URL = 'https://api.arcgate.dev';
 export const PAYMENT_META = 'x402/payment';
 export const RECEIPT_META = 'x402/payment-response';
 
@@ -58,7 +58,7 @@ export const authorizationTypes = {
 
 /** Who an x402 `_meta["x402/payment"]` payload's EIP-3009 authorization recovers to. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function recoverPayer(payment: any, chainId = 5042002): Promise<Address> {
+export async function recoverPayer(payment: any, chainId = 5042): Promise<Address> {
   const a = payment.payload.authorization;
   return recoverTypedDataAddress({
     domain: { name: 'USDC', version: '2', chainId, verifyingContract: USDC },

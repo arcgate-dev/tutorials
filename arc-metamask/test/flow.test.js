@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { encodeAbiParameters, encodeEventTopics, erc20Abi } from 'viem';
 import { runFlow } from '../src/flow.js';
 import { USDC } from '../src/payment.js';
-import { account, config, finalSwap, hash, pinTime, quote, search, swap, tradeReceipt, trader } from './fixtures.js';
+import { config, finalSwap, hash, permitSignature, pinTime, quote, search, swap, tradeReceipt, trader } from './fixtures.js';
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
@@ -15,7 +15,7 @@ function workflow({ approval = true } = {}) {
   const q = quote(), first = swap({ approval }), typedData = first.signatures[0].typedData, receipts = [tradeReceipt()], finalPatch = {};
   const dependencies = { config, log: () => {}, sleep: async () => { sequence.push('sleep'); }, wallet: { ...trader,
     decode: async txs => { sequence.push('decode'); assert.equal(txs.at(-1).purpose, 'swap'); },
-    signTypedData: async data => { sequence.push('sign'); return account.signTypedData(data); },
+    signTypedData: async () => { sequence.push('sign'); return permitSignature; }, // the signature the captured taker gave this permit
     send: async tx => { sent.push(tx); sequence.push(tx.purpose); return hash; },
   }, api: async (operation, body) => {
     calls.push({ operation, body });
@@ -27,7 +27,8 @@ function workflow({ approval = true } = {}) {
       assert.deepEqual(Object.keys(body).sort(), ['deadlineSec', 'permit', 'quoteId', 'recipient', 'taker']);
       assert.deepEqual(body.permit, { message: typedData.message, signature: body.permit.signature });
       assert.equal(sent.length, first.transactions.filter(tx => tx.purpose === 'approve').length);
-      return { ...finalSwap({ typedData, signature: body.permit.signature }), ...finalPatch };
+      assert.equal(body.permit.signature, permitSignature);
+      return { ...finalSwap(), ...finalPatch };
     }
     assert.equal(operation, 'swap'); assert.equal(body.approval, 'permit2'); assert.equal(body.permit, undefined);
     return first;
@@ -105,10 +106,8 @@ test('a quote that is not executable or does not say swap is never swapped', asy
     await assert.rejects(runFlow('trade', w.dependencies), undefined, JSON.stringify(change));
     assert.deepEqual(w.calls.map(c => c.operation), ['search', 'quote']); assert.deepEqual(w.sequence, []);
   }
-  for (const change of [{}, { next: 'swap' }]) { // deployed 603c5f1 omits next, local HEAD says swap
-    const w = workflow(); Object.assign(w.q, change);
-    assert.equal((await runFlow('quote', w.dependencies)).quote.quoteId, w.q.quoteId);
-  }
+  const w = workflow(); // as captured, the quote says next=swap
+  assert.equal((await runFlow('quote', w.dependencies)).quote.quoteId, w.q.quoteId);
 });
 
 test('search follows the row\'s trade network', async t => { pinTime(t);
@@ -127,7 +126,7 @@ test('a first swap response that does not say sign_permit is not signed', async 
   }
 });
 
-test('a final swap response must say send, or nothing, before anything is broadcast', async t => { pinTime(t);
+test('a final swap response must say send before anything is broadcast', async t => { pinTime(t);
   for (const next of ['sign_permit', 'done', 'stop', 'requote', 'retry', 'pay']) {
     const w = workflow(); w.finalPatch.next = next;
     await assert.rejects(runFlow('trade', w.dependencies), undefined, next);
@@ -138,13 +137,11 @@ test('a final swap response must say send, or nothing, before anything is broadc
   assert.equal((await runFlow('trade', w.dependencies)).receipt.result, 'pass');
 });
 
-test('a passing receipt must say done, or nothing', async t => { pinTime(t);
-  for (const next of [undefined, 'done']) { // deployed 603c5f1 omits next on a pass, local HEAD says done
-    const w = workflow(); w.receipts[0] = { ...tradeReceipt(), ...next && { next } };
-    assert.equal((await runFlow('trade', w.dependencies)).receipt.result, 'pass', String(next));
-  }
-  for (const next of ['stop', 'retry', 'requote', 'sign_permit', 'send', 'pay']) {
-    const w = workflow(); w.receipts[0] = { ...tradeReceipt(), next };
+test('a passing receipt must say done', async t => { pinTime(t);
+  const w = workflow(); w.receipts[0] = tradeReceipt(); // as captured, next=done
+  assert.equal((await runFlow('trade', w.dependencies)).receipt.result, 'pass');
+  for (const next of [undefined, 'stop', 'retry', 'requote', 'sign_permit', 'send', 'pay']) {
+    const w = workflow(); w.receipts[0] = { ...tradeReceipt(), next }; if (next === undefined) delete w.receipts[0].next;
     await assert.rejects(runFlow('trade', w.dependencies), /do not rerun the trade/i, next);
   }
 });

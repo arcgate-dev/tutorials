@@ -82,8 +82,7 @@ export async function runFlow(command, { wallet, config, api, rpc, log = console
     throw new Error(`The swap already mined and local delivery checks passed. Arcgate receipt lookup failed: ${error.message} Check only the receipt with: ${receiptCommand}. Do not rerun the trade.`, { cause: error });
   }
   log(JSON.stringify({ receipt: result }, null, 2));
-  // The deployed API omits next on a pass; the local one says done.
-  if (result.result !== 'pass' || (result.next !== undefined && result.next !== 'done')) {
+  if (result.result !== 'pass' || result.next !== 'done') {
     throw new Error(`The swap already mined. Arcgate receipt is ${result.result}: ${result.reason ?? 'inspect the transactions'}; next=${result.next ?? 'stop'}. Wait at least 5 seconds and run ${receiptCommand}. Do not rerun the trade.`);
   }
   if (getAddress(result.token) !== config.buyToken || getAddress(result.recipient) !== wallet.address

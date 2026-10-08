@@ -1,6 +1,6 @@
 // The only network test double: a `fetch` for StreamableHTTPClientTransport's `fetch` option (and for the
 // capture's one post to an inbound address) that plays the arcgate server. It answers each JSON-RPC
-// request with a captured localnet response, verbatim: only the JSON-RPC id is rewritten to match the
+// request with a captured arcgate response, verbatim: only the JSON-RPC id is rewritten to match the
 // request (the GET answer's id is null and stays so). It answers the SDK's GET /mcp (Accept:
 // text/event-stream) with the 405 the server sends, because the server offers no event stream.
 //

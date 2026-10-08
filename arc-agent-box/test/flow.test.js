@@ -6,8 +6,8 @@ import { INBOUND_POST, PAID, acceptedOf, apiTrace, clone, createReplay, health, 
 
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
 
-// The steps run against the localnet run the tutorial's own capture mode recorded
-// (test/fixtures/localnet.json). A replay serves those exchanges in order; the steps are the code
+// The steps run against the mainnet run the tutorial's own capture mode recorded
+// (test/fixtures/mainnet.json). A replay serves those exchanges in order; the steps are the code
 // under test and nothing in them is mocked. The only edits are to copies of captured answers, made
 // by a test to put the step in a situation the capture does not hold, and the two fake inbound
 // secrets: the capture redacts every secret, so a test needs real ones to tell old from new.
@@ -113,35 +113,10 @@ const messagesIn = trace => ofOp(trace, 'boxMessageList').flatMap(entry => entry
 
 // box -------------------------------------------------------------------------------------------
 
-test('box: an existing box (the captured run) is read with a signed boxStatus and nothing is paid', async () => {
+// The captured run is a fresh box: boxStatus 404 box_not_found, one paid boxCreate, boxStatus 200.
+test('box: a missing box (404 box_not_found) is created by one paid boxCreate and the status is read again', async () => {
   const { w, out } = await stepwise();
   const t = out.box.trace;
-  assert.deepEqual(ops(t), ['boxStatus'], 'the captured run found its box, so the box step made one request');
-  assert.equal(t[0].status, 200);
-  assert.ok(signed(t[0]), 'the status read is signed by the wallet');
-  assert.equal(paid(t).length, 0, 'no payment is signed');
-  assert.equal(t[0].response.address.toLowerCase(), w.fixture.address.toLowerCase());
-  assert.match(out.box.logs.join('\n'), /exist/i);
-});
-
-// The captured run holds no 404 box_not_found, so the create branch runs on edited copies of captured answers:
-// the status answered 404 (the body is the openapi box_not_found example), the start run's captured topup 402 and
-// charged 200 with the path edited to the box path, and the captured status 200.
-test('box: a missing box (404 box_not_found) is created by one paid boxCreate and the status is read again', async () => {
-  const w = world();
-  assert.equal(w.price.boxCreate, w.price.boxTopUp, 'the create branch replays the captured topup payment, which needs equal prices');
-  const start = runExchanges(w.fixture);
-  const status = clone(start.find(e => operationOfExchange(e) === 'boxStatus' && e.status === 200));
-  const at = start.findIndex(e => operationOfExchange(e) === 'boxTopUp' && e.status === 402);
-  assert.ok(at >= 0 && ok(start[at + 1].status), 'the start run holds a topup 402 and its charged answer');
-  const [unpaid, charged] = clone(start.slice(at, at + 2)).map(e => ({ ...e, path: e.path.replace(/\/topup$/, '') }));
-  assert.equal(operationOfExchange(unpaid), 'boxCreate');
-  assert.equal(operationOfExchange(charged), 'boxCreate');
-  const missing = { ...clone(status), status: 404, body: { error: { code: 'box_not_found', message: 'this address has no box' }, next: 'fix_request' } };
-
-  const run = await runStep('box', [missing, unpaid, charged, status]);
-  assert.equal(run.error, null, run.error?.message);
-  const t = run.trace;
   assert.deepEqual(ops(t), ['boxStatus', 'boxCreate', 'boxCreate', 'boxStatus']);
   assert.equal(t[0].status, 404);
   assert.equal(t[0].response.error.code, 'box_not_found');
@@ -153,6 +128,21 @@ test('box: a missing box (404 box_not_found) is created by one paid boxCreate an
   assert.ok(signed(t[0]) && signed(t[3]), 'the status reads are signed by the wallet');
   assert.ok(!signed(t[1]) && !signed(t[2]), 'a paid create is authenticated by its payment');
   assert.equal(t[3].response.address.toLowerCase(), w.fixture.address.toLowerCase());
+});
+
+// The capture holds no box that already existed, so this branch runs on a copy of the captured 200 status.
+test('box: an existing box is read with a signed boxStatus and nothing is paid', async () => {
+  const w = world();
+  const status = clone(w.fixture.exchanges.find(e => operationOfExchange(e) === 'boxStatus' && e.status === 200));
+  const run = await runStep('box', [status]);
+  assert.equal(run.error, null, run.error?.message);
+  const t = run.trace;
+  assert.deepEqual(ops(t), ['boxStatus'], 'a box that exists costs one request');
+  assert.equal(t[0].status, 200);
+  assert.ok(signed(t[0]), 'the status read is signed by the wallet');
+  assert.equal(paid(t).length, 0, 'no payment is signed');
+  assert.equal(t[0].response.address.toLowerCase(), w.fixture.address.toLowerCase());
+  assert.match(run.logs.join('\n'), /exist/i);
 });
 
 // inbound ---------------------------------------------------------------------------------------
@@ -310,6 +300,16 @@ test('channel: a verified channel listed with a different filter than the one se
   assert.match(run.error.message, /\["inbound"\]/);
   assert.match(run.error.message, /\["inbound","watch"\]/);
   assert.equal(ofOp(run.trace, 'webhookRotate').length, 0);
+});
+
+test('channel and start without WEBHOOK_URL throw the WEBHOOK_URL error before any request', async () => {
+  const w = world();
+  for (const name of ['channel', 'start']) {
+    const calls = [];
+    const { ctx } = context({ ...w, config: { ...w.config, webhookUrl: null } }, { fetch: async (...args) => { calls.push(args); throw new Error('no request may be made'); } });
+    await assert.rejects(steps[name](ctx), /Set WEBHOOK_URL in \.env/, name);
+    assert.equal(calls.length, 0, `${name} made a request`);
+  }
 });
 
 // messages --------------------------------------------------------------------------------------
@@ -527,8 +527,8 @@ test('the run pays exactly the captured paid calls, each at the API terms, to on
   const count = {};
   for (const entry of payments) count[entry.operation] = (count[entry.operation] ?? 0) + 1;
   const firstStatus = runExchanges(w.fixture).find(e => operationOfExchange(e) === 'boxStatus');
-  assert.deepEqual(count, { ...firstStatus.status === 404 && { boxCreate: 1 }, inboundCreate: 1, watchCreate: 3, tradeSearch: 1, webhookCreate: 1, boxTopUp: 1 });
-  assert.equal(firstStatus.status, 200, 'the capture is the box-exists run: its first boxStatus found the box');
+  assert.deepEqual(count, { boxCreate: 1, inboundCreate: 1, watchCreate: 3, tradeSearch: 1, webhookCreate: 1, boxTopUp: 1 });
+  assert.equal(firstStatus.status, 404, 'the capture is the fresh-box run: its first boxStatus found no box');
 
   const payTo = new Set();
   let total = 0n;

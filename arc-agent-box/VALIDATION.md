@@ -1,5 +1,37 @@
 # Validation
 
+## Mainnet run, 2026-10-08 (UTC), api.arcgate.dev at commit 6e04f6ab0a060417c852f87f20980e42a00fa3eb
+
+`npm run capture` (the `npm start` steps under the recording fetch, then two more `npm run topup` runs) ran against `https://api.arcgate.dev` from 15:15:58Z to 15:16:40Z, from a clean state: `npm ci`, a fresh gitignored `.env` (`PRIVATE_KEY`, `API_URL=https://api.arcgate.dev`, `ARC_RPC_URL=https://rpc.mainnet.arc.io`, `WEBHOOK_URL` the trycloudflare URL), with `npm run receiver` behind `cloudflared tunnel --url http://localhost:8787` (cloudflared 2026.10.0). `/health` reported `x402.network` `eip155:5042`. It wrote `test/fixtures/mainnet.json`. Sources: the run log `.runs/600bf3df-beda-499d-ae6a-2a4bb52473a3.jsonl`, not committed.
+
+- Payer and box address `0xB0d1…44E0`, a fresh key with no box: boxStatus answered 404 `box_not_found`, so `boxCreate` was paid. A new box holds 500 messages and 30 days.
+- payTo in every 402: `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e`, network `eip155:5042`, asset USDC `0x3600000000000000000000000000000000000000`.
+- Prices are `x-payment.baseUnits` from `https://api.arcgate.dev/openapi.json` on 2026-10-08.
+
+| Step | Operation | Price (USDC) | Settlement tx | Request ID |
+| --- | --- | --- | --- | --- |
+| box | `boxCreate` | 0.05 | `0x21ab77a3dbc5e333c2065ad67f1250494baaf71faf65073c416a5187c4b857fb` | `e1fcf184` |
+| inbound | `inboundCreate` | 0.01 | `0xf1e203358b6c436f692c3af9ca7c6a611927f6da697d611d91511f2498d6d731` | `2978e272` |
+| watch | `watchCreate` (token) | 0.01 | `0xcb0a933eeb37320d7553426acb38a90b0bd2c1bf16a319f1a28f981bf9931c74` | `290aeadc` |
+| watch | `watchCreate` (screen) | 0.01 | `0xe807c24f6a648270023efb156627df6679d8956b4f82d4aff0abbebfb2d3fc17` | `41aef085` |
+| watch | `watchCreate` (agents) | 0.01 | `0x151bf32fc551868e7135f42d454672cd70c722cfd4042a2c706e79ee9de11f95` | `5276cbba` |
+| watch | `tradeSearch` | 0.005 | `0xff5d9ec13dd2058cb0d10df2917fd10e0da49aa3ddc4bdf3e55e88b5ce90bfd4` | `2289e560` |
+| channel | `webhookCreate` | 0.01 | `0xa6979f89f3a36bee8e2fe7c7a922a2f4bd393ff8ac1720edef9ac8ed58e069a2` | `0d50784d` |
+| topup | `boxTopUp` (granted 500 messages, 30 days) | 0.05 | `0x786ca762c7c2d323cd446b95a73297d4f59b194c271b1d6ae83f4c881ab6f6d7` | `3d4ee442` |
+| extra topup 1 | `boxTopUp` (granted 3 messages, 0 days) | 0.05 | `0x43962d14f8ba8ce424ef4016abed7b865c93afc74195843f09603812234e33a7` | `d460ea9f` |
+| extra topup 2 | `boxTopUp` | not charged: 409 `allowance_full`, paymentResponse null | none | `98de2695` |
+
+Total spent **0.205 USDC** (205000 base units): 0.155 for the `npm start` steps on a fresh box, plus 0.05 for the first extra topup. The balance read 0.40 before the first payment and 0.195 after.
+
+Every hash was checked with `eth_getTransactionReceipt` on `https://rpc.mainnet.arc.io`: each has status `0x1` and one USDC Transfer log from the payer to the payTo, of the amount in the table. The nine Transfers sum to 205000.
+
+- Inbound: the address was `https://in.arcgate.dev/<id>`. The signed post and the new-secret post were stored (201); the old secret was refused with 401 `inbound_unauthorized` after the rotation.
+- Channel: the receiver printed `Challenge for channel NsXiu1aqhJuMUYJsWaxnCg: echoed.` and webhookList showed `verifiedAt` set. Every message (seq 1 to 3, createdAt up to 1791472578) was stored before webhookCreate (createdAt 1791472581), and none was stored while the channel existed, so there was nothing to push.
+- Watches: the token watch fired on FAZE within the run (seq 3 `watch.token`). The box held 1 inbound, 2 inbound and 3 `watch.token`; seq 2 was fetched and deleted.
+- Cleanup deleted 1 inbound address, 3 watches and 1 webhook channel; 2 messages stayed. The final check passed.
+- Push, 15:36Z: with `npm run receiver` behind a new quick tunnel and `WEBHOOK_URL` updated, `npm run channel` (`webhookCreate`, 0.01, `0x0d5c90678acfdd123e19132d319be483489a9d4f749d06881223afaefc2cde82`, request `b69d7903`) and then `npm run inbound` (`inboundCreate`, 0.01, `0x3fa2dae9540039d8c8eddf7962852957cb81c1300382184c4137013c7932fc1f`, request `aa98acd9`) ran, as README step 8 says. Both receipts have status `0x1` and a 10000 USDC Transfer from the payer to the payTo. The receiver printed `Pushed: inbound seq 4` and `Pushed: inbound seq 5`, each with `ARCGATE-SIGNATURE` and `ARCGATE-TIMESTAMP` 1791473830 (the receiver does not check the signature). `npm run cleanup` then deleted the address and the channel. With this step the total spent is **0.225 USDC**; the balance is 0.175.
+- Afterwards, free: `npm run box` (existing box, nothing signed), `npm run messages` (1 inbound and 3 `watch.token`; the one inbound message was kept) and `npm run cleanup` (nothing left to delete) ran as the README says. `npm run channel` with an empty `WEBHOOK_URL` stopped before any payment. The paid single-step commands (`inbound`, `watch`, `channel`, `topup`) were not run again on their own: they run the same step functions as `npm start`, and running them would have paid a second time.
+
 ## Production check, 2026-10-08 (UTC)
 
 A free, unpaid, unsigned probe of `https://api.arcgate.dev` at 14:27Z, at commit `6e04f6a`. Nothing was signed or paid. Source: `.runs/prod-check-20261008T142719Z-41260.log`, not committed.
@@ -7,8 +39,6 @@ A free, unpaid, unsigned probe of `https://api.arcgate.dev` at 14:27Z, at commit
 - `GET /health` is `ok: true`, with `x402.network` `eip155:5042`. Production serves `/agent/v1` on Arc mainnet, where payments are real USDC.
 - `GET /agent/v1/<address>/box/status` with no signature answers 401 `signature_required`, as JSON.
 - `POST /agent/v1/<address>/box` with no payment answers 402 `payment_required` on `eip155:5042`.
-
-Validation runs stay on the arcgate localnet (Arc testnet), and they never spend mainnet USDC.
 
 ## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
 

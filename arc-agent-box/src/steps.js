@@ -101,12 +101,17 @@ async function watchStep(ctx, { pay, own }) {
   }
   log(`The box's watches: ${show(await own('watchList'))}`);
   // The token watch and the screen wait for the index to change something about a token; the agent screen waits for the
-  // agent directory. With the indexer off, a search that names the token is what gets it checked, and the check is what the index reports.
+  // agent directory. A search that names the token makes arcgate check it now; a trade on it is reported too.
   const found = await pay('tradeSearch', { query: config.watchToken, limit: 5 });
-  log(`Searched for ${config.watchToken} (${found.results?.length ?? 0} results): this makes the index name the token, which is what the token watch and the screen wait for (the agent screen waits for the directory).`);
+  log(`Searched for ${config.watchToken} (${found.results?.length ?? 0} results): this makes arcgate check the token now, one of the index changes the token watch and the screen wait for (the agent screen waits for the directory).`);
 }
 
 // channel -----------------------------------------------------------------------------------------
+
+// Checked before the first payment of a run that creates a channel: without a receiver the channel is paid for and never verified.
+function needWebhook({ webhookUrl }) {
+  if (!webhookUrl) throw new Error('Set WEBHOOK_URL in .env to the https URL of your receiver (npm run receiver behind a tunnel). No payment signed.');
+}
 
 async function channelStep(ctx, { pay, own }) {
   const { log, now, sleep, config } = ctx;
@@ -193,13 +198,14 @@ const alone = step => async ctx => step(ctx, await open(ctx));
 export const box = alone(boxStep);
 export const inbound = alone(inboundStep);
 export const watch = alone(watchStep);
-export const channel = alone(channelStep);
+export const channel = async ctx => { needWebhook(ctx.config); await alone(channelStep)(ctx); };
 export const messages = alone(messagesStep);
 export const topup = alone(topupStep);
 export const cleanup = alone(cleanupStep);
 
 // All seven steps in one run, which shares one spending cap, then a check of what the box holds.
 export async function start(ctx) {
+  needWebhook(ctx.config);
   const session = await open(ctx);
   for (const [name, step] of Object.entries(STEPS)) {
     ctx.log(`\n== ${name}`);

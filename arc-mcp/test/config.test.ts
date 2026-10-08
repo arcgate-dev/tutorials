@@ -12,7 +12,7 @@ test('API_URL rules', () => {
   assert.equal(loadConfig({ ...keys() }).apiUrl, 'https://api.arcgate.dev', 'the default is the public API');
   assert.equal(loadConfig({ ...keys() }).mcpUrl, 'https://api.arcgate.dev/mcp');
 
-  for (const origin of ['https://api.arcgate.dev', 'https://example.com:8443', 'http://127.0.0.1:19800', 'http://localhost:19800']) {
+  for (const origin of ['https://api.arcgate.dev', 'https://example.com:8443']) {
     const config = loadConfig({ ...keys(), API_URL: origin });
     assert.equal(config.apiUrl, origin);
     assert.equal(config.mcpUrl, `${origin}/mcp`);
@@ -34,6 +34,14 @@ test('API_URL rules', () => {
       assert.doesNotMatch(error.message, /hunter2/, 'a URL credential never reaches the error');
       return true;
     }, bad);
+  }
+});
+
+test('a loopback http API_URL and Arc testnet are accepted, for the localnet build gate', () => {
+  for (const origin of ['http://127.0.0.1:19800', 'http://localhost:19800']) {
+    const config = loadConfig({ ...keys(), API_URL: origin });
+    assert.equal(config.mcpUrl, `${origin}/mcp`);
+    assert.ok(config.networks.includes('eip155:5042002'), 'Arc testnet, where the localnet settles');
   }
 });
 

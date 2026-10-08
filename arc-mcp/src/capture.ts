@@ -42,7 +42,7 @@ function fixtureName(init: RequestInit, body: string): string | undefined {
 }
 
 /**
- * Records the localnet responses the tests answer with. It tees the one client's fetch: an unsigned
+ * Records the arcgate responses the tests answer with. It tees the one client's fetch: an unsigned
  * boxStatus, the tour, then a second connection (its own budget) that calls boxCreate again for the
  * box_exists answer. It writes the 15 files only when every one was recorded.
  */

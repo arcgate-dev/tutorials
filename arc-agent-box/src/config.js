@@ -25,16 +25,16 @@ export const OWNER_OPERATIONS = {
   webhookRotate: ['POST', '/agent/v1/{address}/webhook/{id}/rotate'],
 };
 
-// What the watch step watches. With the indexer off, the only thing that makes the index report a token is a search
-// that finds its evidence missing or stale and checks it, and a token is checked once. A pinned asset such as cirBTC
-// is never checked. So the default is the token the recorded run searched, and WATCH_TOKEN picks another for a rerun.
+// What the watch step watches. A watch is evaluated when the index reports a change to a token: a trade on it, or a
+// check that a search starts when the token's evidence is missing or stale. A pinned asset such as cirBTC is never
+// checked. So the default is the token the recorded run watched, and WATCH_TOKEN picks another for a rerun.
 const FAZE = '0xf81afef268aca40717e0adcae7c41514327cfaab';
 export const tokenWatch = token => ({ kind: 'token', token, where: [{ field: 'volume_24h', op: 'gt', value: 100_000 }] });
 export const SCREEN_WATCH = { kind: 'screen', where: [
   { field: 'volume_24h', op: 'gt', value: 100_000 },
   { field: 'safety_verdict', op: 'eq', value: 'ok' },
 ] };
-// chainId is the agent directory's chain (Arc mainnet, the one the deployment serves, shown in boxStatus.registeredAgents), not the payment network.
+// chainId is the agent directory's chain (the one the deployment serves, shown in boxStatus.registeredAgents).
 export const AGENTS_WATCH = { kind: 'agents', chainId: 5042, on: ['registered'] };
 
 // The one origin rule: https, or http only for localhost and 127.0.0.1, with no credentials, query or fragment.
@@ -65,11 +65,15 @@ function watchToken(value) {
   return value.toLowerCase();
 }
 
+// The localnet build gate's mock receiver answers every webhook on 192.0.2.10; production has no default.
+const LOCALNET_WEBHOOK = 'https://192.0.2.10/arc-agent-box';
+
 export function loadConfig(env = process.env) {
+  const apiUrl = apiOrigin(env.API_URL || 'https://api.arcgate.dev');
   return {
-    apiUrl: apiOrigin(env.API_URL || 'https://api.arcgate.dev'),
+    apiUrl,
     rpcUrl: env.ARC_RPC_URL || 'https://rpc.mainnet.arc.io',
-    webhookUrl: env.WEBHOOK_URL || 'https://192.0.2.10/arc-agent-box',
+    webhookUrl: env.WEBHOOK_URL || (new URL(apiUrl).protocol === 'http:' ? LOCALNET_WEBHOOK : null),
     watchToken: watchToken(env.WATCH_TOKEN || FAZE),
     maxPayment: 50_000n, // 0.05 USDC per API call
     maxTotal: 160_000n, // per command run: box 0.05 + inbound 0.01 + 3 watches 0.03 + search 0.005 + webhook 0.01 + topup 0.05 = 0.155. Never reset after a timeout.

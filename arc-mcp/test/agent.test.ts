@@ -35,7 +35,7 @@ test('agentSignature signs AgentRequest over GET /agent/v1/<lowercased address>/
     signature: signed.signature,
   });
   assert.equal(await recover({}), config.agent.address);
-  assert.notEqual(await recover({ domain: { chainId: 5042002 } }), config.agent.address, 'no chainId in the domain');
+  assert.notEqual(await recover({ domain: { chainId: 5042 } }), config.agent.address, 'no chainId in the domain');
   assert.notEqual(await recover({ path: `/agent/v1/${address}/box/status` }), config.agent.address, 'the path is lowercased');
   assert.notEqual(await recover({ method: 'POST' }), config.agent.address);
 });

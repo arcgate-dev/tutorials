@@ -3,7 +3,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 
 type Env = Record<string, string | undefined>;
 
-// Arc mainnet and Arc testnet. Arcgate's localnet settles on testnet.
+// Arc mainnet, where api.arcgate.dev settles, and Arc testnet, where arcgate's localnet settles.
 const NETWORKS: Network[] = ['eip155:5042', 'eip155:5042002'];
 
 // The API origin: https, or http only for localhost and 127.0.0.1, with no credentials, path, query or fragment.

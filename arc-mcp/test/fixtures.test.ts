@@ -30,14 +30,14 @@ test('every fixture is a JSON-RPC 2.0 response', () => {
   }
 });
 
-test('the paid fixtures carry a successful Arc testnet receipt', () => {
+test('the paid fixtures carry a successful Arc mainnet receipt', () => {
   for (const name of PAID) {
     const result = fixture(name).result;
     assert.notEqual(result.isError, true, name);
     const receipt = result._meta?.[RECEIPT_META];
     assert.ok(receipt, `${name}: a receipt in _meta`);
     assert.equal(receipt.success, true, name);
-    assert.equal(receipt.network, 'eip155:5042002', name);
+    assert.equal(receipt.network, 'eip155:5042', name);
     assert.match(receipt.transaction, TX, `${name}: a 32-byte transaction hash`);
     assert.match(receipt.payer, ADDRESS, `${name}: the payer`);
   }
@@ -68,11 +68,15 @@ test('no fixture holds a key, a payment payload or an agent signature', () => {
 
   // Pool ids are public on-chain identifiers (Uniswap v4 pool ids are 32-byte hex). The search and quote
   // answers carry them in venues[].poolId and hops[].poolId, and a routeId embeds one, so they are allowed.
+  // The quote's attestation.signature is the server's own signature over the quote, which it publishes: allowed too.
+  const attestations = new Set<string>();
   const walk = (value: unknown, name: string, poolIds: Set<string>): void => {
     if (Array.isArray(value)) return value.forEach((item) => walk(item, name, poolIds));
     if (typeof value !== 'object' || value === null) return;
     for (const [key, inner] of Object.entries(value)) {
       if (key.toLowerCase() === 'poolid' && typeof inner === 'string') poolIds.add(inner.toLowerCase());
+      const attested = (inner as { signature?: unknown } | null)?.signature;
+      if (key === 'attestation' && typeof attested === 'string') attestations.add(attested.toLowerCase());
       assert.notEqual(key, PAYMENT_META, `${name}: a request payment`);
       assert.notEqual(key.toLowerCase(), 'authorization', `${name}: an EIP-3009 authorization`);
       if (key === 'agentSignature') {
@@ -87,7 +91,9 @@ test('no fixture holds a key, a payment payload or an agent signature', () => {
     const raw = text(name);
     const poolIds = new Set<string>();
     walk(JSON.parse(raw), name, poolIds);
-    assert.doesNotMatch(raw, /0x[0-9a-fA-F]{128,}/, `${name}: a signature-length hex string`);
+    for (const [hex] of raw.matchAll(/0x[0-9a-fA-F]{128,}/g)) {
+      assert.ok(attestations.has(hex.toLowerCase()), `${name}: a signature-length hex string that is not the quote's attestation`);
+    }
     for (const [hash] of raw.matchAll(/0x[0-9a-fA-F]{64}(?![0-9a-fA-F])/g)) {
       const known = receiptTransactions.has(hash.toLowerCase()) || poolIds.has(hash.toLowerCase());
       assert.ok(known, `${name}: ${hash} is a 32-byte hex string that is neither a receipt transaction nor a poolId`);

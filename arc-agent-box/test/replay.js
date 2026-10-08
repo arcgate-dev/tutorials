@@ -4,8 +4,8 @@ import { decodePaymentSignatureHeader } from '@x402/core/http';
 import { getAddress } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-// Offline replay of test/fixtures/localnet.json, the exchanges the tutorial's own capture mode
-// recorded during the localnet run. Nothing here talks to a network. Every value a test needs
+// Offline replay of test/fixtures/mainnet.json, the exchanges the tutorial's own capture mode
+// recorded during the mainnet run. Nothing here talks to a network. Every value a test needs
 // (address, ids, prices, payTo, network, secrets' shape) comes from the fixture, never a literal.
 //
 // Fixture shape (written by src/capture.js):
@@ -77,7 +77,7 @@ export function templateOf(operationId) {
 }
 
 export function loadFixture() {
-  return JSON.parse(readFileSync(new URL('./fixtures/localnet.json', import.meta.url), 'utf8'));
+  return JSON.parse(readFileSync(new URL('./fixtures/mainnet.json', import.meta.url), 'utf8'));
 }
 
 export const isFree = exchange => exchange.method === 'GET' && (exchange.path === '/health' || exchange.path === '/openapi.json');

@@ -1,5 +1,7 @@
 # Validation
 
+Mainnet run pending: needs the owner's Circle LIVE credentials.
+
 ## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
 
 The epic branch `epic/7` at `41e891b` ran `npm run inspect`, `npm run connect` and `npm run trade -- --execute` against the arcgate localnet between 14:07:52Z and 14:11:20Z. The recorded run passed every step. Sources: `.runs/inspect-epic-1008.log`, `.runs/connect-epic-1008.log`, `.runs/trade-epic-1008-2.log` and the run log `.runs/c3759b0f-56fd-40bc-8da9-91e1abf852ca.jsonl`, not committed.

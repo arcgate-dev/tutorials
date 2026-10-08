@@ -4,7 +4,7 @@ import { encodeFunctionData, erc20Abi, maxUint256 } from 'viem';
 import { loadConfig } from '../src/config.js';
 import { reviewPermit, reviewQuote, reviewSwap } from '../src/guards.js';
 import { main } from '../src/main.js';
-import { account, config, finalSwap, minimum, other, permit, pinTime, quote, swap, swapArgs, testnetConfig, trader } from './fixtures.js';
+import { config, finalSwap, minimum, other, permit, permitSignature, pinTime, quote, swap, swapArgs, testnetConfig, trader } from './fixtures.js';
 
 process.env.PATH = ''; // Never let a test find the real `mm` on this machine.
 globalThis.fetch = () => { throw new Error('Network access is forbidden in tests.'); };
@@ -48,19 +48,19 @@ test('batch guards refuse changed router, recipient, floor, amount, mode and app
   assert.throws(() => reviewSwap(allowance, quote(), trader, config, minimum), /fresh Permit2/);
 });
 
-test('final calldata must contain precisely the permit and signature this wallet signed', async t => { pinTime(t);
-  const typedData = permit(), signature = await account.signTypedData(typedData), signed = { typedData, signature };
-  assert.equal(reviewSwap(finalSwap(signed), quote(), trader, config, minimum, signed).length, 1);
-  const args = swapArgs(signed); args[7].permit = structuredClone(args[7].permit); args[7].permit.details.amount = '500001';
-  assert.throws(() => reviewSwap(finalSwap(signed, args), quote(), trader, config, minimum, signed), /Embedded permit/);
-  const wrongSignature = swapArgs(signed); wrongSignature[7].signature = '0x1234';
-  assert.throws(() => reviewSwap(finalSwap(signed, wrongSignature), quote(), trader, config, minimum, signed), /Embedded permit/);
+test('final calldata must contain precisely the permit and signature this wallet signed', t => { pinTime(t);
+  const signed = { typedData: permit(), signature: permitSignature };
+  assert.equal(reviewSwap(finalSwap(), quote(), trader, config, minimum, signed).length, 1);
+  const args = swapArgs(true); args[7].permit.details.amount = '500001'; // the embedded permit no longer matches what was signed
+  assert.throws(() => reviewSwap(finalSwap(args), quote(), trader, config, minimum, signed), /Embedded permit/);
+  const wrongSignature = swapArgs(true); wrongSignature[7].signature = '0x1234';
+  assert.throws(() => reviewSwap(finalSwap(wrongSignature), quote(), trader, config, minimum, signed), /Embedded permit/);
 });
 
-test('quote needs best.executable true and a next of swap, or none on the deployed API', t => { pinTime(t);
-  assert.equal(reviewQuote(quote(), config), minimum); // next absent: the deployed 603c5f1 omits it
-  const local = quote(); local.next = 'swap'; // local HEAD makes it required
-  assert.equal(reviewQuote(local, config), minimum);
+test('quote needs best.executable true and a next of swap', t => { pinTime(t);
+  assert.equal(reviewQuote(quote(), config), minimum); // as captured, next is swap
+  const absent = quote(); delete absent.next;
+  assert.throws(() => reviewQuote(absent, config), undefined, 'next missing');
   for (const executable of [false, undefined, 'true', 1]) {
     const q = quote(); q.best.executable = executable;
     assert.throws(() => reviewQuote(q, config), undefined, `executable ${executable}`);
@@ -94,13 +94,13 @@ test('the first swap response must say sign_permit', t => { pinTime(t);
   }
 });
 
-test('the final swap response says send, or nothing on the deployed API', async t => { pinTime(t);
-  const typedData = permit(), signature = await account.signTypedData(typedData), signed = { typedData, signature };
-  assert.equal(reviewSwap(finalSwap(signed), quote(), trader, config, minimum, signed).length, 1); // next absent
-  const withSend = finalSwap(signed); withSend.next = 'send';
-  assert.equal(reviewSwap(withSend, quote(), trader, config, minimum, signed).length, 1);
+test('the final swap response says send', t => { pinTime(t);
+  const signed = { typedData: permit(), signature: permitSignature };
+  assert.equal(reviewSwap(finalSwap(), quote(), trader, config, minimum, signed).length, 1); // as captured, next is send
+  const absent = finalSwap(); delete absent.next;
+  assert.throws(() => reviewSwap(absent, quote(), trader, config, minimum, signed), undefined, 'next missing');
   for (const next of ['sign_permit', 'done', 'swap', 'stop', 'requote', 'retry', 'fix_request', 'pay', '']) {
-    const s = finalSwap(signed); s.next = next;
+    const s = finalSwap(); s.next = next;
     assert.throws(() => reviewSwap(s, quote(), trader, config, minimum, signed), undefined, `next ${next}`);
   }
 });

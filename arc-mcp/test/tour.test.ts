@@ -18,7 +18,7 @@ async function tour(t: TestContext, arrange: (fake: ReturnType<typeof fakeMcp>) 
 
 test('prints every tools/list name', async (t) => {
   const names: string[] = fixture('tools-list').result.tools.map((tool: { name: string }) => tool.name);
-  assert.equal(names.length, 32, 'the captured localnet lists 32 tools');
+  assert.equal(names.length, 32, 'the captured server lists 32 tools');
   const { fake, run } = await tour(t);
   await run();
 

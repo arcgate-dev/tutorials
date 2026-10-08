@@ -55,7 +55,7 @@ function redact(body: string): string {
 }
 
 /**
- * Records the localnet responses the tests answer with, with no model: the one client's fetch is teed.
+ * Records the arcgate responses the tests answer with, with no model: the one client's fetch is teed.
  * It checks the box first (a signed boxStatus: no box, nothing is paid), then pays boxCreate (answered
  * box_exists, not charged), watchCreate and inboundCreate, posts to the inbound address as an outside
  * sender would, and reads and deletes what arrived. It writes the 14 files only when every one was recorded.

@@ -1,5 +1,37 @@
 # Validation
 
+## Mainnet run, 2026-10-08 (UTC), api.arcgate.dev at commit 6e04f6ab0a060417c852f87f20980e42a00fa3eb
+
+Issue #11. The README's commands ran once each, in order, against `https://api.arcgate.dev` from a clean state (`npm ci`, `cp .env.example .env`), with the tutorial code at `epic/7` `21745f4` (unmodified; that code still accepted a missing `next`, which this change now refuses, and production sent `next` on every answer): `inspect` (15:15:25Z), `connect` (15:15:30Z), `search` (15:15:38Z), `quote` (15:15:54Z), `preview` (15:16:20Z), `trade -- --execute` (15:16:54Z to 15:17:49Z) and `receipt` (15:17:59Z). Every run passed. Sources: the captured stdout and API exchanges (PAYMENT-SIGNATURE never recorded) behind the README's example output and `test/fixtures/mainnet-run.json`, and the run logs `.runs/f09f7f6c-87f9-41a2-b379-45aa4658d270.jsonl` (search), `.runs/2fda8ee4-ed00-423c-9892-3f3d95f98910.jsonl` (preview) and `.runs/342269d2-e4c9-47c6-bed4-011bbd3794e9.jsonl` (trade), not committed.
+
+- `/health`: `ok: true`, `commit` `6e04f6ab0a060417c852f87f20980e42a00fa3eb`, `rulesVersion` `r2-383954828c`, `x402.network` `eip155:5042`. The 402 offered `exact` on `eip155:5042`, USDC `0x3600000000000000000000000000000000000000`, payTo `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e`.
+- Payer: the `mm` server wallet `0x72e1…35a3`, trading mode `beast` before the run, never switched. USDC 7.959815 before.
+- Prices from `https://api.arcgate.dev/openapi.json` `x-payment` on 2026-10-08: search 5000 base units, quote 10000, swap 10000 (USD notional under 1,000).
+
+Every paid step. Each hash was checked with `eth_getTransactionReceipt` on `https://rpc.mainnet.arc.io`: status `0x1`, and one USDC `Transfer` from `0x72e1…35a3` to `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e` for the price.
+
+| Command | Operation | Price (base units) | Settlement tx | requestId |
+| --- | --- | --- | --- | --- |
+| `search` | search | 5000 | `0x4601505503e786de0e72216596551710695d892bd82c6f26c93aceca4355248c` | `b1ec669f` |
+| `quote` | search | 5000 | `0x3ff58f3539cc4ed5cb3da81ee3898a742798de309a3be9fcccc82cd06231e93c` | `d99f612d` |
+| `quote` | quote | 10000 | `0xb90b58e13e02ec1442ec9b5fbfeeeb1960b094380f391518be532acd94ae4468` | `7d2c3249` |
+| `preview` | search | 5000 | `0xb8055f20ee9f8b41cea8ee1382f91b5776a9a153075f0b04920348038ba8e956` | `a00dcdbc` |
+| `preview` | quote | 10000 | `0x25613382d0e91383701703f3e7fdc1bda62b613b464d339a1c3504535b257995` | `6d1b5c8e` |
+| `preview` | swap | 10000 | `0xf7b57084d4ef7a504081a42b23e6d412151668b2177788b2aca61026bd745088` | `17d65d5b` |
+| `trade` | search | 5000 | `0x5da5444d774f4a34bc5579d0a1986fd4fdd12739942e94f881d6ecb561b6c2c5` | `4d492eaf` |
+| `trade` | quote | 10000 | `0xf5b5fa4ef12884055763efbc5b09b488d4a1f67fa4dc8d433e3f1ff4851e0b68` | `4cf4c60a` |
+| `trade` | swap | 10000 | `0xb029ebbeb97aa0734a57d3aae4d09731030a495657a089826c6769352ae6d378` | `31a1882a` |
+
+The trade:
+
+- Quote `q_0f992fbf19628259`: sell 0.5 USDC, quoted 0.00000607 cirBTC, minimum 0.000006 (600 base units). `mm decode` read `executeGraph` through router `0x6cf4f7785d479b9ec1c3abe2fb569525380baede`, `amountIn` 500000, `minOut` 600, recipient the wallet, funding Permit2.
+- The wallet already held a USDC allowance to Permit2, so the first `/swap` returned no approval and none was sent. The Permit2 `PermitSingle` (spender the router, amount 500000, nonce 2) was signed with `mm wallet sign-typed-data`; the free `/swap/tx` returned the swap with `permitAttached: true` and no outstanding signature.
+- Swap [`0xe46347fc25c721681217809fbb11ddc41c5e17fc92663663b1f879879be78e2e`](https://explorer.arc.io/tx/0xe46347fc25c721681217809fbb11ddc41c5e17fc92663663b1f879879be78e2e), sent with `mm wallet send-transaction` in Beast Mode, mined in block 24920618 with status `0x1`. Gas 247,387 at an effective 22.44 gwei: 0.005552 USDC.
+- Received 607 base units (0.00000607 cirBTC), against the 600 minimum. The cirBTC balance went from 597 to 1204.
+- `/trade/v1/receipt` (free), asked by the trade and again by `npm run receipt -- q_0f992fbf19628259 0xe46347fc…6e2e`: `result: "pass"`, `delivered: "607"`, `minAmountOut: "600"`, `next: "done"`, the swap `status: "success"`.
+
+Total spent: API fees 70000 base units (0.07 USDC: four searches, three quotes, two swaps), the 0.50 USDC order and 0.005552 USDC gas, 0.575552 USDC. The wallet's USDC read 7.384262 afterward, a fall of 0.575553; the extra base unit is gas rounding.
+
 ## Epic #7 check: Beast Mode preview on the arcgate localnet, October 8, 2026 (UTC): not passed, wallet out of testnet USDC
 
 The epic branch `epic/7` at `41e891b` ran `npm run connect` (14:12:15Z) and `npm run preview` (14:12:18Z to 14:13:09Z) against the arcgate localnet. `preview` did **not** pass. Sources: `.runs/connect-epic-1008.log`, `.runs/preview-epic-1008.log` and the run logs `.runs/6222be9e-1e75-4609-9423-ba55e8959fa2.jsonl` and `.runs/ee740579-b7b5-4ff8-a31c-23cf7a377b06.jsonl`, not committed.

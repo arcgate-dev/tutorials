@@ -26,8 +26,8 @@ export function pickToken(search, config) {
 
 export function reviewQuote(quote, config) {
   ensure(quote.network === config.tradeNetwork && quote.side === 'exactIn', 'Unexpected quote network or side.');
-  // The deployed API omits next on a 200; the local one says swap. Anything else is the API telling the caller not to swap.
-  ensure(quote.best?.executable === true && (quote.next === undefined || quote.next === 'swap'), 'The API does not say this quote can be swapped.');
+  // Anything but next=swap is the API telling the caller not to swap.
+  ensure(quote.best?.executable === true && quote.next === 'swap', 'The API does not say this quote can be swapped.');
   ensure(same(quote.sell.address, USDC) && quote.sell.decimals === 6
     && same(quote.buy.address, config.buyToken) && quote.buy.decimals === 8, 'Unexpected quote tokens or decimals.');
   ensure(quote.sell.amountRaw === parseUnits(config.amount, 6).toString()
@@ -76,8 +76,7 @@ export function reviewSwap(swap, quote, wallet, config, minOut, signed = null, n
   ensure(['ok', 'pinned'].includes(swap.safety?.verdict), 'Swap safety verdict is not accepted.');
   ensure(Date.parse(swap.expiresAt) > now * 1000, 'Swap has expired.');
   if (signed) {
-    // /swap/tx on the deployed API omits next; the local one says send.
-    ensure(swap.next === undefined || swap.next === 'send', 'The API does not say to send the final swap.');
+    ensure(swap.next === 'send', 'The API does not say to send the final swap.');
     ensure(swap.signatures?.length === 0, 'Final swap still asks for a signature; do not send placeholder calldata.');
     reviewPermit(signed.typedData, config, now);
   } else {

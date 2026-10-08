@@ -4,26 +4,20 @@ Use your own Circle wallet to call **https://api.arcgate.dev**. You will connect
 
 Everything you need to run the example is in this folder. The dependencies are the public Circle SDK, x402 SDK, and viem. Arcgate does not need an API key: your wallet pays per call. Your Circle credentials go to Circle, never to Arcgate.
 
-**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. **Localnet run, October 7, 2026:** the same commands ran search, quote, swap, sign, send and receipt against the arcgate localnet from checkout `5addf63f`, on Arc testnet. The receipt passed with 1192 cirBTC units delivered against a minimum of 1180; see [Run against the arcgate localnet](#run-against-the-arcgate-localnet). See [the validation record and transaction receipts](VALIDATION.md).
+**Earlier mainnet validation, September 29, 2026 (UTC):** the commands paid through x402, previewed the swap, and used Circle to approve and trade 0.50 USDC for 0.00000598 cirBTC. **API compatibility review, September 30:** updated for wallet readiness, free receipts, and the current error and Permit2 flows. The update was checked with offline tests and unpaid public requests; it did not repeat the funded trade. **October 8, 2026:** the request and response shapes below were checked against [the OpenAPI document](https://api.arcgate.dev/openapi.json). A fresh funded mainnet run is pending; until it lands, example responses marked *illustrative* show the shape of a real response, not values from a mainnet run. See [the validation record and transaction receipts](VALIDATION.md).
 
 ## Before you start
 
 - **Node.js 22.9 or newer**, npm, and Git.
-- A [Circle developer account](https://console.circle.com). The public service needs mainnet access; the arcgate localnet needs a test account.
-- A **developer-controlled EOA wallet**, an API key whose type matches it, and the entity secret registered for that account. A user-controlled wallet or smart contract account needs a different integration.
+- A [Circle developer account](https://console.circle.com) with mainnet access.
+- A **developer-controlled EOA wallet** on the `ARC` blockchain, a **`LIVE_API_KEY:`** Circle API key, and the entity secret registered for that account. A user-controlled wallet or smart contract account needs a different integration.
+- USDC on **Arc mainnet** (chain `5042`) in that wallet, for API payments, the swap and gas. Test-network USDC cannot pay the API.
 
-  | Where the API pays | Circle API key | Wallet blockchain |
-  | --- | --- | --- |
-  | Public service, Arc mainnet `eip155:5042` | `LIVE_API_KEY:` | `ARC` |
-  | Arcgate localnet, Arc testnet `eip155:5042002` | `TEST_API_KEY:` | `ARC-TESTNET` |
-
-- USDC on the network the API pays on. On the public service that is **Arc mainnet, chain `5042`**, for API payments and swaps alike; testnet faucet USDC cannot pay it. On the localnet, API payments use Arc testnet USDC, and the swap runs on the localnet's fork of Arc mainnet. The program reads the network from the API and refuses a key of the other kind before it calls Circle; it checks the wallet's blockchain when it reads the wallet from Circle, before any payment.
-
-The rest of this README follows the public service. The localnet needs different setup; see [Run against the arcgate localnet](#run-against-the-arcgate-localnet).
+The program reads the payment network from the API and refuses a Circle key that is not a `LIVE_API_KEY:` before it calls Circle. It checks the wallet's blockchain when it reads the wallet from Circle, before any payment.
 
 This walkthrough uses real funds. Its default limits are **0.01 USDC per API call**, **0.025 USDC in API fees per command**, and **1 USDC sold per trade**. Gas is additional and also paid in USDC. Fund a dedicated wallet with enough for those amounts plus gas; 2 USDC gives headroom for the 1 USDC example, but gas costs vary.
 
-| Command | What it does | API fees at the current prices |
+| Command | What it does | API fees |
 | --- | --- | --- |
 | `npm run inspect` | Checks service health and displays an unpaid payment request | Free |
 | `npm run connect` | Reads your Circle wallet and its USDC balance | Free |
@@ -32,6 +26,8 @@ This walkthrough uses real funds. Its default limits are **0.01 USDC per API cal
 | `npm run preview` | Searches, quotes, and builds an unsigned swap | 0.025 USDC total |
 | `npm run trade -- --execute` | Runs the same three calls, broadcasts, then checks the receipt | 0.025 USDC, plus the trade and gas |
 | `npm run receipt -- <quoteId> <txHash> [txHash ...]` | Checks an already submitted trade without Circle credentials | Free |
+
+Prices come from the `x-payment` entries in [https://api.arcgate.dev/openapi.json](https://api.arcgate.dev/openapi.json), as of October 8, 2026: search 5000 base units (0.005 USDC), quote 10000 (0.01 USDC), swap 10000 (0.01 USDC) for an order under 1,000 USD. Check that document for the current figures.
 
 Each command starts a new run. Running all four paid commands costs 0.07 USDC in API fees. A preview pays for its API calls even though it does not send the swap. The code refuses prices above its limits.
 
@@ -46,7 +42,7 @@ npm ci
 cp .env.example .env
 ```
 
-Run every command below from `tutorials/arc-circle`. Only this folder's `.env` is loaded. You do not need Docker or an Arcgate server.
+Run every command below from `tutorials/arc-circle`. Only this folder's `.env` is loaded. You do not need an Arcgate server or API key.
 
 You can already inspect the public service without a wallet:
 
@@ -54,23 +50,34 @@ You can already inspect the public service without a wallet:
 npm run inspect
 ```
 
-It checks `GET /health` and makes an unpaid `POST /trade/v1/search`. The latter returns **HTTP 402**, with a base64 JSON `PAYMENT-REQUIRED` header. It prints the commit and rules version from `/health`. The network in `/health` must match the one in the offer, and it must be `eip155:5042` or `eip155:5042002`; any other network stops the program before it pays. On the public service the offer names network `eip155:5042`, and the verified September 29, 2026 run paid `amountAtomic` `5000` (0.005 USDC) for each search. The `payTo` in that run's record is `0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e` ([evidence/mainnet-2026-09-29.json](evidence/mainnet-2026-09-29.json)). The full 402 offer was not kept in that record.
-
-Relevant fields from the arcgate localnet on October 6, 2026 (source: `test/fixtures/localnet-free.json`, `search402.paymentRequired.accepts[0]`). The network is Arc testnet, and `payTo` is that stack's own fee recipient:
+It checks `GET /health` and makes an unpaid `POST /trade/v1/search`. The latter returns **HTTP 402**, with a base64 JSON `PAYMENT-REQUIRED` header. It prints the commit and rules version from `/health`. The network in `/health` must match the one in the offer, and it must be `eip155:5042`; any other network stops the program before it pays. Output from the public service on October 8, 2026 (no payment is made):
 
 ```json
 {
-  "scheme": "exact",
-  "network": "eip155:5042002",
-  "amount": "5000",
-  "asset": "0x3600000000000000000000000000000000000000",
-  "payTo": "0x987F719b516f528f4080EF0853E37aD5d7E773A0",
-  "maxTimeoutSeconds": 300,
-  "extra": { "name": "USDC", "version": "2" }
+  "api": "https://api.arcgate.dev",
+  "ok": true,
+  "x402": { "enabled": true, "network": "eip155:5042" },
+  "commit": "6e04f6ab0a060417c852f87f20980e42a00fa3eb",
+  "rulesVersion": "r2-383954828c"
+}
+{
+  "network": "eip155:5042",
+  "paymentRequired": [
+    {
+      "scheme": "exact",
+      "network": "eip155:5042",
+      "amount": "5000",
+      "asset": "0x3600000000000000000000000000000000000000",
+      "payTo": "0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e",
+      "maxTimeoutSeconds": 300,
+      "extra": { "name": "USDC", "version": "2" }
+    }
+  ],
+  "configuredPayTo": "0x08A4f8734ADAB08d3461E356b5A498b893Bd7B5e"
 }
 ```
 
-`amount` is in six-decimal USDC units: `5000` means 0.005 USDC. `payTo` is **Arcgate's fee recipient**, not your wallet. The example pins each network's address in [src/config.js](src/config.js) and checks each offer against it before signing. For a localnet whose `PAY_TO` differs, set `ARCGATE_PAY_TO` in `.env`.
+`amount` is in six-decimal USDC units: `5000` means 0.005 USDC. `payTo` is **Arcgate's fee recipient**, not your wallet. The example pins the address in [src/config.js](src/config.js) and checks each offer against it before signing. The September 29, 2026 mainnet run paid this same `payTo` ([evidence/mainnet-2026-09-29.json](evidence/mainnet-2026-09-29.json)).
 
 ## 2. Connect your Circle wallet
 
@@ -83,7 +90,7 @@ CIRCLE_ENTITY_SECRET=your_registered_64_character_hex_secret
 CIRCLE_WALLET_ID=your_wallet_uuid
 ```
 
-The network the API pays on decides which pair you need. `config.blockchain` is `ARC` on `eip155:5042` and `ARC-TESTNET` on `eip155:5042002`, and the key prefix must match: `LIVE_API_KEY:` with `ARC`, `TEST_API_KEY:` with `ARC-TESTNET`. The commands refuse a key prefix that does not match before any Circle call, and a wallet on the other blockchain when they read it from Circle. The examples here use mainnet; the localnet is covered [below](#run-against-the-arcgate-localnet).
+The API pays on Arc mainnet (`eip155:5042`), so you need a `LIVE_API_KEY:` key with an `ARC` wallet. The commands refuse any other key prefix before any Circle call, and a wallet on another blockchain when they read it from Circle.
 
 `CIRCLE_WALLET_ID` is Circle's UUID for the wallet, **not** its `0x` address. The API key and entity secret must belong to the account that owns it. Use the existing registered entity secret; do not generate a replacement for an existing account.
 
@@ -99,9 +106,9 @@ Create the wallet programmatically with the included script:
 npm run wallet:create
 ```
 
-[src/create-wallet.js](src/create-wallet.js) follows Circle's [Create your first developer-controlled wallet](https://developers.circle.com/wallets/dev-controlled/create-your-first-wallet) guide: call `createWalletSet`, then `createWallets`. It sets `blockchains: [config.blockchain]` and `accountType: 'EOA'`, where `config.blockchain` is `ARC` or `ARC-TESTNET` according to the network the API reports. Circle's quickstart uses `ARC-TESTNET` in its example.
+[src/create-wallet.js](src/create-wallet.js) follows Circle's [Create your first developer-controlled wallet](https://developers.circle.com/wallets/dev-controlled/create-your-first-wallet) guide: call `createWalletSet`, then `createWallets`. It sets `blockchains: [config.blockchain]` and `accountType: 'EOA'`, where `config.blockchain` is `ARC` for the public API.
 
-Paste the printed `CIRCLE_WALLET_ID=…` line into `.env`. If that variable is already set, the command validates the existing wallet instead of creating another. Fund the printed address with USDC on the network it names (**Arc mainnet** for the public service), leaving additional USDC for gas.
+Paste the printed `CIRCLE_WALLET_ID=…` line into `.env`. If that variable is already set, the command validates the existing wallet instead of creating another. Fund the printed address with USDC on **Arc mainnet**, leaving additional USDC for gas.
 
 Then connect:
 
@@ -132,7 +139,7 @@ const wallet = response.data.wallet;
 npm run search
 ```
 
-The request is (the body is from `test/fixtures/localnet-free.json`, `search402.requestBody`):
+The request is:
 
 ```http
 POST https://api.arcgate.dev/trade/v1/search
@@ -165,7 +172,7 @@ It stops on ambiguous results, a different address, an unverified token, or any 
 npm run quote
 ```
 
-After search, the script makes this paid request (the body is from `test/fixtures/localnet-run.json`, `run.quote.request`):
+After search, the script makes this paid request (`taker` is your wallet's address):
 
 ```http
 POST https://api.arcgate.dev/trade/v1/quote
@@ -177,13 +184,13 @@ Content-Type: application/json
   "amount": "1",
   "side": "exactIn",
   "slippageBps": 100,
-  "taker": "0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD"
+  "taker": "<your wallet address>"
 }
 ```
 
 Here `amount` is a **human-readable token amount**: `"1"` means 1 USDC. Slippage is 100 basis points, or 1%. You can lower `SELL_AMOUNT` in `.env`; the tutorial caps it at 1 USDC.
 
-The verified mainnet walkthrough used `SELL_AMOUNT=0.50`. Set that value in `.env` to follow the same trade size.
+The September 29 mainnet walkthrough used `SELL_AMOUNT=0.50`. Set that value in `.env` to follow the same trade size.
 
 The response includes `quoteId`, `expiresAt`, the tokens, routes, `best`, and `safety`. For an exact-input quote, the input is `sell.amount` / `sell.amountRaw`. `best.amountOutQuoted` and `best.minAmountOut` are human-readable output amounts. The script preserves that original minimum when it later checks the swap calldata.
 
@@ -194,7 +201,7 @@ The script supplies your wallet address as `taker`, so the response also reports
 - `gas` and `fees`: estimated native USDC gas and the remaining swap API fee, with balance checks for the taker and x402 payer.
 - `totalCostUsdc`: swap fee plus estimated gas, excluding the traded principal and the search/quote fees already paid. The gas estimate uses the default Permit2 plan, so the exact-approval flow's actual gas can differ.
 
-The script prints readiness and stops if `readiness.ready` is false, `next` is anything other than `"swap"`, or `best.executable` is false. A good quote ends like this, from the localnet run on October 6, 2026 (source: `test/fixtures/localnet-run.json`, `run.quote.body`, shortened):
+The script prints readiness and stops if `readiness.ready` is false, `next` is anything other than `"swap"`, or `best.executable` is false. A good quote ends like this (*illustrative of the shape*, shortened; the quote ID and amounts are from a recorded run, not a mainnet run):
 
 ```json
 {
@@ -230,15 +237,15 @@ const swap = await api('swap', {
 
 `api` is the paid HTTP helper from [src/payment.js](src/payment.js); `runFlow` shows all three calls together in [src/flow.js](src/flow.js).
 
-`POST /trade/v1/swap` re-quotes and simulates the trade from your wallet, so you need the sell amount and gas headroom even for a preview. Arcgate returns unsigned `transactions[]`. This tutorial requests **`approval: "approve"`**: at most one ERC-20 approval for the exact sell amount, followed by the swap. An existing allowance or a route funded by native USDC can make the approval unnecessary. A swap response with `next: "send"` and an empty `signatures` array means the transactions are ready to send in order. This example refuses to send anything else. From the localnet run on October 6, 2026 (source: `test/fixtures/localnet-run.json`, `run.swap.body`; the calldata is cut here):
+`POST /trade/v1/swap` re-quotes and simulates the trade from your wallet, so you need the sell amount and gas headroom even for a preview. Arcgate returns unsigned `transactions[]`. This tutorial requests **`approval: "approve"`**: at most one ERC-20 approval for the exact sell amount, followed by the swap. An existing allowance or a route funded by native USDC can make the approval unnecessary. A swap response with `next: "send"` and an empty `signatures` array means the transactions are ready to send in order. This example refuses to send anything else. *Illustrative of the shape* (recorded run, not a mainnet run; each transaction's `to` and the calldata are cut here):
 
 ```json
 {
   "quoteId": "q_9b4fe45c89ab130a",
   "signatures": [],
   "transactions": [
-    { "to": "0x3600000000000000000000000000000000000000", "data": "0x095ea7b3…", "value": "0", "gas": "72070", "purpose": "approve" },
-    { "to": "0x0ea7461542fe051c013ab0f5860190bc847f3271", "data": "0xfdbcb692…", "value": "0", "gas": "307150", "purpose": "swap" }
+    { "data": "0x095ea7b3…", "value": "0", "gas": "72070", "purpose": "approve" },
+    { "data": "0xfdbcb692…", "value": "0", "gas": "307150", "purpose": "swap" }
   ],
   "amountOutSimulated": "1193",
   "minAmountOut": "1181",
@@ -250,13 +257,13 @@ const swap = await api('swap', {
 
 **If you choose Permit2 in another integration:** call paid `/trade/v1/swap` first. If it returns `next: "sign_permit"` and a nonempty `signatures` array, validate and sign `signatures[0].typedData` with the taker's Circle wallet, then call **free `POST /trade/v1/swap/tx`** with the same `quoteId`, `taker`, `recipient`, optional `deadlineSec`, and `permit: { message: typedData.message, signature }`. Send only the final response's transactions, in order. `/swap/tx` accepts no `approval` field, and `/swap` accepts no `permit` field. The free round requires a pending paid swap for that quote, taker and recipient, a live quote, and is consumed by its first successful response. This tutorial keeps exact approval throughout; its x402 signing policy accepts payment authorizations only, so implementing Permit2 also requires a separate permit validation policy.
 
-Before sending anything, [src/guards.js](src/guards.js) decodes the entire transaction batch. It checks the approval spender and amount, router address, input and output tokens, sell amount, recipient, minimum output, deadline, native value, and input pull mode. The router is pinned per network in [src/config.js](src/config.js). For the public deployment it is:
+Before sending anything, [src/guards.js](src/guards.js) decodes the entire transaction batch. It checks the approval spender and amount, router address, input and output tokens, sell amount, recipient, minimum output, deadline, native value, and input pull mode. The router is pinned per network in [src/config.js](src/config.js). It is:
 
 ```text
 0x6cf4f7785d479b9ec1c3abe2fb569525380baede
 ```
 
-The localnet's router is `0x0eA7461542fE051c013AB0f5860190bC847f3271`. `ARCGATE_ROUTER_ADDRESS` overrides either.
+`ARCGATE_ROUTER_ADDRESS` overrides it.
 
 The script prints the decoded fields and stops. **No approval or swap is broadcast in preview.** API fees have still been paid.
 
@@ -265,8 +272,6 @@ Arc has two representations of USDC: ERC-20 amounts use **6 decimals**, while na
 These checks bind the transaction to the order you requested. They do not independently price the asset or audit every venue call inside the route. Review the quoted price and minimum before choosing to trade.
 
 ## 6. Send the trade through Circle
-
-This section is the mainnet path, where Circle signs and broadcasts. On the localnet the transactions are sent differently; see [Run against the arcgate localnet](#run-against-the-arcgate-localnet).
 
 When you are ready to spend the configured amount:
 
@@ -313,7 +318,7 @@ if (!response.ok) throw new Error(`receipt: ${response.status} ${receipt.error?.
 - `result: "pending"`: wait at least 5 seconds and query the receipt again. Do not broadcast again.
 - `result: "fail"`: inspect `reason` and `next`. `stop` means a swap succeeded but the fill failed the check; do not trade again. `requote` means no swap succeeded; inspect the transactions before deciding on a new trade.
 
-From the localnet run on October 6, 2026, a passing receipt (source: `test/fixtures/localnet-run.json`, `run.receipt.body`):
+A passing receipt, *illustrative of the shape* (recorded run, not a mainnet run, so the block numbers are not mainnet blocks):
 
 ```json
 {
@@ -340,44 +345,6 @@ npm run receipt -- <quoteId> <swapTxHash> [approvalTxHash]
 
 Replace the placeholders, omitting the brackets and optional approval hash when none was sent. This command needs no Circle credentials and spends nothing. If the receipt lookup fails after a trade, use it to check that same trade; rerunning `trade` would submit a new order. Receipt records are available for one hour after swap construction. Requests are limited to one chain read per quote every 5 seconds and 132 reads per quote; respect `retryAfterSec` on a rate limit.
 
-## Run against the arcgate localnet
-
-The same commands run against an arcgate localnet, a local copy of the API. It charges fees on **Arc testnet** (`eip155:5042002`) and trades on a fork of Arc mainnet (chain `5042`), so you spend testnet USDC and no real funds. You need a running localnet; this tutorial does not start one.
-
-1. Check that it is up and pays on Arc testnet:
-
-   ```sh
-   curl -s http://127.0.0.1:19800/health
-   ```
-
-   `x402.network` must be `eip155:5042002`.
-
-2. Use a Circle **test** account: a `TEST_API_KEY:` key, its registered entity secret, and an `ARC-TESTNET` developer-controlled EOA (`npm run wallet:create` creates one once the API reports the testnet network). Fund the wallet with at least 0.025 USDC on Arc testnet for API fees, the total the program allows per command.
-
-3. Point `.env` at the localnet:
-
-   ```dotenv
-   CIRCLE_API_KEY=TEST_API_KEY:your_key_here
-   CIRCLE_ENTITY_SECRET=your_registered_64_character_hex_secret
-   CIRCLE_WALLET_ID=your_wallet_uuid
-   API_URL=http://127.0.0.1:19800
-   # The PAY_TO of your localnet stack, if it is not the default in src/config.js.
-   ARCGATE_PAY_TO=0x987F719b516f528f4080EF0853E37aD5d7E773A0
-   SELL_AMOUNT=1
-   ```
-
-4. Run the commands from the table at the top, in the same order: `npm run inspect`, `connect`, `search`, `quote`, `preview`, `trade -- --execute`, then the `npm run receipt` command the trade prints.
-
-What differs from mainnet:
-
-- **Circle still signs every x402 payment**, with `signTypedData`, and the program verifies each signature recovers to your wallet. Fees settle on Arc testnet through the Arcus facilitator.
-- **The trade chain is the fork, not Arc testnet.** The router and cirBTC exist only there. Circle cannot sign or broadcast a transaction for a router that exists only on the fork, so the fork is a localnet stand-in for Circle's broadcast: [src/fork.js](src/fork.js) sends the approval and the swap by impersonating your wallet's address on the fork. Mainnet uses [section 6](#6-send-the-trade-through-circle) instead.
-- **Before a quote, preview or trade,** `fundOnFork` gives your wallet's address 10 USDC of native balance on the fork and mines one block, so it can pay gas there. This is fork money only.
-- **The impersonation has guards.** `sendOnFork` runs only against a loopback RPC (`http://127.0.0.1` or `http://localhost`) that is an anvil node on chain `5042`. It refuses anything else before impersonating, impersonates only your wallet's address, and always stops impersonating afterwards. The fork RPC defaults to `http://127.0.0.1:19845`; set `ARC_RPC_URL` for another loopback node.
-- The `inspect` output names the API commit and rules version, so you can see which build you ran against.
-
-A run on October 7, 2026 against the arcgate checkout `5addf63f` (the service's `/health` reports no commit, so the checkout is the only source for it) ended with receipt `result: "pass"`, `next: "done"`: 1192 cirBTC units delivered against a minimum of 1180. See [VALIDATION.md](VALIDATION.md) for the validation record.
-
 ## API errors and replacement quotes
 
 Arcgate's application errors and unpaid payment challenge carry `error.code`, optional `error.hint`, and a top-level `next`: `requote`, `retry`, `fix_request`, `stop` or `pay`. `retryAfterSec`, when present, supplies the delay; `X-Request-Id` identifies the request for support. The client prints and records these fields.
@@ -397,8 +364,7 @@ This tutorial records any replacement quote but stops for review; it does not au
 | Result | What to check |
 | --- | --- |
 | Circle 401/403 or wallet not found | The API key, registered entity secret, and wallet ID must belong to the same Circle account and environment. |
-| Key, wallet or network mismatch (`The API pays on eip155:…` or `Use an active … developer-controlled EOA wallet`) | The key type and wallet must fit the network the API reports: `LIVE_API_KEY:` with an `ARC` wallet on `eip155:5042`, `TEST_API_KEY:` with an `ARC-TESTNET` wallet on `eip155:5042002`. Use a developer-controlled **EOA**, not a smart contract account. A key of the wrong type is refused with `The API pays on eip155:…` before any Circle call. A wallet on the wrong blockchain is refused with `Use an active … developer-controlled EOA wallet` when the wallet is read, before any payment. |
-| Localnet payment requirements differ | The offer's `payTo` is that stack's `PAY_TO`. Run `npm run inspect`, then set `ARCGATE_PAY_TO` in `.env` to that address if you trust the stack. |
+| Key or wallet mismatch (`The API pays on eip155:…` or `Use an active … developer-controlled EOA wallet`) | Use a `LIVE_API_KEY:` key with an `ARC` developer-controlled **EOA** wallet, not a smart contract account. A key of the wrong type is refused with `The API pays on eip155:…` before any Circle call. A wallet on the wrong blockchain is refused with `Use an active … developer-controlled EOA wallet` when the wallet is read, before any payment. |
 | Payment requirements differ | Run `npm run inspect`. Check the public service configuration and documented addresses before changing the pinned recipient or limits. |
 | 402 after signing | The body may be `{}` with no `next`. This is an ordinary settlement or verification failure, which normally charges nothing. Check `PAYMENT-RESPONSE` / the logged `paymentResponse` for the `errorReason`, plus the payment amount, authorization and USDC balance. Fix the cause before a fresh payment; no automatic retry. |
 | `HTTP 502 (X402MiddlewareError: ...)`, or `payment settlement failed: payment_response_expired` | The payment may have settled. The error includes `; the payment may have settled; check the PAYMENT-RESPONSE transaction or your USDC balance before paying again`, then the `requestId` (a settlement failure's 402 also has a note about the payment amount before it). Check the transaction or balance before paying again, and keep the `X-Request-Id` from the error for the report. No automatic retry. |
@@ -417,6 +383,6 @@ This tutorial records any replacement quote but stops for review; it does not au
 npm test
 ```
 
-The **59 tests** run offline. They use generated local signing keys and injected HTTP, Circle, and RPC responses, and the API responses come from fixtures captured on the arcgate localnet ([localnet-free.json](test/fixtures/localnet-free.json) and [localnet-run.json](test/fixtures/localnet-run.json)). They require no credentials, funded wallet, or deployed service. See [VALIDATION.md](VALIDATION.md) for the checks actually run and the limits of live verification.
+The **59 tests** run offline. They use generated local signing keys and injected HTTP, Circle, and RPC responses, with API responses from recorded fixtures in `test/fixtures`. They require no credentials, funded wallet, or deployed service. See [VALIDATION.md](VALIDATION.md) for the checks actually run and the limits of live verification.
 
 For other tokens, order sizes, approval modes, and MCP access, use the [API reference](https://docs.arcgate.dev) and [OpenAPI document](https://api.arcgate.dev/openapi.json). Review the example's token and spending checks before changing its scope.

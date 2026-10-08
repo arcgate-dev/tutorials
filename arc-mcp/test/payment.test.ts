@@ -92,8 +92,8 @@ test('acceptOffer takes both Arc networks and refuses other networks, assets, sc
   const offer = capturedOffer();
   const variant = (patch: Record<string, unknown>) => ({ ...offer, ...patch });
 
-  assert.equal(acceptOffer(offer, config), true, 'the captured Arc testnet offer');
-  assert.equal(acceptOffer(variant({ network: 'eip155:5042' }), config), true, 'Arc mainnet');
+  assert.equal(acceptOffer(offer, config), true, 'the captured Arc mainnet offer');
+  assert.equal(acceptOffer(variant({ network: 'eip155:5042002' }), config), true, 'Arc testnet');
   assert.equal(acceptOffer(variant({ amount: '1' }), config), true);
   assert.equal(acceptOffer(variant({ amount: '5000' }), config), true, 'the cap itself');
   assert.equal(acceptOffer(variant({ maxTimeoutSeconds: 1 }), config), true);
@@ -130,10 +130,10 @@ test('selectOffer is the first accepted offer, and none when nothing is accepted
   const good = capturedOffer();
   const overCap = { ...good, amount: String(config.maxPerCall + 1n) };
   const otherNetwork = { ...good, network: 'eip155:8453' };
-  const mainnet = { ...good, network: 'eip155:5042', amount: '4000' };
+  const cheaper = { ...good, amount: '4000' };
 
-  assert.deepEqual(selectOffer([otherNetwork, overCap, good, mainnet], config), good);
-  assert.deepEqual(selectOffer([otherNetwork, overCap, mainnet, good], config), mainnet);
+  assert.deepEqual(selectOffer([otherNetwork, overCap, good, cheaper], config), good);
+  assert.deepEqual(selectOffer([otherNetwork, overCap, cheaper, good], config), cheaper);
   assert.ok(selectOffer([otherNetwork, overCap], config) == null);
   assert.ok(selectOffer([], config) == null);
 });

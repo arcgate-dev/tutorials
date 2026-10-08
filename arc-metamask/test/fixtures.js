@@ -30,7 +30,7 @@ export const taker = getAddress(production.taker);
 export const trader = { address: taker };
 
 // A capture's expiries and deadlines are only valid at the moment it was taken, so time is pinned to the production run.
-// The quote (expires 00:25:10Z), the swap (expires 00:28:18Z) and its deadline all lie after it, within the guard's window.
+// The pin is the paid /swap response: the quote (expires 15:19:08Z), the swap (expires 15:22:17Z) and its deadline all lie after it, within the guard's window.
 export const capturedMs = Date.parse(production.capturedAt);
 export const pinTime = t => t.mock.timers.enable({ apis: ['Date'], now: capturedMs });
 
@@ -55,19 +55,20 @@ export function authorization(row = config) {
     message: { from: wallet.address, to: row.payTo, value: 5000n, validAfter: BigInt(now - 10), validBefore: BigInt(now + 300), nonce: `0x${'01'.repeat(32)}` } };
 }
 
-// The captured Permit2 typed data. Override: the testnet row's spender is its own router, not the production one.
+// The captured Permit2 typed data; the captured taker's signature for it is permitSignature (embedded in the captured /swap/tx calldata).
+// Override: on the testnet row the spender is that row's router, not the production one.
 export function permit(row = config) {
   const typedData = first().signatures[0].typedData;
   if (row !== config) typedData.message.spender = row.router;
   return typedData;
 }
+export const permitSignature = production.swapTx.request.permit.signature;
 
-// The captured swap calldata, decoded. Variants change one argument and re-encode with routerAbi.
-export function swapArgs(signed = null) {
-  const args = decodeFunctionData({ abi: routerAbi, data: first().transactions[0].data }).args.map(value => structuredClone(value));
-  // Override: /swap/tx answers with the signed permit and signature embedded in the pull.
-  if (signed) args[7] = { mode: 1, permit: signed.typedData.message, signature: signed.signature };
-  return args;
+// The captured swap calldata, decoded: the first /swap response's placeholder, or with `final` the /swap/tx one that embeds the signed
+// permit. Variants change one argument and re-encode with routerAbi.
+export function swapArgs(final = false) {
+  const data = (final ? production.swapTx.body : production.swap.paid.body).transactions[0].data;
+  return decodeFunctionData({ abi: routerAbi, data }).args.map(value => structuredClone(value));
 }
 
 // The first /swap response as captured: it asks for a signature and carries the placeholder swap. The captured wallet already held a
@@ -80,19 +81,12 @@ export function swap({ args, approval = false } = {}) {
   return response;
 }
 
-// TODO(#11): the /swap/tx answer and the /receipt answer below are not captured. /swap/tx needs a Permit2 signature for chain 5042, and the
-// localnet's fork router stands in for the real mainnet router, so that permit must not be signed there. Replace both with clones of the
-// Beast Mode mainnet trade capture when #11 records it. Until then they are the captured first swap with only the fields the final round changes.
-export function finalSwap(signed, args = swapArgs(signed)) {
-  const response = first();
-  delete response.next; // the deployed API omits next on /swap/tx; the local one says send
-  response.signatures = [];
-  response.transactions[0].data = encodeFunctionData({ abi: routerAbi, functionName: 'executeGraph', args });
+// The /swap/tx answer as captured: the final round, with the taker's Permit2 signature embedded in the calldata. The optional `args` re-encodes
+// that calldata with a changed argument.
+export function finalSwap(args) {
+  const response = structuredClone(production.swapTx.body);
+  if (args) response.transactions[0].data = encodeFunctionData({ abi: routerAbi, functionName: 'executeGraph', args });
   return response;
 }
 
-export function tradeReceipt() {
-  const body = first();
-  return { quoteId: body.quoteId, result: 'pass', token: config.buyToken.toLowerCase(), recipient: taker.toLowerCase(), minAmountOut: String(minimum),
-    delivered: body.amountOutSimulated, block: body.block, transactions: [{ hash, purpose: 'swap', status: 'success' }], reason: null };
-}
+export const tradeReceipt = () => structuredClone(production.receipt.body);

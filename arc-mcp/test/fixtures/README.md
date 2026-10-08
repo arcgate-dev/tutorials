@@ -1,10 +1,10 @@
 # Fixtures
 
-Every file here is one response body captured by `npm run capture` from the arcgate localnet (`POST http://127.0.0.1:19800/mcp`,
+Every file here is one response body captured by `npm run capture` from `POST https://api.arcgate.dev/mcp` (with
 headers `content-type: application/json` and `accept: application/json, text/event-stream`), byte for byte.
 None is written by hand. The tests answer with them through `test/fake-mcp.ts`, which rewrites only the JSON-RPC `id`.
 
-Captured on: 2026-10-07, from the localnet whose `/health` answered `ok: true` and `commit: null`, arcgate checkout commit d85271c, settling x402 on Arc testnet (`eip155:5042002`).
+Captured on: 2026-10-08 (15:14Z), from api.arcgate.dev, whose `/health` answered `ok: true` at commit `6e04f6a`, settling x402 on Arc mainnet (`eip155:5042`).
 
 | File | Request |
 | --- | --- |

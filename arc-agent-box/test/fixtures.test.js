@@ -20,13 +20,13 @@ function* walk(value, key = null) {
 
 // a real capture ---------------------------------------------------------------------------------
 
-test('localnet.json is a capture: capturedAt, a loopback apiUrl, an address, the API commit and exchanges', () => {
+test('mainnet.json is a capture: capturedAt, the https apiUrl, an address, the API commit and exchanges', () => {
   const fixture = loadFixture();
   assert.match(fixture.capturedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
   assert.ok(!Number.isNaN(Date.parse(fixture.capturedAt)));
   const api = new URL(fixture.apiUrl);
-  assert.equal(api.protocol, 'http:');
-  assert.ok(['127.0.0.1', 'localhost'].includes(api.hostname), `apiUrl ${fixture.apiUrl} is not loopback`);
+  assert.equal(api.protocol, 'https:');
+  assert.equal(fixture.apiUrl, 'https://api.arcgate.dev');
   assert.equal(fixture.apiUrl, api.origin, 'apiUrl is the origin the run used');
   assert.match(fixture.address, /^0x[0-9a-fA-F]{40}$/);
   assert.match(fixture.apiCommit, /^[0-9a-f]{7,40}$/, 'the arcgate checkout commit the run used');

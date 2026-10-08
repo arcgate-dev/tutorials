@@ -30,14 +30,14 @@ test('every fixture is a JSON-RPC 2.0 response', () => {
   }
 });
 
-test('the paid fixtures carry a successful Arc testnet receipt', () => {
+test('the paid fixtures carry a successful Arc mainnet receipt', () => {
   for (const name of PAID) {
     const result = fixture(name).result;
     assert.notEqual(result.isError, true, name);
     const receipt = result._meta?.[RECEIPT_META];
     assert.ok(receipt, `${name}: a receipt in _meta`);
     assert.equal(receipt.success, true, name);
-    assert.equal(receipt.network, 'eip155:5042002', name);
+    assert.equal(receipt.network, 'eip155:5042', name);
     assert.match(receipt.transaction, TX, `${name}: a 32-byte transaction hash`);
     assert.match(receipt.payer, ADDRESS, `${name}: the payer`);
   }
@@ -45,14 +45,14 @@ test('the paid fixtures carry a successful Arc testnet receipt', () => {
   assert.equal(new Set(transactions).size, 2, 'two payments, two transactions');
 });
 
-test('the payment-required fixtures offer the prices the caps are set against, on Arc testnet in USDC', () => {
+test('the payment-required fixtures offer the prices the caps are set against, on Arc mainnet in USDC', () => {
   const prices: Record<string, string> = { 'box-create.payment-required': '50000', 'watch-create.payment-required': '10000', 'inbound-create.payment-required': '10000' };
   for (const [name, amount] of Object.entries(prices)) {
     const result = fixture(name).result;
     assert.equal(result.isError, true, name);
     const [offer] = result.structuredContent.accepts;
     assert.equal(offer.amount, amount, name);
-    assert.equal(offer.network, 'eip155:5042002', name);
+    assert.equal(offer.network, 'eip155:5042', name);
     assert.equal(offer.scheme, 'exact', name);
     assert.equal(offer.asset, '0x3600000000000000000000000000000000000000', name);
   }
@@ -103,7 +103,7 @@ test('the owner-call fixtures are the real shapes the bridge reads', () => {
 
 test('no fixture holds a key, a payment payload, an agent signature, an unredacted secret or a keyed RPC URL', () => {
   const receiptTransactions = new Set(PAID.map((name) => fixture(name).result._meta[RECEIPT_META].transaction.toLowerCase()));
-  const hosts = /^(127\.0\.0\.1|localhost|json-schema\.org|(.+\.)?arcgate\.dev)$/;
+  const hosts = /^(json-schema\.org|(.+\.)?arcgate\.dev)$/;
 
   // A message's idempotencyKey is a public 32-byte hash, and a receipt's transaction is public: both are allowed.
   const walk = (value: unknown, name: string, allowed: Set<string>): void => {

@@ -70,12 +70,12 @@ test('success without a receipt throws payment-may-have-settled; a receipt on an
     assert.equal(arcgate.budget.reserved, 5_000n, 'and its reservation stays');
   }
 
-  // The captured receipt with a different (but valid Arc) network.
+  // The captured receipt with a network other than the one signed.
   {
     const { fake, arcgate } = await connect(t);
     const wrongNetwork = structuredClone(paid);
-    assert.equal(wrongNetwork._meta[RECEIPT_META].network, 'eip155:5042002');
-    wrongNetwork._meta[RECEIPT_META].network = 'eip155:5042';
+    assert.equal(wrongNetwork._meta[RECEIPT_META].network, 'eip155:5042');
+    wrongNetwork._meta[RECEIPT_META].network = 'eip155:5042002';
     fake.set('tradeSearch', 'paid', wrongNetwork);
     await assert.rejects(arcgate.call('tradeSearch', search));
     assert.equal(money(fake).some((line) => line.startsWith('receipt:')), false, 'it is not reported as a paid success');
@@ -145,12 +145,9 @@ test('the budget counts the offer that gets signed, chosen by the same selectOff
   const { config, fake, arcgate } = await connect(t);
   const good = capturedOffer();
   const overCap = { ...good, amount: String(config.maxPerCall + 1n) };
-  const mainnet = { ...good, network: 'eip155:5042', amount: '4000' };
+  const cheaper = { ...good, amount: '4000' };
   // The first offer is over the cap: the one signed is the first acceptable one, and it is what is reserved and priced.
-  fake.set('tradeSearch', 'unpaid', withOffers('trade-search.payment-required', [overCap, mainnet, good]));
-  const settled = structuredClone(captured('trade-search.paid'));
-  settled._meta[RECEIPT_META].network = 'eip155:5042';
-  fake.set('tradeSearch', 'paid', settled);
+  fake.set('tradeSearch', 'unpaid', withOffers('trade-search.payment-required', [overCap, cheaper, good]));
 
   await arcgate.call('tradeSearch', search);
 
@@ -159,9 +156,9 @@ test('the budget counts the offer that gets signed, chosen by the same selectOff
   assert.equal(payment.accepted.network, 'eip155:5042');
   assert.equal(payment.accepted.amount, '4000');
   assert.equal(payment.payload.authorization.value, '4000');
-  assert.equal(await recoverPayer(payment, 5042), config.payer.address);
+  assert.equal(await recoverPayer(payment), config.payer.address);
   assert.equal(arcgate.budget.reserved, 4_000n, 'the budget holds exactly what was signed');
-  assert.equal(money(fake)[0], `price: tradeSearch 4000 base units (0.004 USDC) on eip155:5042 to ${mainnet.payTo}`);
+  assert.equal(money(fake)[0], `price: tradeSearch 4000 base units (0.004 USDC) on eip155:5042 to ${cheaper.payTo}`);
 });
 
 test('an error result after payment is not charged', async (t) => {
@@ -177,7 +174,7 @@ test('an error result after payment is not charged', async (t) => {
   assert.equal(fake.paidCalls().length, 1, 'the payment was signed and sent; the server refused the call');
   const lines = money(fake);
   assert.equal(lines.length, 2, 'a price line and the not-charged line, no receipt');
-  assert.match(lines[0], /^price: boxCreate 50000 base units \(0\.05 USDC\) on eip155:5042002 to /);
+  assert.match(lines[0], /^price: boxCreate 50000 base units \(0\.05 USDC\) on eip155:5042 to /);
   assert.equal(lines[1], 'not charged: boxCreate box_exists');
   assert.equal(arcgate.budget.reserved, 50_000n, 'and the reservation is not released');
 });

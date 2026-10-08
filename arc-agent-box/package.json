@@ -15,8 +15,9 @@
     "messages": "node --env-file-if-exists=.env src/main.js messages",
     "topup": "node --env-file-if-exists=.env src/main.js topup",
     "cleanup": "node --env-file-if-exists=.env src/main.js cleanup",
+    "receiver": "node --env-file-if-exists=.env src/receiver.js",
     "start": "node --env-file-if-exists=.env src/main.js start",
-    "capture": "node --env-file-if-exists=.env src/main.js start --capture test/fixtures/localnet.json",
+    "capture": "node --env-file-if-exists=.env src/main.js start --capture test/fixtures/mainnet.json",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {

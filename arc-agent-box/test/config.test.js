@@ -31,7 +31,8 @@ test('loadConfig reads API_URL, ARC_RPC_URL and WEBHOOK_URL, and defaults to the
   const defaults = loadConfig({});
   assert.equal(defaults.apiUrl, 'https://api.arcgate.dev');
   assert.equal(new URL(defaults.rpcUrl).protocol, 'https:');
-  assert.equal(new URL(defaults.webhookUrl).protocol, 'https:', 'a webhook url must be https');
+  assert.equal(defaults.webhookUrl, null, 'there is no default webhook url: the reader sets WEBHOOK_URL');
+  assert.equal(loadConfig({ API_URL: 'http://127.0.0.1:19800' }).webhookUrl, 'https://192.0.2.10/arc-agent-box', 'the localnet gate keeps its mock receiver');
 
   const local = loadConfig({ API_URL: 'http://127.0.0.1:19800', ARC_RPC_URL: 'http://127.0.0.1:19845', WEBHOOK_URL: 'https://192.0.2.10/somewhere' });
   assert.equal(local.apiUrl, 'http://127.0.0.1:19800');
