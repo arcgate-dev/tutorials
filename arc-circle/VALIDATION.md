@@ -1,5 +1,26 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
+
+The epic branch `epic/7` at `41e891b` ran `npm run inspect`, `npm run connect` and `npm run trade -- --execute` against the arcgate localnet between 14:07:52Z and 14:11:20Z. The recorded run passed every step. Sources: `.runs/inspect-epic-1008.log`, `.runs/connect-epic-1008.log`, `.runs/trade-epic-1008-2.log` and the run log `.runs/c3759b0f-56fd-40bc-8da9-91e1abf852ca.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`. The localnet api container was built at 12:14Z from the arcgate checkout, whose last commit before then is `27c0ddb3`; the service does not confirm it. `payTo` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`, set as `ARCGATE_PAY_TO`.
+- Taker `0x5Edff82F0E7DC25968cba8B614beDD782ac2cEDD` (`ARC-TESTNET`), `SELL_AMOUNT` `1`. Quote `q_bf0d4aaaf2500d07`, `next` `swap`, `approve.needs` `approve` (the localnet fork was recreated today and no longer held the earlier allowance).
+
+| Step | Result | Detail |
+| --- | --- | --- |
+| search | pass | 5000 units, settlement `0x7afd3ff66de4ca5ea4bb7fa12336960c28a5b9b63112766a1d12188fc2e5b795`, request ID `05dd16aa` |
+| quote | pass | 10000 units, settlement `0x4cf75a6f00f0ad0dda557e05cb31b1dd59586b292a1b13136666b7cc2ad2be5f`, request ID `eb9419d0` |
+| swap | pass | 10000 units, settlement `0x7cc9f5cfe9e435099cc9b8066f46891c77ef99fb800e30204f0ad71e90fb023d`, request ID `d0580282` |
+| send | pass | Approve `0x3ebd9621c69cf073c3c1ac3a514d9cb94d81dc97b20f8635ca7dced32af591c9` (block 23584729) and swap `0xf0ac096a04ec12b5a3a02491e67760112f60112d9460f419144b7c81bbb98377` (block 23584730), both success. The approve hash equals October 7's: the fork restarted from the same state and nonce. |
+| receipt | pass | `result` `pass`, `next` `done`, delivered **1192** cirBTC units against `minAmountOut` **1180** |
+
+Two other `trade -- --execute` processes ran in this checkout at the same time and wrote the same log file; that log is not used. One (run log `2cd24ba0-053a-4023-961a-1ec88dd5a11a`, 14:10:11Z to 14:11:06Z) passed every step and paid 25000 units. The other stopped with a viem timeout on `anvil_setBalance` against the fork, before any payment, while that run was sending on the fork. Neither is counted as this check's result.
+
+Fees: the wallet's USDC went from `9.850748` (`connect`) to `9.800748` afterward, which reconciles with two passing runs of 25000 units each.
+
+Offline: `npm test` passed **59** tests. No Circle keys, entity secrets or wallet IDs are recorded here.
+
 ## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
 
 The epic branch `epic/7` at `18adb0a` (origin/main merged, already up to date) ran `npm run inspect`, `npm run connect` and `npm run trade -- --execute` against the arcgate localnet between 23:52:37Z and 23:53:14Z. Every step passed. Sources: `.runs/inspect-epic.log`, `.runs/connect-epic.log`, `.runs/trade-epic.log` and the run log `.runs/979066ae-d82c-4e30-9e76-94d49a6c640a.jsonl`, not committed.

@@ -1,5 +1,21 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
+
+The epic branch `epic/7` at `41e891b` ran `npm start -- "<request>"` (14:08:14Z to 14:08:32Z), a POST to the new inbound url, and `npm run watch -- --once` (14:08:39Z to 14:08:50Z) against the arcgate localnet. Every step passed. Sources: `.runs/start-epic-1008.log`, `.runs/post-epic-1008.log` and `.runs/watch-epic-1008.log`, not committed. The model ran on a logged-in Claude Code (`ANTHROPIC_API_KEY` empty), `CLAUDE_MODEL` `claude-sonnet-5-5`.
+
+- API `http://127.0.0.1:19800`, MCP at `http://127.0.0.1:19800/mcp`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `commit: null`. The localnet api container was built at 12:14Z from the arcgate checkout, whose last commit before then is `27c0ddb3`; the service does not confirm it.
+- Payer and box address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`; the box already existed, so nothing was paid for it. No key is recorded here.
+- Request: `tell me when any token with verified safety passes 50k 24h volume, and give me an address my other bot can post to`.
+- Screen `V14OFiTcXLoQVPLayeIMJA`, `volume_24h` `gt` `50000` and `safety_verdict` `eq` `ok`. `watchCreate` settlement `0x53e2e920be42753e0c18ebff8bcdceaa4ed8bcff08eb8a2d5b5d3888db76ec4e`.
+- Inbound address `http://127.0.0.1:19803/YEFxaiIONBKutAJs5clHRA` (secret `<redacted>`). `inboundCreate` settlement `0x5366bb6904c434195aab01442c63c4daae54b42660c2c184f20aa2f99b29bbae`.
+- Spend line: `spent: x402 20000 base units (0.02 USDC) in 2 payments (20000 reserved under a cap of 80000); model $0.0852 (SDK estimate)`.
+- The POST answered `HTTP 201` `{"stored":true,...}`.
+- `watch --once` summarised and deleted seq 22 (an inbound post from arc-agent-box's earlier run, signature verified), seq 24 (a FAZE token watch hit) and seq 25 (the POST, signature not verified), and reported that none tried to give it instructions; model $0.0243 (SDK estimate).
+- Payer balance reconciles: 453776 before arc-mcp, 418776 when arc-agent-box started next (15000 arc-mcp + 20000 here).
+- The screen and the inbound address were deleted minutes later by arc-agent-box's cleanup, which empties the shared box.
+- `npm test`: **62** tests passed; `npm run typecheck` printed no diagnostics.
+
 ## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
 
 The epic branch `epic/7` at `18adb0a` ran `npm start -- "<request>"` (23:53:38Z to 23:53:54Z), a POST to the new inbound url, and `npm run watch -- --once` (23:53:59Z to 23:54:07Z) against the arcgate localnet. Every step passed. Sources: `.runs/start-epic.log`, `.runs/post-epic.log` and `.runs/watch-epic.log`, not committed. The model ran on a logged-in Claude Code (`ANTHROPIC_API_KEY` empty), `CLAUDE_MODEL` `claude-sonnet-5-5`.

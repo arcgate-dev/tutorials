@@ -1,5 +1,18 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
+
+The epic branch `epic/7` at `41e891b` (origin/main merged, already up to date) ran `npm start` against the arcgate localnet from 14:08:00Z to 14:08:08Z. Every step passed. Source: `.runs/start-epic-1008.log`, not committed.
+
+- API `http://127.0.0.1:19800`, MCP at `http://127.0.0.1:19800/mcp`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`. The localnet api container was built at 12:14Z from the arcgate checkout, whose last commit before then is `27c0ddb3` (Circle's Facilitator Service as the x402 facilitator); the service does not confirm it.
+- `PRIVATE_KEY` and `AGENT_PRIVATE_KEY` were the same key, address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. No key is recorded here.
+- `tools/list` returned **32** tools. `health` ok, `tradeVenues` ok.
+- `tradeSearch`: 5000 base units, settlement `0x5a54cf7fcfd504e473526103be40b91b99c59e9521a5324d26a0d9918188c9a5`.
+- `tradeQuote`: 10000 base units, settlement `0x8e2c309803e10be86956c9d2613899965bebb3f5f9549386dbab64968fc96504`.
+- `boxStatus` found the existing box, so no `boxCreate` was paid.
+- Payer balance 453776 base units before this run; arc-agent-box's run, after arc-claude-agent's, printed 418776, which reconciles with the 15000 spent here and arc-claude-agent's 20000.
+- `npm test`: **39** tests passed; `npm run typecheck` printed no diagnostics.
+
 ## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
 
 The epic branch `epic/7` at `18adb0a` ran `npm start` against the arcgate localnet from 23:53:24Z to 23:53:32Z. Every step passed. Source: `.runs/start-epic.log`, not committed.

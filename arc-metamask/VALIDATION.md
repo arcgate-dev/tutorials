@@ -1,5 +1,18 @@
 # Validation
 
+## Epic #7 check: Beast Mode preview on the arcgate localnet, October 8, 2026 (UTC): not passed, wallet out of testnet USDC
+
+The epic branch `epic/7` at `41e891b` ran `npm run connect` (14:12:15Z) and `npm run preview` (14:12:18Z to 14:13:09Z) against the arcgate localnet. `preview` did **not** pass. Sources: `.runs/connect-epic-1008.log`, `.runs/preview-epic-1008.log` and the run logs `.runs/6222be9e-1e75-4609-9423-ba55e8959fa2.jsonl` and `.runs/ee740579-b7b5-4ff8-a31c-23cf7a377b06.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `rulesVersion` `r2-383954828c`, `commit: null`. The localnet api container was built at 12:14Z from the arcgate checkout, whose last commit before then is `27c0ddb3`; the service does not confirm it. `ARCGATE_PAY_TO` `0x987F719b516f528f4080EF0853E37aD5d7E773A0`.
+- `mm wallet trading-mode get --json` reported `beast` for `0x72e17261e04e6162a62f034d8d71053ea37d35a3`. `connect` passed and printed testnet USDC **0.03**, enough for one 0.025 preview.
+- Two `preview` processes ran at the same time on this wallet (started 14:12:26Z and 14:12:27Z, one run log each). Each paid search (5000; `0x290f1246e0d7195e8f70fe753b204c537a4ebc235cc0a0a4105c882bf5f2588b` and `0xfee093fc3faa317a2c58e4ed0c2ef25e19ef322cc83e35fcc1f32846a938a73f`) and quote (10000; `0xc6faba8f7f6cb05d6ee360a85e106121ceb0af11f2557a9e6757021dc47e9dc3` and `0x303333749b99553019cb23a6b884a26d4d40b1938ffef703122a6632e84177c7`). Quote `q_50945d59bcf8755b`: sell 0.5 USDC, quoted 0.00000596 cirBTC, minimum 0.0000059.
+- Both swaps were then refused with **HTTP 402** before settling (`request_failed`, request IDs `97dadbd2` and `591a31dc`, no payment response): the two runs had spent the whole 0.03. `connect` afterward printed testnet USDC **0**.
+- Nothing was signed beyond the x402 authorizations and nothing was sent.
+- Not rerun: the wallet needs at least 0.025 testnet USDC, and funding it is the owner's call. The last passing preview is October 7's, below.
+
+Offline: `npm test` reports 67 pass, 0 fail.
+
 ## Epic #7 check: Beast Mode preview on the arcgate localnet, October 7, 2026 (UTC)
 
 The epic branch `epic/7` at `18adb0a` ran `npm run preview` (23:54:17Z to 23:55:07Z) and `npm run trade -- --execute` (23:55:10Z) against the arcgate localnet. Sources: `.runs/preview-epic.log`, `.runs/trade-epic.log` and the run log `.runs/7d93ef69-d046-4e94-99b0-f115eea05f5e.jsonl`, not committed.

@@ -1,5 +1,30 @@
 # Validation
 
+## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
+
+The epic branch `epic/7` at `41e891b` ran `npm start` against the arcgate localnet from 14:08:55Z to 14:10:01Z, after arc-mcp and arc-claude-agent because its cleanup empties the shared box. Every step passed (box, inbound, watch, channel, messages, topup, cleanup) and so did the final check. Sources: `.runs/start-epic-1008.log` and the run log `.runs/68b4b209-bac6-471d-bf23-0541be51c21e.jsonl`, not committed.
+
+- API `http://127.0.0.1:19800`. `/health` is `ok: true`, `x402.network` `eip155:5042002`, `commit: null`. The localnet api container was built at 12:14Z from the arcgate checkout, whose last commit before then is `27c0ddb3`; the service does not confirm it. `ARC_RPC_URL` the public Arc testnet RPC; `WEBHOOK_URL` the default `https://192.0.2.10/arc-agent-box`.
+- Agent (box) address `0x06E594c677Cd28643B82477B7B5328Ac6817b2A0`. The box already existed, so there was no `boxCreate`. No key is recorded here.
+
+| Operation | Amount (base units) | Settlement | Request ID |
+| --- | --- | --- | --- |
+| `inboundCreate` | 10000 | `0xcd13f717bb22cd60b41cf14f71420c752bdb04f444bd64f0a8ec7d385b006bf9` | `01e4454d` |
+| `watchCreate` (token) | 10000 | `0x2f7e79035679fea1c044a4711b8fabdc19cb80086534a9e1bc74abe4fa0f6bf3` | `ae40edc2` |
+| `watchCreate` (screen) | 10000 | `0xf7db1787013e62f4256c00b370e58f8be0b32eccee066b6e66e9acf64d9ade62` | `0d8c7ca1` |
+| `watchCreate` (agents) | 10000 | `0xc42db56aaae13869d8e57da9b90ebf1c25d2f047b9ab2bfd3ed7a9310d2f853c` | `c5554c50` |
+| `tradeSearch` | 5000 | `0x6b36cee1b47011d5e2d147006996bea213504d4b855328f92372f34d37c41aaa` | `e9591578` |
+| `webhookCreate` | 10000 | `0x54a7ac7268de6d463a077a3510fc15ed79ee0815acdb15a2d84f9d2ee689bfeb` | `c2fd3db7` |
+| `boxTopUp` | 50000 | `0x361fb7ceb742bd2c676429425ab5881f8a46cb63b3843ffddf76f2b6f100b1ea` | `c2174860` |
+
+Total **105000** base units (0.105 USDC). The run printed a start balance of 0.418776; a balance read on Arc testnet afterward showed 313776 base units, which reconciles: 418776 - 105000 = 313776.
+
+- Both inbound posts were stored (201); the old secret was refused with 401 `inbound_unauthorized` after the rotation. The webhook url answered the ownership challenge. The token watch fired on FAZE: the box held 26 inbound, 27 inbound and 28 `watch.token`; seq 27 was deleted. The top-up granted 4 messages and 1 day.
+- Cleanup deleted 2 inbound addresses, 4 watches and 1 webhook channel. One inbound address (`YEFxaiIONBKutAJs5clHRA`) and one watch (screen `V14OFiTcXLoQVPLayeIMJA`) were arc-claude-agent's from its run minutes earlier.
+- The final check left 26 inbound and 28 `watch.token` in the box.
+
+Offline: `npm test` passed **78** tests. `npm run capture` was not run, so `test/fixtures/localnet.json` stays the `12b0368f` capture.
+
 ## Epic #7 check: localnet run at arcgate 5addf63f, 2026-10-07 (UTC)
 
 The epic branch `epic/7` at `18adb0a` ran `npm start` against the arcgate localnet from 23:55:17Z to 23:55:47Z, last of the five tutorials because its cleanup empties the shared box. Every step passed (box, inbound, watch, channel, messages, topup, cleanup) and so did the final check. Sources: `.runs/start-epic.log` and the run log `.runs/2e732838-909a-4a46-9fb8-b732ed1d373e.jsonl`, not committed.
