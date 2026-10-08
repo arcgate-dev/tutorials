@@ -10,6 +10,7 @@ The epic branch `epic/7` at `41e891b` ran `npm run connect` (14:12:15Z) and `npm
 - Both swaps were then refused with **HTTP 402** before settling (`request_failed`, request IDs `97dadbd2` and `591a31dc`, no payment response): the two runs had spent the whole 0.03. `connect` afterward printed testnet USDC **0**.
 - Nothing was signed beyond the x402 authorizations and nothing was sent.
 - Not rerun: the wallet needs at least 0.025 testnet USDC, and funding it is the owner's call. The last passing preview is October 7's, below.
+- The balance re-read at 14:27:29Z was 0 (0 base units) on Arc testnet USDC, so it was not rerun, and funding is the owner's step. Source: `.runs/balance-20261008T142719Z-41260.log`, not committed.
 
 Offline: `npm test` reports 67 pass, 0 fail.
 

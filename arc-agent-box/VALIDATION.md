@@ -1,5 +1,15 @@
 # Validation
 
+## Production check, 2026-10-08 (UTC)
+
+A free, unpaid, unsigned probe of `https://api.arcgate.dev` at 14:27Z, at commit `6e04f6a`. Nothing was signed or paid. Source: `.runs/prod-check-20261008T142719Z-41260.log`, not committed.
+
+- `GET /health` is `ok: true`, with `x402.network` `eip155:5042`. Production serves `/agent/v1` on Arc mainnet, where payments are real USDC.
+- `GET /agent/v1/<address>/box/status` with no signature answers 401 `signature_required`, as JSON.
+- `POST /agent/v1/<address>/box` with no payment answers 402 `payment_required` on `eip155:5042`.
+
+Validation runs stay on the arcgate localnet (Arc testnet), and they never spend mainnet USDC.
+
 ## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
 
 The epic branch `epic/7` at `41e891b` ran `npm start` against the arcgate localnet from 14:08:55Z to 14:10:01Z, after arc-mcp and arc-claude-agent because its cleanup empties the shared box. Every step passed (box, inbound, watch, channel, messages, topup, cleanup) and so did the final check. Sources: `.runs/start-epic-1008.log` and the run log `.runs/68b4b209-bac6-471d-bf23-0541be51c21e.jsonl`, not committed.

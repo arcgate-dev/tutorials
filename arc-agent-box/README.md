@@ -24,10 +24,10 @@ A box persists; once created it is not deleted. Creating it a second time answer
 
 **Setup:**
 - **Node.js 22.9 or newer** and npm.
-- **A fresh private key** kept in `.env` (never shared, never on a command line). The key must hold about 3 USDC on **Arc testnet** (chain `eip155:5042002`). Both payments and gas use USDC. The wallet USDC must be at least 0.16 USDC (the per-run cap) before the first payment.
-- **ARC_RPC_URL** must be an RPC for Arc testnet (the network where x402 payments settle). The chainId is checked against the 402's network.
+- **A fresh private key** kept in `.env` (never shared, never on a command line). The key must hold about 3 USDC on **Arc mainnet** (chain `eip155:5042`), the network the API takes payment on. Both payments and gas use USDC. The wallet USDC must be at least 0.16 USDC (the per-run cap) before the first payment.
+- **ARC_RPC_URL** must be an RPC for Arc mainnet (default `https://rpc.mainnet.arc.io`). The chainId is checked against the 402's network.
 
-The localnet API (http://127.0.0.1:19800) takes x402 payments on Arc testnet (eip155:5042002), so your key pays in testnet USDC. Arcgate production does not serve `/agent/v1` yet; use localnet for now.
+`api.arcgate.dev` serves `/agent/v1` on Arc mainnet (`eip155:5042`), and payments there are real USDC.
 
 Only `npm test` runs offline against a recorded fixture.
 
@@ -38,12 +38,12 @@ npm ci
 cp .env.example .env
 ```
 
-Edit `.env` with a test private key (never a real key) and testnet RPC:
+Edit `.env` with your private key (never shared) and an Arc mainnet RPC:
 
 ```sh
 PRIVATE_KEY=0x...
-API_URL=http://127.0.0.1:19800
-ARC_RPC_URL=<Arc testnet RPC>
+API_URL=https://api.arcgate.dev
+ARC_RPC_URL=https://rpc.mainnet.arc.io
 ```
 
 WEBHOOK_URL defaults to `https://192.0.2.10/arc-agent-box`, which only localnet's mock receiver answers. In production, it must be an https URL you own that echoes the ownership challenge.

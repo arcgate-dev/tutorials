@@ -1,6 +1,6 @@
 # Use Arcgate as a paid MCP server
 
-Connect an MCP client to Arcgate's `/mcp` endpoint, list its 32 tools, call the free ones, and pay for three paid ones (`tradeSearch`, `tradeQuote`, `boxCreate`) with x402 on Arc. The whole tutorial runs against an arcgate localnet until production serves `/mcp`. Then point a host (Claude Code, Claude Desktop or Codex) at the same server and see what a host that cannot pay gets.
+Connect an MCP client to Arcgate's `/mcp` endpoint, list its 32 tools, call the free ones, and pay for three paid ones (`tradeSearch`, `tradeQuote`, `boxCreate`) with x402 on Arc. Then point a host (Claude Code, Claude Desktop or Codex) at the same server and see what a host that cannot pay gets.
 
 ## Vocabulary
 
@@ -13,7 +13,7 @@ Connect an MCP client to Arcgate's `/mcp` endpoint, list its 32 tools, call the 
 ## Before you start
 
 - **Node.js 22.18 or newer** and npm.
-- **A payer key** in `.env`: a throwaway key with USDC on Arc testnet (`eip155:5042002`), where the localnet settles. `npm start` is one connection and spends under 0.07 USDC. `npm run capture` is two connections: it signs up to 0.115 USDC (5000 + 10000 + 50000 + 50000 base units), settles about 0.065 and needs an agent address with no box, so fund 0.115 USDC to be safe. Payments are EIP-3009 authorizations the facilitator submits, so the client reads no chain and needs no RPC URL.
+- **A payer key** in `.env`: a throwaway key with USDC on Arc (`eip155:5042` for api.arcgate.dev, where paid calls cost real USDC). `npm start` is one connection and spends under 0.07 USDC. `npm run capture` is two connections: it signs up to 0.115 USDC (5000 + 10000 + 50000 + 50000 base units), settles about 0.065 and needs an agent address with no box, so fund 0.115 USDC to be safe. Payments are EIP-3009 authorizations the facilitator submits, so the client reads no chain and needs no RPC URL.
 - **An agent key** in `.env`, for an address with no box. A box is for good (a second `boxCreate` answers `box_exists`), so use a key you can spare. It signs and holds no funds. It may be the payer's key.
 - **One box per address.** The box belongs to `AGENT_PRIVATE_KEY`'s address. One wallet address means one box, shared by every tutorial run with the same key (arc-agent-box, arc-claude-agent), and arc-agent-box's cleanup deletes every watch and inbound address in it.
 
@@ -29,10 +29,9 @@ Edit `.env`:
 ```sh
 PRIVATE_KEY=0x...
 AGENT_PRIVATE_KEY=0x...
-API_URL=http://127.0.0.1:19800
 ```
 
-`API_URL` defaults to `https://api.arcgate.dev`. It is an origin: https, or http for `localhost` and `127.0.0.1`, with no credentials or path. The tutorial adds `/mcp`. Production does not serve `/mcp` yet (checked 2026-10-07, POST /mcp answers 404), so the whole tutorial, and any host, runs against an arcgate localnet until production serves `/mcp`. Use `http://127.0.0.1:19800/mcp` today. `mcp.json` and the Claude Desktop step name the production URL for when it ships.
+`API_URL` defaults to `https://api.arcgate.dev`. It is an origin: https, or http for `localhost` and `127.0.0.1`, with no credentials or path. The tutorial adds `/mcp`, so the server is `https://api.arcgate.dev/mcp`.
 
 ## Run it
 
@@ -47,7 +46,7 @@ The tour does this, in order:
 3. `tradeSearch` for `cirBTC` and `tradeQuote` for 1 USDC to cirBTC, each paid once.
 4. A signed `boxStatus` for the agent address. A 200 means the box exists and is the box. A 404 `box_not_found` leads to `boxCreate`, paid once, then a signed `boxStatus` that answers 200.
 
-Each paid call prints its price before the paid request is sent and its receipt after. The three paid tools, from a run on a fresh agent (`.runs/capture-2026-10-07.log`):
+Each paid call prints its price before the paid request is sent and its receipt after. The three paid tools, from a run on a fresh agent (`.runs/capture-2026-10-07.log`), were captured on the arcgate localnet, which settles on Arc testnet (`eip155:5042002`); `api.arcgate.dev` offers `eip155:5042` (Arc mainnet):
 
 ```
 price: tradeSearch 5000 base units (0.005 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0
@@ -98,33 +97,29 @@ Any other `boxStatus` refusal, such as `signature_expired` or `nonce_reused`, st
 { "mcpServers": { "arcgate": { "type": "http", "url": "https://api.arcgate.dev/mcp" } } }
 ```
 
-That is the URL for when production serves `/mcp`. Today, put `http://127.0.0.1:19800/mcp` in its place.
-
 **Claude Code**:
 
 ```sh
-claude mcp add --transport http arcgate http://127.0.0.1:19800/mcp
+claude mcp add --transport http arcgate https://api.arcgate.dev/mcp
 ```
 
-`--scope project` writes the same shape to `.mcp.json` in the project instead of your local settings. Once production serves `/mcp`, use `https://api.arcgate.dev/mcp`.
+`--scope project` writes the same shape to `.mcp.json` in the project instead of your local settings.
 
 **Codex**:
 
 ```sh
-codex mcp add arcgate --url http://127.0.0.1:19800/mcp
+codex mcp add arcgate --url https://api.arcgate.dev/mcp
 ```
 
-Once production serves `/mcp`, use `https://api.arcgate.dev/mcp`.
+**Claude Desktop**: add Arcgate as a custom connector with the URL `https://api.arcgate.dev/mcp`. Anthropic's help page walks through it: [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 
-**Claude Desktop**: this applies once production serves `/mcp` over https. Add Arcgate as a custom connector with the URL `https://api.arcgate.dev/mcp`. Anthropic's help page walks through it: [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
-
-The free tools work at once. A host that cannot pay gets the price instead of a result. To check it against the localnet without spending anything, put the localnet URL in a scratch file and run Claude Code with only the free tool and `tradeSearch` allowed (prompt first, because `--allowedTools` takes a list):
+The free tools work at once. A host that cannot pay gets the price instead of a result, and it spends nothing. To check that, put the server URL (`https://api.arcgate.dev/mcp`) in a scratch file and run Claude Code with only the free tool and `tradeSearch` allowed (prompt first, because `--allowedTools` takes a list):
 
 ```sh
 claude -p 'call the arcgate health tool, then tradeSearch with query cirBTC; report each raw result' --strict-mcp-config --mcp-config /tmp/arcgate-mcp.json --allowedTools mcp__arcgate__health,mcp__arcgate__tradeSearch
 ```
 
-The host connected, `health` returned `ok: true`, and `tradeSearch` with query `cirBTC` got (`.runs/host-2026-10-07.log`, trimmed):
+The host connected, `health` returned `ok: true`, and `tradeSearch` with query `cirBTC` got on the arcgate localnet, which settles on Arc testnet (`.runs/host-2026-10-07.log`, trimmed; `api.arcgate.dev` names `eip155:5042`):
 
 ```
 {"x402Version":2,"error":"Payment required to access this tool","resource":{"url":"mcp://tool/tradeSearch",...},"accepts":[{"scheme":"exact","network":"eip155:5042002","amount":"5000","asset":"0x3600000000000000000000000000000000000000","payTo":"0x987F719b516f528f4080EF0853E37aD5d7E773A0","maxTimeoutSeconds":300,"extra":{"name":"USDC","version":"2"}}]}

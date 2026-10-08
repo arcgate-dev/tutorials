@@ -1,6 +1,6 @@
 # A Claude Agent SDK bot for Arcgate
 
-Build a bot with the Claude Agent SDK that sets up Arcgate for you from one sentence and then works its box. `npm start -- "<request>"` ends with a box, a screen watch and an inbound address, and prints what it spent: x402 payments on Arc and the model's cost. `npm run watch` reads the box, has the model summarise each message and deletes what it summarised. The model never holds your key: its tools run in your process, and an in-process MCP server bridges them to Arcgate's `/mcp`. The whole tutorial runs against an arcgate localnet until production serves `/mcp`.
+Build a bot with the Claude Agent SDK that sets up Arcgate for you from one sentence and then works its box. `npm start -- "<request>"` ends with a box, a screen watch and an inbound address, and prints what it spent: x402 payments on Arc and the model's cost. `npm run watch` reads the box, has the model summarise each message and deletes what it summarised. The model never holds your key: its tools run in your process, and an in-process MCP server bridges them to Arcgate's `/mcp`.
 
 ## Vocabulary
 
@@ -16,7 +16,7 @@ Build a bot with the Claude Agent SDK that sets up Arcgate for you from one sent
 ## Before you start
 
 - **Node.js 22.18 or newer** and npm.
-- **One key**, `PRIVATE_KEY` in `.env`: a throwaway key with USDC on Arc testnet (`eip155:5042002`), where the localnet settles. It is the payer, the box's address and the agent signer all at once, because `watchCreate` and `inboundCreate` accept only the box's own address as payer (anything else is a 403 `payer_not_box`). The box is for good, so use a key you can spare, and one that already has a box makes every run cheaper (`boxCreate` is 0.05 USDC and is not paid when the box exists). One wallet address means one box, shared by every tutorial run with the same key (arc-agent-box, arc-mcp), and arc-agent-box's cleanup deletes this bot's screen and inbound addresses.
+- **One key**, `PRIVATE_KEY` in `.env`: a throwaway key with USDC on Arc (`eip155:5042` for api.arcgate.dev). It is the payer, the box's address and the agent signer all at once, because `watchCreate` and `inboundCreate` accept only the box's own address as payer (anything else is a 403 `payer_not_box`). The box is for good, so use a key you can spare, and one that already has a box makes every run cheaper (`boxCreate` is 0.05 USDC and is not paid when the box exists). One wallet address means one box, shared by every tutorial run with the same key (arc-agent-box, arc-mcp), and arc-agent-box's cleanup deletes this bot's screen and inbound addresses.
 - **Model credentials**: a logged-in Claude Code, or `ANTHROPIC_API_KEY` in `.env`. The default model is `claude-sonnet-5-5`; set `CLAUDE_MODEL` to change it.
 - A setup run signs at most 0.08 USDC and usually settles 0.02 or less. Fund the payer with at least 0.1 USDC.
 
@@ -33,10 +33,9 @@ Edit `.env`:
 PRIVATE_KEY=0x...
 ANTHROPIC_API_KEY=
 CLAUDE_MODEL=claude-sonnet-5-5
-API_URL=http://127.0.0.1:19800
 ```
 
-`API_URL` defaults to `https://api.arcgate.dev`. It is an origin: https, or http for `localhost` and `127.0.0.1`, with no credentials or path. Production does not serve `/mcp` yet, so run it against an arcgate localnet (`http://127.0.0.1:19800`) until it does.
+`API_URL` defaults to `https://api.arcgate.dev`. It is an origin: https, or http for `localhost` and `127.0.0.1`, with no credentials or path. `api.arcgate.dev` serves `/mcp` on Arc mainnet, where payments are real USDC under the per-run cap.
 
 ## Run it
 
@@ -50,7 +49,7 @@ The model turns the request into three tool calls, each once:
 2. `watchCreate`: the model writes the screen's `where` clauses from your request. The bridge signs `watchList` first. If a watch with the same condition already exists it returns that watch and pays nothing, which keeps reruns under the box's limit of 5 screens. A box holds at most 20 watches in all (`watch_limit`), at most 5 of them screens and 5 agent screens. Otherwise it pays 0.01 USDC.
 3. `inboundCreate`: pays 0.01 USDC and prints the url and the secret to you.
 
-Each paid call prints its price before the payment is sent and its receipt after. This is the output of the run in `.runs/start-5addf63f.log` (arcgate `5addf63f`). The box already existed, so nothing was paid for it, and the screen was new. The secret is replaced by `<redacted>`:
+Each paid call prints its price before the payment is sent and its receipt after. This is the output of the run in `.runs/start-5addf63f.log` (arcgate `5addf63f`), captured on the arcgate localnet, which settles on Arc testnet (`eip155:5042002`); `api.arcgate.dev` offers `eip155:5042` (Arc mainnet). The box already existed, so nothing was paid for it, and the screen was new. The secret is replaced by `<redacted>`:
 
 ```
 price: watchCreate 10000 base units (0.01 USDC) on eip155:5042002 to 0x987F719b516f528f4080EF0853E37aD5d7E773A0

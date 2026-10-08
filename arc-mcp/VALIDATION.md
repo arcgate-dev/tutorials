@@ -1,5 +1,15 @@
 # Validation
 
+## Production check, 2026-10-08 (UTC)
+
+A free, unpaid, unsigned probe of `https://api.arcgate.dev` at 14:27Z, at commit `6e04f6a`. Source: `.runs/prod-check-20261008T142719Z-41260.log`, not committed.
+
+- `POST https://api.arcgate.dev/mcp` with `initialize` answers 200 `application/json` (protocol `2025-06-18`, server `arcgate`).
+- `tools/list` returns **32** tools, the same count as the localnet.
+- `/health` is `ok: true`, at commit `6e04f6a`, with `x402.network` `eip155:5042`.
+
+Production now serves `/mcp`, so the 2026-10-07 404 entry below is superseded. No paid tool was called. Validation runs stay on the arcgate localnet (Arc testnet), and mainnet USDC is never spent for validation.
+
 ## Epic #7 check: localnet run at arcgate 27c0ddb3, 2026-10-08 (UTC)
 
 The epic branch `epic/7` at `41e891b` (origin/main merged, already up to date) ran `npm start` against the arcgate localnet from 14:08:00Z to 14:08:08Z. Every step passed. Source: `.runs/start-epic-1008.log`, not committed.
@@ -26,7 +36,7 @@ The epic branch `epic/7` at `18adb0a` ran `npm start` against the arcgate localn
 - Payer balance 593776 -> 578776 base units (the next run's start balance), which reconciles with the 15000 spent.
 - `npm test`: **39** tests passed; `npm run typecheck` printed no diagnostics.
 
-## Production check, 2026-10-07 (UTC)
+## Production check, 2026-10-07 (UTC) (superseded by the 2026-10-08 check above)
 
 POST https://api.arcgate.dev/mcp answers HTTP 404 text/html; /health is ok at commit 603c5f1. Production does not serve /mcp.
 
